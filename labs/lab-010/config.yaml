@@ -1,0 +1,54 @@
+metadata:
+  name: "ats-003-lab-010"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+
+bootstrap:
+  init:
+    - name: "chrony-install"
+      description: "Installs chrony and starts chronyd, giving the task a default chrony.conf to edit"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-main-servers"
+      description: "Confirms 0.pool.ntp.org and 1.pool.ntp.org are configured as chrony sources"
+      type: "file"
+      source: "validation/validate-main-servers.sh"
+
+    - name: "verify-fallback-servers"
+      description: "Confirms ntp.ubuntu.com and 0.debian.pool.ntp.org are configured as chrony sources"
+      type: "file"
+      source: "validation/validate-fallback-servers.sh"
+
+    - name: "verify-maxpoll"
+      description: "Confirms all four required sources use maxpoll 10 (1024s, closest power-of-two to the requested 1000s)"
+      type: "file"
+      source: "validation/validate-maxpoll.sh"
+
+    - name: "verify-minpoll"
+      description: "Confirms all four required sources use minpoll 4 (16s, closest power-of-two to the requested 20s retry)"
+      type: "file"
+      source: "validation/validate-minpoll.sh"
+
+    - name: "verify-chronyd-synced"
+      description: "Confirms chronyd reloaded the edited config and chronyc tracking reports Leap status: Normal"
+      type: "file"
+      source: "validation/validate-chronyd-synced.sh"
+
+teardown:
+  keepCluster: false
