@@ -1,16 +1,6 @@
 # Solution
 
-## Study First: Expected Reasoning
-
-1. Yes — a Linux interface can hold arbitrary numbers of IPv4 and IPv6 addresses simultaneously; adding a second address is additive unless you explicitly delete the first.
-2. `ip addr add` changes the running kernel state immediately but only in memory — it's gone at the next boot unless a config file backing the network stack (Netplan, NetworkManager, systemd-networkd, or legacy scripts) also declares the address, which gets re-applied automatically every boot.
-3. `fd00::/8` (more specifically `fc00::/7`) is IPv6's equivalent of RFC 1918 private IPv4 space (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) — addresses meant for internal routing only, never globally routable on the public internet.
-4. `/etc/hostname` sets the static hostname the kernel reports (what `hostname`/`hostnamectl` display); `/etc/hosts` is a local, DNS-independent name-to-address mapping table consulted by name resolution for any hostname lookup, not just the machine's own name. `hostnamectl` is the tool that reads/writes `/etc/hostname` (and the transient kernel name) — it doesn't itself store separate data.
-5. With `hosts: dns files`, `getent hosts astro-ats-003-lab-050` would return whatever DNS answers first, only falling back to `/etc/hosts` if DNS has no record or is unreachable — the opposite priority from the default `files dns` order, which checks the local file first.
-
-## Guided Solution
-
-### Step 0: Identify the active network management stack
+## Step 0: Identify the active network management stack
 
 ```bash
 ip -br addr show
@@ -21,7 +11,7 @@ ls /etc/netplan/ 2>/dev/null
 
 Different distros default to different stacks — Ubuntu Server typically uses Netplan (which itself renders down to either `systemd-networkd` or `NetworkManager`), while many other distros run NetworkManager directly. Persisting an address the wrong way — e.g. hand-editing `ifcfg-eth0` on a NetworkManager-managed host — can be silently overwritten or ignored, so confirming the active stack first avoids wasted work.
 
-### Step 1: Add both addresses live (ephemeral) first
+## Step 1: Add both addresses live (ephemeral) first
 
 ```bash
 sudo ip addr add 192.168.10.71/24 dev eth0
@@ -30,7 +20,7 @@ sudo ip -6 addr add fd00:10::70/64 dev eth0
 
 Check `man ip-address` — the `ip addr add ADDRESS dev DEVICE` form is documented there, including that `ADDRESS` takes CIDR notation directly (no separate netmask argument needed, unlike the old `ifconfig`). Doing this step first gives you immediate, fast feedback that the addresses are valid and don't conflict with anything already assigned, before you touch any persistent config — a live smoke test before committing to a config file.
 
-### Step 2a: Persist with Netplan (if active)
+## Step 2a: Persist with Netplan (if active)
 
 ```yaml
 # /etc/netplan/50-astro-ats-003-lab-050-secondary.yaml
@@ -53,7 +43,7 @@ sudo netplan apply
 
 `netplan generate` renders the YAML into the backend renderer's native config without applying it — a safe dry-run-adjacent step to catch YAML/schema errors before `apply` actually touches the live network.
 
-### Step 2b: Persist with NetworkManager (if active)
+## Step 2b: Persist with NetworkManager (if active)
 
 ```bash
 sudo nmcli con show
@@ -64,7 +54,7 @@ sudo nmcli con up "eth0"
 
 Check `man nmcli` and search `/ipv4.addresses` — the `+` prefix on `+ipv4.addresses` is documented as an *append* operation (add to the existing list) rather than the plain form, which would overwrite the whole property and drop the primary address. This distinction is the single most common way this step goes wrong.
 
-### Step 3: Add the /etc/hosts entry for forward and reverse resolution
+## Step 3: Add the /etc/hosts entry for forward and reverse resolution
 
 ```bash
 sudo tee -a /etc/hosts > /dev/null <<'EOF'
@@ -76,7 +66,7 @@ Check `man 5 hosts` — the file format is `IP_address canonical_hostname [alias
 
 If `astro-ats-003-lab-050` already has an `/etc/hosts` entry for its primary address, decide deliberately whether the new line should replace it or add an alias — duplicate hostname entries resolve to whichever line the NSS backend encounters first when scanning top-to-bottom, which for forward lookups means the first matching line wins.
 
-### Step 4: Confirm hostname vs hosts-file distinction
+## Step 4: Confirm hostname vs hosts-file distinction
 
 ```bash
 hostnamectl status
@@ -85,7 +75,7 @@ cat /etc/hostname
 
 Check `man hostnamectl` — this only reports and sets the machine's *own* name (static, transient, pretty), which is unrelated to the `/etc/hosts` mapping you just added. The task doesn't ask you to rename the host, only to make the existing hostname resolve to the new address — don't touch `/etc/hostname` or run `hostnamectl set-hostname` here, that would be solving a different problem.
 
-### Step 5: Confirm the resolution order
+## Step 5: Confirm the resolution order
 
 ```bash
 grep '^hosts:' /etc/nsswitch.conf
