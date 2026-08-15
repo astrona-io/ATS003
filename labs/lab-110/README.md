@@ -1,6 +1,6 @@
 # lab-110: DNS Verification with dig
 
-QEMU VM for the LFCS course — using `dig` to isolate whether a DNS problem lives in the record, the resolver, or delegation.
+Two QEMU VMs for the LFCS course — `client` (terminal's role) and `dns` (the authoritative internal DNS server) — using `dig` to isolate whether a DNS problem lives in the record, the resolver, or delegation, across a real network hop between two genuinely independent machines. The server is reachable as `astrona-ats-003-lab-110-dns`.
 
 ## Run
 

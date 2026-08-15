@@ -1,14 +1,21 @@
 #!/usr/bin/env bash
-# Checks that the route to 10.10.30.0/24 via 10.10.20.1 is declared in a
-# persistent network config -- Netplan, systemd-networkd, NetworkManager,
-# or a legacy route-* script -- not just added live with `ip route add`.
-# Any one of these mechanisms re-applying the route at boot is sufficient.
+# Checks that the route to 10.10.30.0/24 via the gateway VM's real
+# resolved address is declared in a persistent network config --
+# Netplan, systemd-networkd, NetworkManager, or a legacy route-*
+# script -- not just added live with `ip route add`. Any one of these
+# mechanisms re-applying the route at boot is sufficient.
 
 set -u
 
 dest="10.10.30.0/24"
 dest_bare="10.10.30.0"
-gw="10.10.20.1"
+gw_host="astrona-ats-003-lab-060-gateway"
+gw="$(getent hosts "$gw_host" 2>/dev/null | awk '{print $1}' | head -n1)"
+
+if [[ -z "$gw" ]]; then
+  echo "FAIL: persistent-route - could not resolve $gw_host to an address"
+  exit 1
+fi
 
 found=""
 
@@ -55,6 +62,6 @@ if [[ -n "$found" ]]; then
   echo "PASS: persistent route to $dest via $gw found ($found)"
   exit 0
 else
-  echo "FAIL: persistent-route - no Netplan/systemd-networkd/NetworkManager/legacy config declares a route to $dest via $gw"
+  echo "FAIL: persistent-route - no Netplan/systemd-networkd/NetworkManager/legacy config declares a route to $dest via $gw ($gw_host)"
   exit 1
 fi

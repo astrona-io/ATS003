@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
 # Checks that the live kernel routing table has a route to 10.10.30.0/24
-# via gateway 10.10.20.1 on dev eth1 (from `ip route show`).
+# via the gateway VM's real resolved address (from `ip route show`).
 
 set -u
 
-expected_via="10.10.20.1"
-expected_dev="eth1"
+gw_host="astrona-ats-003-lab-060-gateway"
+gw_ip="$(getent hosts "$gw_host" 2>/dev/null | awk '{print $1}' | head -n1)"
+
+if [[ -z "$gw_ip" ]]; then
+  echo "FAIL: route-live - could not resolve $gw_host to an address"
+  exit 1
+fi
 
 line="$(ip route show 10.10.30.0/24 2>/dev/null)"
 
@@ -14,10 +19,10 @@ if [[ -z "$line" ]]; then
   exit 1
 fi
 
-if [[ "$line" == *"via $expected_via"* && "$line" == *"dev $expected_dev"* ]]; then
+if [[ "$line" == *"via $gw_ip"* ]]; then
   echo "PASS: route-live (10.10.30.0/24 -> $line)"
   exit 0
 else
-  echo "FAIL: route-live - got '$line', expected via $expected_via dev $expected_dev"
+  echo "FAIL: route-live - got '$line', expected via $gw_ip ($gw_host)"
   exit 1
 fi

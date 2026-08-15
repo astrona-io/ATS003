@@ -32,10 +32,11 @@ dig @8.8.8.8 data-001.internal.example.com
 Check `man dig` — the `@server` syntax (documented right in the SYNOPSIS) sends the query directly to that IP/hostname, completely ignoring whatever is configured in `/etc/resolv.conf`. This is the single most useful move for isolating a DNS problem: if this returns something different from Step 1's system-resolver query, the problem is local to `terminal`'s resolver configuration or cache, not the record itself. For an internal-only name like this scenario's, querying the organization's actual authoritative/internal DNS server directly (rather than a public resolver like `8.8.8.8`, which won't know an internal-only zone at all) is the realistic move — the public-resolver example above is shown for a public-name variant of the same technique.
 
 ```bash
-dig @192.168.10.80 data-001.internal.example.com
+DNS="$(getent hosts astrona-ats-003-lab-110-dns | awk '{print $1}')"
+dig @"$DNS" data-001.internal.example.com
 ```
 
-Comparing this against Step 1's result is the actual diagnostic step the scenario calls for — a match means the record and both resolvers agree (problem is elsewhere, e.g. the application, not DNS at all); a mismatch means `terminal`'s own resolver is the layer at fault.
+Comparing this against Step 1's result is the actual diagnostic step the scenario calls for — a match means the record and both resolvers agree (problem is elsewhere, e.g. the application, not DNS at all); a mismatch means `terminal`'s own resolver is the layer at fault. In this lab that's a genuinely independent check: Step 1 went through `terminal`'s configured resolver (`/etc/resolv.conf`), while this step talks directly to the authoritative server on a separate VM, bypassing local resolver config entirely.
 
 ## Step 4: Check MX and NS records for the domain
 
@@ -68,7 +69,7 @@ Check `man dig` for `+trace` — instead of asking one resolver for a final answ
 dig +short data-001.internal.example.com
 # 192.168.10.80
 
-dig @192.168.10.80 +short data-001.internal.example.com
+dig @"$DNS" +short data-001.internal.example.com
 # 192.168.10.80
 # (matches system resolver's answer -> record + both resolvers agree)
 
@@ -89,7 +90,8 @@ Matching output between the system-resolver query and the direct-server query co
 ```bash
 dig data-001.internal.example.com
 dig +short data-001.internal.example.com
-dig @192.168.10.80 data-001.internal.example.com
+DNS="$(getent hosts astrona-ats-003-lab-110-dns | awk '{print $1}')"
+dig @"$DNS" data-001.internal.example.com
 dig internal.example.com MX
 dig internal.example.com NS
 dig -x 192.168.10.80

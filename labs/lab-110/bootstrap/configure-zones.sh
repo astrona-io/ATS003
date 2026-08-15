@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Bootstrap: writes the forward (internal.example.com) and reverse
-# (10.168.192.in-addr.arpa) zone files bind9 serves authoritatively,
-# matching the records the scenario and its guided solution reference:
-# data-001.internal.example.com -> 192.168.10.80, an NS record for
-# ns1.internal.example.com, an MX record for mail.internal.example.com,
-# and a PTR record back to data-001.
+# Bootstrap (dns VM): writes the forward (internal.example.com) and
+# reverse (10.168.192.in-addr.arpa) zone files bind9 serves
+# authoritatively, matching the records the scenario and its guided
+# solution reference: data-001.internal.example.com -> 192.168.10.80
+# (a fictional in-zone target address, not this VM's own address), an
+# NS record for ns1.internal.example.com, an MX record for
+# mail.internal.example.com, and a PTR record back to data-001.
 
 set -eu
 
@@ -57,7 +58,7 @@ sudo tee /etc/bind/named.conf.options > /dev/null <<'EOF'
 options {
     directory "/var/cache/bind";
 
-    listen-on { 127.0.0.1; 192.168.10.80; };
+    listen-on { any; };
     listen-on-v6 { none; };
     allow-query { any; };
 
