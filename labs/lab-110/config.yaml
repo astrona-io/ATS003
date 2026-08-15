@@ -1,0 +1,59 @@
+metadata:
+  name: "ats-003-lab-110"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+
+bootstrap:
+  init:
+    - name: "install-dnsutils"
+      description: "Installs dnsutils (dig, host, nslookup) via apt-get so the DNS querying tools the lab task relies on are present"
+      type: "folder"
+      source: "bootstrap/10-install-dnsutils/"
+
+    - name: "setup-internal-dns"
+      description: "Installs bind9 as this VM's internal authoritative DNS server, binds a secondary loopback address (192.168.10.80) so it's queryable directly, serves the internal.example.com forward zone plus its reverse zone, and points the system resolver at it"
+      type: "folder"
+      source: "bootstrap/20-setup-internal-dns/"
+
+validation:
+  scripts:
+    - name: "verify-system-resolver-a-record"
+      description: "Confirms the system's default resolver (dig, no @server) returns 192.168.10.80 for data-001.internal.example.com"
+      type: "file"
+      source: "validation/validate-system-resolver-a-record.sh"
+
+    - name: "verify-direct-server-a-record"
+      description: "Confirms a direct query to @192.168.10.80 returns the same A record as the system resolver"
+      type: "file"
+      source: "validation/validate-direct-server-a-record.sh"
+
+    - name: "verify-ns-record"
+      description: "Confirms internal.example.com's NS record is ns1.internal.example.com"
+      type: "file"
+      source: "validation/validate-ns-record.sh"
+
+    - name: "verify-mx-record"
+      description: "Confirms internal.example.com's MX record is priority 10, mail.internal.example.com"
+      type: "file"
+      source: "validation/validate-mx-record.sh"
+
+    - name: "verify-ptr-record"
+      description: "Confirms the reverse (PTR) lookup for 192.168.10.80 resolves to data-001.internal.example.com"
+      type: "file"
+      source: "validation/validate-ptr-record.sh"
+
+teardown:
+  keepCluster: false
