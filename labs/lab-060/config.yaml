@@ -1,0 +1,44 @@
+metadata:
+  name: "ats-003-lab-060"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+
+bootstrap:
+  init:
+    - name: "eth1-dummy-setup"
+      description: "Creates a persistent local 'eth1' interface addressed on 10.10.20.0/24 and installs traceroute, giving the static-routing task a real interface/gateway pair to route against on a single VM"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-route-live"
+      description: "Confirms 'ip route show 10.10.30.0/24' resolves via 10.10.20.1 dev eth1 in the live kernel routing table"
+      type: "file"
+      source: "validation/validate-route-live.sh"
+
+    - name: "verify-route-get"
+      description: "Confirms 'ip route get 10.10.30.5' selects gateway 10.10.20.1 via dev eth1"
+      type: "file"
+      source: "validation/validate-route-get.sh"
+
+    - name: "verify-route-persistent"
+      description: "Confirms the route to 10.10.30.0/24 via 10.10.20.1 is declared in a persistent network config (Netplan, systemd-networkd, NetworkManager, or legacy route-* file), not just added live with ip route add"
+      type: "file"
+      source: "validation/validate-route-persistent.sh"
+
+teardown:
+  keepCluster: false
