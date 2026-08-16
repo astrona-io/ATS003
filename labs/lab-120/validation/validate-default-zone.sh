@@ -4,7 +4,7 @@
 set -u
 
 expected="public"
-actual="$(firewall-cmd --get-default-zone 2>/dev/null)"
+actual="$(sudo firewall-cmd --get-default-zone 2>/dev/null)"
 
 if [[ "$actual" == "$expected" ]]; then
   echo "PASS: default-zone (default zone = '$actual')"

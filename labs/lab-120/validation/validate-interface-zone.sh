@@ -11,7 +11,7 @@ if [[ -z "$IFACE" ]]; then
   exit 1
 fi
 
-actual="$(firewall-cmd --get-zone-of-interface="$IFACE" 2>/dev/null)"
+actual="$(sudo firewall-cmd --get-zone-of-interface="$IFACE" 2>/dev/null)"
 
 if [[ "$actual" == "public" ]]; then
   echo "PASS: interface-zone ($IFACE is bound to '$actual')"

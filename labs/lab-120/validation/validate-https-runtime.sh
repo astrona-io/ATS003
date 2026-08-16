@@ -3,7 +3,7 @@
 
 set -u
 
-services="$(firewall-cmd --zone=public --list-services 2>/dev/null)"
+services="$(sudo firewall-cmd --zone=public --list-services 2>/dev/null)"
 
 if grep -qw "https" <<< "$services"; then
   echo "PASS: https-runtime (https present in runtime services: '$services')"
