@@ -1,16 +1,10 @@
 #!/usr/bin/env bash
 # Checks that `ip route get 10.10.30.1` (a table lookup, no packet sent)
-# actually resolves via the gateway VM's real resolved address.
+# actually resolves via gateway 10.10.20.1.
 
 set -u
 
-gw_host="astrona-ats-003-lab-060-gateway"
-gw_ip="$(getent hosts "$gw_host" 2>/dev/null | awk '{print $1}' | head -n1)"
-
-if [[ -z "$gw_ip" ]]; then
-  echo "FAIL: route-get - could not resolve $gw_host to an address"
-  exit 1
-fi
+expected_via="10.10.20.1"
 
 out="$(ip route get 10.10.30.1 2>/dev/null)"
 
@@ -19,10 +13,10 @@ if [[ -z "$out" ]]; then
   exit 1
 fi
 
-if [[ "$out" == *"via $gw_ip"* ]]; then
-  echo "PASS: route-get (10.10.30.1 resolves via $gw_ip / $gw_host)"
+if [[ "$out" == *"via $expected_via"* ]]; then
+  echo "PASS: route-get (10.10.30.1 resolves via $expected_via)"
   exit 0
 else
-  echo "FAIL: route-get - got '$out', expected via $gw_ip ($gw_host)"
+  echo "FAIL: route-get - got '$out', expected via $expected_via"
   exit 1
 fi

@@ -1,77 +1,88 @@
 metadata:
   name: "ats-003-lab-060"
   docs:
-    solution: "docs/solution.md"
-    question: "docs/question.md"
+    guide: "docs/solution.md"
+    examQuestion: "docs/question.md"
 
 runtime:
   type: "qemu"
+  # backend-net is the scenario's own "eth1 on 10.10.20.0/24" subnet, built
+  # for real: target gets 10.10.20.5, gateway gets 10.10.20.1 (the exact
+  # gateway address the scenario names), so the route the student adds is
+  # to a genuinely reachable next hop, not a config-only fiction.
+  networks:
+    - name: "backend-net"
+      cidr: "10.10.20.0/24"
+
   qemu:
-  - name: "target"
-    image:
-      type: "oci"
-      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+    - name: "target"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
 
-    cpus: 2
-    memoryMB: 2048
-    diskSizeGB: 15
-    display: false
+      cpus: 2
+      memoryMB: 2048
+      diskSizeGB: 15
+      display: false
+      networks:
+        - name: "backend-net"
+          ipv4: "10.10.20.5"
 
-  - name: "gateway"
-    image:
-      type: "oci"
-      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+      bootstrap:
+        init:
+          - name: "install-traceroute"
+            description: "Installs traceroute so the solution's verification commands run without a 'command not found' error"
+            type: "file"
+            source: "bootstrap/install-traceroute.sh"
 
-    cpus: 2
-    memoryMB: 2048
-    diskSizeGB: 15
-    display: false
+      validation:
+        scripts:
+          - name: "verify-route-live"
+            description: "Confirms 'ip route show 10.10.30.0/24' resolves via 10.10.20.1 in the live kernel routing table"
+            type: "file"
+            source: "validation/validate-route-live.sh"
 
-bootstrap:
-  init:
-    - name: "install-traceroute"
-      description: "Installs traceroute on the target VM so the solution's verification commands run without a 'command not found' error"
-      type: "file"
-      source: "bootstrap/install-traceroute.sh"
-      vm: "target"
+          - name: "verify-route-get"
+            description: "Confirms 'ip route get 10.10.30.1' selects gateway 10.10.20.1"
+            type: "file"
+            source: "validation/validate-route-get.sh"
 
-    - name: "gateway-setup"
-      description: "Turns the gateway VM into the partner-subnet gateway: enables IP forwarding persistently and creates dummy0 addressed 10.10.30.1/24, the address the target's route ultimately reaches"
-      type: "file"
-      source: "bootstrap/gateway-setup.sh"
-      vm: "gateway"
+          - name: "verify-route-persistent"
+            description: "Confirms the route to 10.10.30.0/24 via 10.10.20.1 is declared in a persistent network config, not just added live with ip route add"
+            type: "file"
+            source: "validation/validate-route-persistent.sh"
 
-validation:
-  scripts:
-    - name: "verify-route-live"
-      description: "Confirms 'ip route show 10.10.30.0/24' resolves via the gateway VM's real resolved address in the live kernel routing table"
-      type: "file"
-      source: "validation/validate-route-live.sh"
-      vm: "target"
+          - name: "verify-route-reachability"
+            description: "Real end-to-end proof: pings 10.10.30.1 (the gateway's own address in the partner subnet) through the route — only passes if the gateway is actually forwarding"
+            type: "file"
+            source: "validation/validate-route-reachability.sh"
 
-    - name: "verify-route-get"
-      description: "Confirms 'ip route get 10.10.30.1' selects the gateway VM's real resolved address"
-      type: "file"
-      source: "validation/validate-route-get.sh"
-      vm: "target"
+    - name: "gateway"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
 
-    - name: "verify-route-persistent"
-      description: "Confirms the route to 10.10.30.0/24 via the gateway is declared in a persistent network config (Netplan, systemd-networkd, NetworkManager, or legacy route-* file), not just added live with ip route add"
-      type: "file"
-      source: "validation/validate-route-persistent.sh"
-      vm: "target"
+      cpus: 2
+      memoryMB: 2048
+      diskSizeGB: 15
+      display: false
+      networks:
+        - name: "backend-net"
+          ipv4: "10.10.20.1"
 
-    - name: "verify-route-reachability"
-      description: "Real end-to-end proof: pings 10.10.30.1 (the gateway VM's own address in the partner subnet) through the route — only passes if the gateway is actually forwarding, not just present in the routing table"
-      type: "file"
-      source: "validation/validate-route-reachability.sh"
-      vm: "target"
+      bootstrap:
+        init:
+          - name: "gateway-setup"
+            description: "Turns this VM into the partner-subnet gateway: enables IP forwarding persistently and creates dummy0 addressed 10.10.30.1/24, the address the target's route ultimately reaches"
+            type: "file"
+            source: "bootstrap/gateway-setup.sh"
 
-    - name: "verify-gateway-ready"
-      description: "Confirms the gateway VM itself is actually able to act as a gateway: IP forwarding on, dummy0 up with 10.10.30.1/24"
-      type: "file"
-      source: "validation/validate-gateway-ready.sh"
-      vm: "gateway"
+      validation:
+        scripts:
+          - name: "verify-gateway-ready"
+            description: "Confirms this VM is actually able to act as a gateway: IP forwarding on, dummy0 up with 10.10.30.1/24"
+            type: "file"
+            source: "validation/validate-gateway-ready.sh"
 
 teardown:
   keepCluster: false
