@@ -1,9 +1,20 @@
-# lab-010: NTP Time Synchronization with chrony
+# Challenge Lab 010: Core Host Configurations Capstone (Section Capstone)
 
-QEMU VM for the LFCS course — configuring chrony's main and fallback NTP sources with the correct poll-interval directives.
+This is the **unguid challenge lab** that serves as the section capstone assessment.
 
-## Run
-
+## Start the Sandbox VM
+To spin up this certification challenge sandbox in your host terminal, run:
 ```bash
 astrona run --git git@github.com:astrona-io/ATS003.git -c labs/lab-010
+```
+
+## Learning Path & Objectives
+This challenge lab tests the integrated concepts learned across all modules in Section 010. Open the prompt file inside the VM to read the scenario goals:
+```bash
+cat docs/question.md
+```
+
+Implement your changes, and run the validation scripts inside the VM to verify your solutions:
+```bash
+/usr/local/bin/validate-*.sh
 ```

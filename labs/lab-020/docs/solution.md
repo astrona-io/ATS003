@@ -1,153 +1,151 @@
 # Solution
 
-## Step 0: Confirm the interface name and current ruleset
+## Step 0: Inspect the current interfaces and routing table
 
 ```bash
-ip -br link show
-sudo nft list ruleset
+ip -br addr show
+ip route show
 ```
 
-Confirm the interface really is named `eth0` (some distros use predictable names like `enp0s3`) and see whether any base tables already exist — you don't want to accidentally create duplicate hooks with conflicting priorities.
+Confirm `eth0` really has 192.168.10.0/24 and the second interface really has 10.10.20.0/24 before adding anything — interface names and subnet assignments should never be assumed on an exam target, always confirmed. The interface name itself may not literally be `eth1` on every distro/image (predictable naming can give it something like `enp0s6`) — `ip -br addr show` tells you the real name to use below.
 
-## Step 1: Create a filter table with input and output chains
+## Step 1: Add the route live (ephemeral) first
 
 ```bash
-sudo nft add table inet filter
-sudo nft add chain inet filter input   { type filter hook input priority filter\; policy accept\; }
-sudo nft add chain inet filter output  { type filter hook output priority filter\; policy accept\; }
+sudo ip route add 10.10.30.0/24 via 10.10.20.1
 ```
 
-Check `man nft` and search for `hook` — the CHAINS section spells out the valid hook names per family (`input`, `output`, `forward`, `prerouting`, `postrouting`) and the valid named priorities, which is faster to confirm on the spot than guessing under exam pressure.
+Check `man ip-route` — the general form is `ip route add DESTINATION via GATEWAY [dev INTERFACE]`. `10.10.30.0/24` is the destination network being reached, `via 10.10.20.1` names the next-hop router that knows how to get there. `dev` is optional when only one interface could plausibly reach that gateway, which the kernel can usually work out on its own — pin it explicitly (`dev eth1`, or whatever `ip -br addr show` reported) if you want to remove any ambiguity on a host with more routes to choose from.
 
-`inet` is a dual-stack table family (matches both IPv4 and IPv6) — the modern default unless you specifically need `ip`-only or `ip6`-only matching. `hook input` attaches to packets destined for this host; `hook output` attaches to packets originating from this host. `priority filter` (numeric `0`) places these chains at netfilter's conventional filtering point. `policy accept` is the default verdict for anything that falls through without matching a rule — we'll add explicit `drop` rules rather than flipping the whole chain to default-deny, since the task only asks for four specific behaviors, not a lockdown of the entire host.
+If a route to this destination already exists and you need to change it rather than error out on a duplicate, use `ip route replace` instead of `add` — check `man ip-route` for the distinction; `add` fails loudly if a matching route already exists, while `replace` overwrites it unconditionally.
 
-## Step 2: Close port 5000
+## Step 2: Verify with `ip route get` before assuming anything
 
 ```bash
-sudo nft add rule inet filter input iifname "eth0" tcp dport 5000 drop
+ip route get 10.10.30.1
 ```
 
-`iifname "eth0"` scopes the rule to the interface named in the task — traffic arriving on other interfaces (e.g. loopback) is untouched. `tcp dport 5000` matches the TCP destination port. `drop` silently discards the packet with no response, which is what "closed" conventionally means in packet-filtering exam language (as opposed to `reject`, which sends back an ICMP/TCP-RST — either is defensible, but `drop` is the more common exam expectation for "closed").
+Check `man ip-route`, search `/get` — this subcommand asks the kernel which route it would actually select for a destination, without sending any packet. Expected output:
 
-## Step 3: Redirect port 6000 traffic to local port 6001
+```text
+10.10.30.1 via 10.10.20.1 dev eth1 src 10.10.20.5 uid 1000
+    cache
+```
+
+The `via` shown here must match `10.10.20.1` exactly — if it instead shows a different gateway, something is wrong (a more specific conflicting route, or a typo in the destination CIDR).
+
+## Step 3: Understand the default-route interaction
 
 ```bash
-sudo nft add table ip nat
-sudo nft add chain ip nat prerouting { type nat hook prerouting priority dstnat\; }
-sudo nft add rule ip nat prerouting iifname "eth0" tcp dport 6000 redirect to :6001
+ip route show default
 ```
 
-Check `man nft` and search for `redirect` in the NAT STATEMENTS section — it documents `redirect` as shorthand for `dnat` to the machine's own address, and shows the `to :PORT` argument form.
+If `data-001` has a default route (e.g. `default via 192.168.10.1 dev eth0`), that route only ever matches destinations *not* covered by any more specific route. Because `10.10.30.0/24` is a `/24` (more specific than the default's `/0`), the kernel's longest-prefix-match logic always prefers your new route for anything inside `10.10.30.0/24`, regardless of the default route's existence — the two coexist without conflict.
 
-Port redirection is destination NAT to *this same host*, so it must live in a `nat`-type table on the `prerouting` hook — this runs before routing decisions, which is exactly when a packet's destination port needs to change so the kernel subsequently delivers it to whatever's listening on 6001. The `redirect` statement is a convenience form of DNAT specifically for "redirect to a port on the local machine," which is simpler and more correct here than a manual `dnat to <local-ip>:6001` (redirect automatically uses whichever local address the packet arrived on, which matters if data-002 has multiple addresses). Note the `nat` table here uses family `ip` rather than `inet` — NAT chain types are not currently supported in `inet` family tables the same way filter chains are, so `ip` (IPv4-only) is the standard, portable choice for DNAT.
+## Step 4: Persist the route — Netplan path
 
-## Step 4: Restrict port 6002 to 192.168.10.80 only
+```yaml
+# /etc/netplan/60-data-001-eth1.yaml
+network:
+  version: 2
+  ethernets:
+    eth1:
+      addresses:
+        - 10.10.20.5/24
+      routes:
+        - to: 10.10.30.0/24
+          via: 10.10.20.1
+```
+
+Check `man 5 netplan` and search for `routes:` — it's a list under the interface, with `to`/`via` (and optionally `metric`) keys, distinct from the `addresses:` key used for the interface's own IPs. `netplan apply` re-renders and applies the change:
 
 ```bash
-sudo nft add rule inet filter input iifname "eth0" tcp dport 6002 ip saddr 192.168.10.80 accept
-sudo nft add rule inet filter input iifname "eth0" tcp dport 6002 drop
+sudo netplan generate
+sudo netplan apply
 ```
 
-This is the ordering principle from Study First made concrete: the `accept` rule for the trusted source IP is added *first*, and the catch-all `drop` for the same port is added *second*. `nft add rule` always appends to the end of the chain, so issuing these two commands in this order guarantees the correct evaluation order. If a connection to port 6002 arrives from 192.168.10.80, it matches the first rule and gets an `accept` verdict, which terminates chain evaluation — the second rule is never consulted for that packet. Any other source hitting port 6002 fails the first rule's `ip saddr` match, falls through to the second rule, and is dropped.
-
-## Step 5: Block outgoing traffic to 192.168.10.70
+## Step 5: Persist the route — NetworkManager path
 
 ```bash
-sudo nft add rule inet filter output ip daddr 192.168.10.70 drop
+sudo nmcli con mod "eth1" +ipv4.routes "10.10.30.0/24 10.10.20.1"
+sudo nmcli con up "eth1"
 ```
 
-This lives in the `output` chain because the task explicitly says "outgoing" — packets data-002 originates toward 192.168.10.70. No interface/port restriction was asked for, so this is a blanket destination-IP block for any protocol. (If the task later needed this scoped to `eth0` specifically, you'd add `oifname "eth0"` — using `output` alone already implies locally-originated traffic on whatever interface routes toward that destination.)
+Check `man nmcli` and search `/ipv4.routes` — the property value format is `destination/prefix next-hop [metric]`, space-separated, as a string. As with addresses, the `+` prefix appends to any existing routes on that connection rather than replacing the whole list — omitting it would wipe out any other static routes already configured on `eth1`.
 
-## Step 6: Review the full ruleset before persisting
+## Step 6: Persist the route — legacy RHEL-family scripts (if not NetworkManager/Netplan)
 
 ```bash
-sudo nft list ruleset
+# /etc/sysconfig/network-scripts/route-eth1
+10.10.30.0/24 via 10.10.20.1 dev eth1
 ```
 
-Read it top to bottom exactly as the kernel will evaluate it. Confirm the 6002 accept rule appears *before* the 6002 drop rule, and that each rule is attached to the chain/hook you intended.
-
-## Step 7: Persist the ruleset across reboot
-
-```bash
-# Most distros: nft's own systemd unit reads a saved ruleset file at boot
-sudo nft list ruleset | sudo tee /etc/nftables.conf
-sudo systemctl enable --now nftables
-```
-
-nftables rules built with `nft add` live only in kernel memory — a reboot wipes them unless they're written to the file the `nftables.service` unit loads at boot (`/etc/nftables.conf` on Debian/Ubuntu and RHEL-family alike, though check `/etc/sysconfig/nftables.conf` or distro docs if it differs). Saving the ruleset and enabling the service is what makes this survive a restart, which matters both operationally and because exam grading sometimes reboots the target.
+This older-style file format (still supported on some RHEL-family systems for backward compatibility) is read by the legacy network service at interface-up time. It's declining in relevance as NetworkManager becomes the default everywhere, but it's worth recognizing on a system that still uses it.
 
 ## Verification
 
 ```bash
-sudo nft list ruleset
+ip route show 10.10.30.0/24
 ```
 
-Expected (abbreviated):
+Expected:
 
 ```text
-table inet filter {
-        chain input {
-                type filter hook input priority filter; policy accept;
-                iifname "eth0" tcp dport 5000 drop
-                iifname "eth0" tcp dport 6002 ip saddr 192.168.10.80 accept
-                iifname "eth0" tcp dport 6002 drop
-        }
-        chain output {
-                type filter hook output priority filter; policy accept;
-                ip daddr 192.168.10.70 drop
-        }
-}
-table ip nat {
-        chain prerouting {
-                type nat hook prerouting priority dstnat; policy accept;
-                iifname "eth0" tcp dport 6000 redirect to :6001
-        }
-}
+10.10.30.0/24 via 10.10.20.1 dev eth1
 ```
-
-Functional checks (run from data-001, IP 192.168.10.80, where relevant):
 
 ```bash
-# From data-001: port 6002 should succeed (or at least not be firewall-blocked)
-nc -zv 192.168.10.?? 6002
-
-# From any other host: port 6002 should time out / be refused
-nc -zv 192.168.10.?? 6002
-
-# Port 5000 should never connect from anywhere
-nc -zv 192.168.10.?? 5000
-
-# A connection to 6000 should land on whatever is listening on 6001
-nc -zv 192.168.10.?? 6000
+ip route get 10.10.30.1
 ```
 
-On data-002 itself, confirm no outbound reachability to app-srv1:
+Expected:
+
+```text
+10.10.30.1 via 10.10.20.1 dev eth1 src 10.10.20.5
+```
+
+Real end-to-end proof — this only works if the gateway is actually forwarding, not just present in the routing table:
 
 ```bash
-ping -c1 192.168.10.70   # should get no reply once the output rule is active
+ping -c2 10.10.30.1
+traceroute 10.10.30.1
 ```
+
+`10.10.30.1` is the gateway's own address inside the partner subnet it fronts — a reply proves the packet actually left this host, reached the gateway, and got a real response back, not just that an entry exists in `ip route show`. `traceroute`'s first hop should be `10.10.20.1`.
+
+Reboot-survival check (if the environment allows a reboot):
+
+```bash
+sudo reboot
+# after reboot:
+ip route show 10.10.30.0/24
+```
+
+The route should reappear automatically without re-running `ip route add`.
 
 ## Command Summary
 
 ```bash
-ip -br link show
-sudo nft list ruleset
+ip -br addr show
+ip route show
 
-sudo nft add table inet filter
-sudo nft add chain inet filter input   { type filter hook input priority filter\; policy accept\; }
-sudo nft add chain inet filter output  { type filter hook output priority filter\; policy accept\; }
-sudo nft add rule inet filter input iifname "eth0" tcp dport 5000 drop
+sudo ip route add 10.10.30.0/24 via 10.10.20.1
+ip route get 10.10.30.1
+ip route show default
 
-sudo nft add table ip nat
-sudo nft add chain ip nat prerouting { type nat hook prerouting priority dstnat\; }
-sudo nft add rule ip nat prerouting iifname "eth0" tcp dport 6000 redirect to :6001
+# Netplan path:
+sudo $EDITOR /etc/netplan/60-data-001-eth1.yaml
+sudo netplan generate
+sudo netplan apply
 
-sudo nft add rule inet filter input iifname "eth0" tcp dport 6002 ip saddr 192.168.10.80 accept
-sudo nft add rule inet filter input iifname "eth0" tcp dport 6002 drop
+# NetworkManager path:
+sudo nmcli con mod "eth1" +ipv4.routes "10.10.30.0/24 10.10.20.1"
+sudo nmcli con up "eth1"
 
-sudo nft add rule inet filter output ip daddr 192.168.10.70 drop
+# Legacy RHEL-family path:
+echo "10.10.30.0/24 via 10.10.20.1 dev eth1" | sudo tee /etc/sysconfig/network-scripts/route-eth1
 
-sudo nft list ruleset
-sudo nft list ruleset | sudo tee /etc/nftables.conf
-sudo systemctl enable --now nftables
+ip route show 10.10.30.0/24
+ping -c2 10.10.30.1
+traceroute 10.10.30.1
 ```

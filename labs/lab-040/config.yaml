@@ -7,7 +7,18 @@ metadata:
 runtime:
   type: "qemu"
   qemu:
-  - image:
+  - name: "client"
+    image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+
+  - name: "dns"
+    image:
       type: "oci"
       source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
 
@@ -18,47 +29,67 @@ runtime:
 
 bootstrap:
   init:
-    - name: "install-openssh"
-      description: "Installs and enables openssh-server, and installs sshpass for later live-login validation checks"
-      type: "folder"
-      source: "bootstrap/"
+    - name: "install-dnsutils"
+      description: "Installs dnsutils (dig, host, nslookup) on the client VM so the DNS querying tools this lab's task relies on are present"
+      type: "file"
+      source: "bootstrap/install-dnsutils.sh"
+      vm: "client"
 
-    - name: "create-test-users"
-      description: "Creates local users elena and victor with password authentication (password = username) and no SSH keys"
-      type: "folder"
-      source: "bootstrap/"
+    - name: "install-bind"
+      description: "Installs bind9 on the dns VM to act as this lab's internal authoritative DNS server"
+      type: "file"
+      source: "bootstrap/install-bind.sh"
+      vm: "dns"
 
-    - name: "baseline-sshd-config"
-      description: "Sets the pre-hardening sshd_config baseline (PasswordAuthentication yes, X11Forwarding yes) that the lab task requires changing, without touching the astrona admin user's key-based access"
-      type: "folder"
-      source: "bootstrap/"
+    - name: "configure-zones"
+      description: "Serves the internal.example.com forward zone plus its reverse zone from the dns VM, listening on all interfaces"
+      type: "file"
+      source: "bootstrap/configure-zones.sh"
+      vm: "dns"
+
+    - name: "point-client-resolver"
+      description: "Resolves the dns VM's real address on the shared lab network and points the client's system resolver at it, so system-resolver vs. direct-server queries are two genuinely independent hops"
+      type: "file"
+      source: "bootstrap/point-client-resolver.sh"
+      vm: "client"
 
 validation:
   scripts:
-    - name: "verify-sshd-service"
-      description: "Confirms the sshd/ssh service is active"
+    - name: "verify-system-resolver-a-record"
+      description: "Confirms the client's default resolver (dig, no @server) returns 192.168.10.80 for data-001.internal.example.com"
       type: "file"
-      source: "validation/validate-sshd-service.sh"
+      source: "validation/validate-system-resolver-a-record.sh"
+      vm: "client"
 
-    - name: "verify-x11forwarding"
-      description: "Confirms X11Forwarding is disabled in the effective sshd config (sshd -T)"
+    - name: "verify-direct-server-a-record"
+      description: "Confirms a direct query to the dns VM's real address returns the same A record as the system resolver"
       type: "file"
-      source: "validation/validate-x11forwarding.sh"
+      source: "validation/validate-direct-server-a-record.sh"
+      vm: "client"
 
-    - name: "verify-passwordauth-config"
-      description: "Confirms PasswordAuthentication resolves to yes for elena and no for victor via sshd -T -C"
+    - name: "verify-ns-record"
+      description: "Confirms internal.example.com's NS record is ns1.internal.example.com"
       type: "file"
-      source: "validation/validate-passwordauth-config.sh"
+      source: "validation/validate-ns-record.sh"
+      vm: "client"
 
-    - name: "verify-banner"
-      description: "Confirms Banner resolves to /etc/ssh/sshd-banner for elena and victor via sshd -T -C, and the file exists"
+    - name: "verify-mx-record"
+      description: "Confirms internal.example.com's MX record is priority 10, mail.internal.example.com"
       type: "file"
-      source: "validation/validate-banner.sh"
+      source: "validation/validate-mx-record.sh"
+      vm: "client"
 
-    - name: "verify-ssh-login"
-      description: "Confirms real SSH login behavior: elena authenticates with a password, victor is rejected"
+    - name: "verify-ptr-record"
+      description: "Confirms the reverse (PTR) lookup for 192.168.10.80 resolves to data-001.internal.example.com"
       type: "file"
-      source: "validation/validate-ssh-login.sh"
+      source: "validation/validate-ptr-record.sh"
+      vm: "client"
+
+    - name: "verify-dns-server-ready"
+      description: "Confirms bind9 is actually running and the zones loaded cleanly on the dns VM"
+      type: "file"
+      source: "validation/validate-dns-server-ready.sh"
+      vm: "dns"
 
 teardown:
   keepCluster: false

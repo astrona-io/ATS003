@@ -18,37 +18,42 @@ runtime:
 
 bootstrap:
   init:
-    - name: "chrony-install"
-      description: "Installs chrony and starts chronyd, giving the task a default chrony.conf to edit"
+    - name: "network-tooling-setup"
+      description: "Confirms the primary interface and ensures Netplan/iproute2 tooling is present, without touching live addressing or /etc/hosts"
       type: "folder"
       source: "bootstrap/"
 
 validation:
   scripts:
-    - name: "verify-main-servers"
-      description: "Confirms 0.pool.ntp.org and 1.pool.ntp.org are configured as chrony sources"
+    - name: "verify-secondary-ipv4"
+      description: "Confirms the secondary IPv4 address 192.168.10.71/24 is live on the primary interface alongside the original address"
       type: "file"
-      source: "validation/validate-main-servers.sh"
+      source: "validation/validate-secondary-ipv4.sh"
 
-    - name: "verify-fallback-servers"
-      description: "Confirms ntp.ubuntu.com and 0.debian.pool.ntp.org are configured as chrony sources"
+    - name: "verify-ipv6-address"
+      description: "Confirms the static IPv6 ULA fd00:10::70/64 is bound to the primary interface with global scope"
       type: "file"
-      source: "validation/validate-fallback-servers.sh"
+      source: "validation/validate-ipv6-address.sh"
 
-    - name: "verify-maxpoll"
-      description: "Confirms all four required sources use maxpoll 10 (1024s, closest power-of-two to the requested 1000s)"
+    - name: "verify-ipv6-reachable"
+      description: "Confirms fd00:10::70 actually answers a ping, not just appears in `ip addr`"
       type: "file"
-      source: "validation/validate-maxpoll.sh"
+      source: "validation/validate-ipv6-reachable.sh"
 
-    - name: "verify-minpoll"
-      description: "Confirms all four required sources use minpoll 4 (16s, closest power-of-two to the requested 20s retry)"
+    - name: "verify-hosts-forward"
+      description: "Confirms getent hosts app-srv1 resolves to 192.168.10.71"
       type: "file"
-      source: "validation/validate-minpoll.sh"
+      source: "validation/validate-hosts-forward.sh"
 
-    - name: "verify-chronyd-synced"
-      description: "Confirms chronyd reloaded the edited config and chronyc tracking reports Leap status: Normal"
+    - name: "verify-hosts-reverse"
+      description: "Confirms getent hosts 192.168.10.71 resolves back to app-srv1"
       type: "file"
-      source: "validation/validate-chronyd-synced.sh"
+      source: "validation/validate-hosts-reverse.sh"
+
+    - name: "verify-persistence"
+      description: "Confirms the secondary IPv4/IPv6 addresses are declared in a persistent Netplan or NetworkManager config, not only applied live"
+      type: "file"
+      source: "validation/validate-persistence.sh"
 
 teardown:
   keepCluster: false

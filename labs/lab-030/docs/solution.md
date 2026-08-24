@@ -1,156 +1,153 @@
 # Solution
 
-## Step 0: Confirm existing apps are untouched and locate Nginx's include path
+## Step 0: Confirm the interface name and current ruleset
 
 ```bash
-curl -s -o /dev/null -w '%{http_code}\n' http://192.168.10.60:1111/
-curl -s -o /dev/null -w '%{http_code}\n' http://192.168.10.60:2222/
-sudo nginx -T | grep -m1 'include'
-ls /etc/nginx/conf.d/ /etc/nginx/sites-enabled/ 2>/dev/null
+ip -br link show
+sudo nft list ruleset
 ```
 
-Verify both existing app ports respond before you start, so any breakage later is clearly attributable to your new config, not something already broken. `nginx -T` prints the fully-merged config with all includes resolved — look for the `include conf.d/*.conf;` (or `sites-enabled/*`) line in `nginx.conf`, since that's the directory your new file needs to land in to actually get loaded.
+Confirm the interface really is named `eth0` (some distros use predictable names like `enp0s3`) and see whether any base tables already exist — you don't want to accidentally create duplicate hooks with conflicting priorities.
 
-## Step 1: Create a new, isolated config file
+## Step 1: Create a filter table with input and output chains
 
 ```bash
-sudo touch /etc/nginx/conf.d/lb-8000-8001.conf
+sudo nft add table inet filter
+sudo nft add chain inet filter input   { type filter hook input priority filter\; policy accept\; }
+sudo nft add chain inet filter output  { type filter hook output priority filter\; policy accept\; }
 ```
 
-A descriptive filename tells the next admin exactly what this file is for at a glance. Using `conf.d/` avoids the extra symlink step `sites-available`/`sites-enabled` requires on Debian-family systems — either works as long as it's picked up by an `include`, but a single new file is the minimal, least-invasive footprint, satisfying "don't touch the existing app configs."
+Check `man nft` and search for `hook` — the CHAINS section spells out the valid hook names per family (`input`, `output`, `forward`, `prerouting`, `postrouting`) and the valid named priorities, which is faster to confirm on the spot than guessing under exam pressure.
 
-## Step 2: Build the fixed-target proxy on port 8001
+`inet` is a dual-stack table family (matches both IPv4 and IPv6) — the modern default unless you specifically need `ip`-only or `ip6`-only matching. `hook input` attaches to packets destined for this host; `hook output` attaches to packets originating from this host. `priority filter` (numeric `0`) places these chains at netfilter's conventional filtering point. `policy accept` is the default verdict for anything that falls through without matching a rule — we'll add explicit `drop` rules rather than flipping the whole chain to default-deny, since the task only asks for four specific behaviors, not a lockdown of the entire host.
 
-```nginx
-# /etc/nginx/conf.d/lb-8000-8001.conf
-
-server {
-    listen 8001;
-    server_name _;
-
-    location / {
-        proxy_pass http://192.168.10.60:2222/special;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-}
-```
-
-Since Nginx has no offline man page for directive syntax, lean on `nginx -t`'s error messages as you iterate — write the block, test it, and let the parser tell you immediately if `proxy_pass` or a header directive is malformed, rather than trying to recall exact syntax from memory.
-
-`listen 8001` opens a brand-new socket that has nothing to do with the app on 2222's own `server{}` block — Nginx dispatches purely by the port/host the request arrived on, so this coexists safely with the untouched app config. `proxy_pass http://192.168.10.60:2222/special;` forwards every request under `/` to that fixed backend URL, path included — this is the reverse-proxy behavior that satisfies "redirects all traffic to 192.168.10.60:2222/special" without ever exposing a 301 to the client or requiring changes to the app on 2222. The three `proxy_set_header` lines aren't strictly required by the task, but they're standard reverse-proxy hygiene: they preserve the original `Host` and client IP information for the backend app's logs, which a real API server would otherwise lose (it would just see 127.0.0.1 as the source).
-
-## Step 3: Build the load-balanced upstream on port 8000
-
-```nginx
-# same file, appended
-
-upstream app_pool {
-    # No explicit algorithm = round robin (Nginx's default).
-    # Swap the line above for `random;` to load-balance randomly instead.
-    server 192.168.10.60:1111;
-    server 192.168.10.60:2222;
-}
-
-server {
-    listen 8000;
-    server_name _;
-
-    location / {
-        proxy_pass http://app_pool;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-}
-```
-
-Check `man -k nginx` and any locally installed doc package for the `upstream` module first if you're unsure of the `random;`/`least_conn;` keyword spelling — with no internet available, `nginx -t` is again the fastest way to confirm a directive name is spelled correctly, since an unrecognized directive fails syntax validation immediately with the bad token named.
-
-`upstream app_pool { ... }` defines a named pool of backends; Nginx load-balances requests across the `server` entries inside it. With no algorithm directive, Nginx uses round-robin — each successive request goes to the next server in the list, cycling back to the top. If the task's "Random" option is preferred instead, add a `random;` line as the first statement inside the `upstream` block:
-
-```nginx
-upstream app_pool {
-    random;
-    server 192.168.10.60:1111;
-    server 192.168.10.60:2222;
-}
-```
-
-Either satisfies the task since it explicitly allows "Random or Round Robin" — round-robin (the default, shown above) requires the least code and is the safer choice under time pressure since there's nothing extra to get wrong.
-
-## Step 4: Test syntax before touching the running service
+## Step 2: Close port 5000
 
 ```bash
-sudo nginx -t
+sudo nft add rule inet filter input iifname "eth0" tcp dport 5000 drop
 ```
 
-Expected:
+`iifname "eth0"` scopes the rule to the interface named in the task — traffic arriving on other interfaces (e.g. loopback) is untouched. `tcp dport 5000` matches the TCP destination port. `drop` silently discards the packet with no response, which is what "closed" conventionally means in packet-filtering exam language (as opposed to `reject`, which sends back an ICMP/TCP-RST — either is defensible, but `drop` is the more common exam expectation for "closed").
 
-```text
-nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
-nginx: configuration file /etc/nginx/nginx.conf test is successful
-```
-
-`nginx -t` parses and validates the *entire merged* configuration, including your new file, without affecting the running worker processes at all. Never skip this before a reload — a typo here (a missing semicolon, an unmatched brace) is the single most common way to accidentally break the untouched app configs too, since Nginx reloads its configuration as one atomic unit.
-
-## Step 5: Reload Nginx
+## Step 3: Redirect port 6000 traffic to local port 6001
 
 ```bash
-sudo systemctl reload nginx
+sudo nft add table ip nat
+sudo nft add chain ip nat prerouting { type nat hook prerouting priority dstnat\; }
+sudo nft add rule ip nat prerouting iifname "eth0" tcp dport 6000 redirect to :6001
 ```
 
-`reload` (not `restart`) sends Nginx's master process a signal to gracefully spawn new workers with the updated config while finishing in-flight requests on the old workers — zero dropped connections for the two existing apps, which matters since you're not allowed to disrupt them.
+Check `man nft` and search for `redirect` in the NAT STATEMENTS section — it documents `redirect` as shorthand for `dnat` to the machine's own address, and shows the `to :PORT` argument form.
+
+Port redirection is destination NAT to *this same host*, so it must live in a `nat`-type table on the `prerouting` hook — this runs before routing decisions, which is exactly when a packet's destination port needs to change so the kernel subsequently delivers it to whatever's listening on 6001. The `redirect` statement is a convenience form of DNAT specifically for "redirect to a port on the local machine," which is simpler and more correct here than a manual `dnat to <local-ip>:6001` (redirect automatically uses whichever local address the packet arrived on, which matters if data-002 has multiple addresses). Note the `nat` table here uses family `ip` rather than `inet` — NAT chain types are not currently supported in `inet` family tables the same way filter chains are, so `ip` (IPv4-only) is the standard, portable choice for DNAT.
+
+## Step 4: Restrict port 6002 to 192.168.10.80 only
+
+```bash
+sudo nft add rule inet filter input iifname "eth0" tcp dport 6002 ip saddr 192.168.10.80 accept
+sudo nft add rule inet filter input iifname "eth0" tcp dport 6002 drop
+```
+
+This is the ordering principle from Study First made concrete: the `accept` rule for the trusted source IP is added *first*, and the catch-all `drop` for the same port is added *second*. `nft add rule` always appends to the end of the chain, so issuing these two commands in this order guarantees the correct evaluation order. If a connection to port 6002 arrives from 192.168.10.80, it matches the first rule and gets an `accept` verdict, which terminates chain evaluation — the second rule is never consulted for that packet. Any other source hitting port 6002 fails the first rule's `ip saddr` match, falls through to the second rule, and is dropped.
+
+## Step 5: Block outgoing traffic to 192.168.10.70
+
+```bash
+sudo nft add rule inet filter output ip daddr 192.168.10.70 drop
+```
+
+This lives in the `output` chain because the task explicitly says "outgoing" — packets data-002 originates toward 192.168.10.70. No interface/port restriction was asked for, so this is a blanket destination-IP block for any protocol. (If the task later needed this scoped to `eth0` specifically, you'd add `oifname "eth0"` — using `output` alone already implies locally-originated traffic on whatever interface routes toward that destination.)
+
+## Step 6: Review the full ruleset before persisting
+
+```bash
+sudo nft list ruleset
+```
+
+Read it top to bottom exactly as the kernel will evaluate it. Confirm the 6002 accept rule appears *before* the 6002 drop rule, and that each rule is attached to the chain/hook you intended.
+
+## Step 7: Persist the ruleset across reboot
+
+```bash
+# Most distros: nft's own systemd unit reads a saved ruleset file at boot
+sudo nft list ruleset | sudo tee /etc/nftables.conf
+sudo systemctl enable --now nftables
+```
+
+nftables rules built with `nft add` live only in kernel memory — a reboot wipes them unless they're written to the file the `nftables.service` unit loads at boot (`/etc/nftables.conf` on Debian/Ubuntu and RHEL-family alike, though check `/etc/sysconfig/nftables.conf` or distro docs if it differs). Saving the ruleset and enabling the service is what makes this survive a restart, which matters both operationally and because exam grading sometimes reboots the target.
 
 ## Verification
 
 ```bash
-# Fixed-target proxy: every request on 8001 should land on the /special
-# path of the 2222 app, regardless of what path the client requested.
-curl -s http://192.168.10.60:8001/
-curl -s http://192.168.10.60:8001/anything-else
-
-# Load-balanced pool: repeated requests on 8000 should alternate (or
-# randomize) between the 1111 and 2222 backends.
-for i in $(seq 1 6); do curl -s http://192.168.10.60:8000/ | head -c 80; echo; done
+sudo nft list ruleset
 ```
 
-Expected pattern for the round-robin case — alternating backend identity in the response body (assuming each app's response distinguishes itself, e.g. by port or hostname):
+Expected (abbreviated):
 
 ```text
-response-from-app-on-1111
-response-from-app-on-2222
-response-from-app-on-1111
-response-from-app-on-2222
-response-from-app-on-1111
-response-from-app-on-2222
+table inet filter {
+        chain input {
+                type filter hook input priority filter; policy accept;
+                iifname "eth0" tcp dport 5000 drop
+                iifname "eth0" tcp dport 6002 ip saddr 192.168.10.80 accept
+                iifname "eth0" tcp dport 6002 drop
+        }
+        chain output {
+                type filter hook output priority filter; policy accept;
+                ip daddr 192.168.10.70 drop
+        }
+}
+table ip nat {
+        chain prerouting {
+                type nat hook prerouting priority dstnat; policy accept;
+                iifname "eth0" tcp dport 6000 redirect to :6001
+        }
+}
 ```
 
-Confirm the untouched apps still work directly:
+Functional checks (run from data-001, IP 192.168.10.80, where relevant):
 
 ```bash
-curl -s -o /dev/null -w '%{http_code}\n' http://192.168.10.60:1111/
-curl -s -o /dev/null -w '%{http_code}\n' http://192.168.10.60:2222/
+# From data-001: port 6002 should succeed (or at least not be firewall-blocked)
+nc -zv 192.168.10.?? 6002
+
+# From any other host: port 6002 should time out / be refused
+nc -zv 192.168.10.?? 6002
+
+# Port 5000 should never connect from anywhere
+nc -zv 192.168.10.?? 5000
+
+# A connection to 6000 should land on whatever is listening on 6001
+nc -zv 192.168.10.?? 6000
 ```
 
-Both should return the same status codes as in Step 0, proving the existing configs were never touched.
+On data-002 itself, confirm no outbound reachability to app-srv1:
+
+```bash
+ping -c1 192.168.10.70   # should get no reply once the output rule is active
+```
 
 ## Command Summary
 
 ```bash
-curl -s -o /dev/null -w '%{http_code}\n' http://192.168.10.60:1111/
-curl -s -o /dev/null -w '%{http_code}\n' http://192.168.10.60:2222/
-sudo nginx -T | grep -m1 'include'
+ip -br link show
+sudo nft list ruleset
 
-sudo touch /etc/nginx/conf.d/lb-8000-8001.conf
-sudo $EDITOR /etc/nginx/conf.d/lb-8000-8001.conf
-# (add server{} on 8001 with proxy_pass to :2222/special,
-#  upstream{} + server{} on 8000 balancing :1111 and :2222)
+sudo nft add table inet filter
+sudo nft add chain inet filter input   { type filter hook input priority filter\; policy accept\; }
+sudo nft add chain inet filter output  { type filter hook output priority filter\; policy accept\; }
+sudo nft add rule inet filter input iifname "eth0" tcp dport 5000 drop
 
-sudo nginx -t
-sudo systemctl reload nginx
+sudo nft add table ip nat
+sudo nft add chain ip nat prerouting { type nat hook prerouting priority dstnat\; }
+sudo nft add rule ip nat prerouting iifname "eth0" tcp dport 6000 redirect to :6001
 
-curl -s http://192.168.10.60:8001/
-for i in $(seq 1 6); do curl -s http://192.168.10.60:8000/; echo; done
+sudo nft add rule inet filter input iifname "eth0" tcp dport 6002 ip saddr 192.168.10.80 accept
+sudo nft add rule inet filter input iifname "eth0" tcp dport 6002 drop
+
+sudo nft add rule inet filter output ip daddr 192.168.10.70 drop
+
+sudo nft list ruleset
+sudo nft list ruleset | sudo tee /etc/nftables.conf
+sudo systemctl enable --now nftables
 ```

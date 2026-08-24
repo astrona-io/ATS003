@@ -1,0 +1,54 @@
+metadata:
+  name: "ats-003-lab-051"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+
+bootstrap:
+  init:
+    - name: "install-nginx"
+      description: "Installs nginx via apt-get and enables/starts the service"
+      type: "folder"
+      source: "bootstrap/10-install-nginx/"
+
+    - name: "deploy-existing-apps"
+      description: "Deploys the two pre-existing, off-limits apps on ports 1111 and 2222 (with /special on 2222) that the new reverse proxy/load balancer config must route around without modifying"
+      type: "folder"
+      source: "bootstrap/20-deploy-existing-apps/"
+
+validation:
+  scripts:
+    - name: "verify-nginx-syntax"
+      description: "Confirms `nginx -t` reports the full merged configuration as syntactically valid"
+      type: "file"
+      source: "validation/validate-nginx-syntax.sh"
+
+    - name: "verify-existing-apps-untouched"
+      description: "Confirms the pre-existing apps on ports 1111 and 2222 (including /special on 2222) still serve their original, unmodified content"
+      type: "file"
+      source: "validation/validate-existing-apps-untouched.sh"
+
+    - name: "verify-proxy-8001"
+      description: "Confirms port 8001 reverse-proxies every request through to the 2222 app's /special path"
+      type: "file"
+      source: "validation/validate-proxy-8001.sh"
+
+    - name: "verify-loadbalancer-8000"
+      description: "Confirms port 8000 load-balances traffic across both the 1111 and 2222 backends"
+      type: "file"
+      source: "validation/validate-loadbalancer-8000.sh"
+
+teardown:
+  keepCluster: false

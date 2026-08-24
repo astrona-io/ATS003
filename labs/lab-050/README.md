@@ -1,9 +1,20 @@
-# lab-050: IPv4/IPv6 Addressing and Hostname Resolution
+# Challenge Lab 050: Application Proxy and SSH Capstone (Section Capstone)
 
-QEMU VM for the LFCS course — adding a persistent secondary IPv4 address and a static IPv6 ULA to the primary interface, plus forward/reverse hostname resolution via `/etc/hosts`.
+This is the **unguid challenge lab** that serves as the section capstone assessment.
 
-## Run
-
+## Start the Sandbox VM
+To spin up this certification challenge sandbox in your host terminal, run:
 ```bash
 astrona run --git git@github.com:astrona-io/ATS003.git -c labs/lab-050
+```
+
+## Learning Path & Objectives
+This challenge lab tests the integrated concepts learned across all modules in Section 050. Open the prompt file inside the VM to read the scenario goals:
+```bash
+cat docs/question.md
+```
+
+Implement your changes, and run the validation scripts inside the VM to verify your solutions:
+```bash
+/usr/local/bin/validate-*.sh
 ```

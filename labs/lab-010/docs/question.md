@@ -1,5 +1,7 @@
 # Question
 
-Solve this question on: `terminal`
+The data team needs `astro-ats-003-lab-010` reachable under a dedicated secondary address before they will point their pipeline configs at it. On interface eth0 (primary address 192.168.10.70/24), add a second static IPv4 address 192.168.10.71/24 and a static IPv6 address fd00:10::70/64 from the site's ULA range.
 
-Time synchronisation configuration needs to be updated: Set `0.pool.ntp.org` and `1.pool.ntp.org` as main NTP servers. Set `ntp.ubuntu.com` and `0.debian.pool.ntp.org` as fallback NTP servers. The maximum poll interval should be `1000` seconds and the connection retry `20` seconds.
+Both addresses must survive a reboot. Additionally, ensure the hostname `astro-ats-003-lab-010` resolves to 192.168.10.71 via `/etc/hosts`, and that reverse lookups of 192.168.10.71 resolve back to `astro-ats-003-lab-010`.
+
+Confirm resolution works with `getent`.

@@ -1,164 +1,160 @@
 # Solution
 
-## Step 1: Locate the chrony configuration file
+## Step 0: Identify the active network management stack
 
 ```bash
-# Ubuntu/Debian
-ls /etc/chrony/chrony.conf
-
-# RHEL/Fedora/openSUSE
-ls /etc/chrony.conf
+ip -br addr show
+systemctl is-active NetworkManager 2>/dev/null
+systemctl is-active systemd-networkd 2>/dev/null
+ls /etc/netplan/ 2>/dev/null
 ```
 
-Debian-family distros ship chrony's config at `/etc/chrony/chrony.conf`; RHEL-family distros use `/etc/chrony.conf` directly. Both are read by the same `chronyd` daemon and use identical directive syntax — only the path differs. Back the file up before editing:
+Different distros default to different stacks — Ubuntu Server typically uses Netplan (which itself renders down to either `systemd-networkd` or `NetworkManager`), while many other distros run NetworkManager directly. Persisting an address the wrong way — e.g. hand-editing `ifcfg-eth0` on a NetworkManager-managed host — can be silently overwritten or ignored, so confirming the active stack first avoids wasted work.
+
+## Step 1: Add both addresses live (ephemeral) first
 
 ```bash
-sudo cp /etc/chrony/chrony.conf /etc/chrony/chrony.conf.bak
+sudo ip addr add 192.168.10.71/24 dev eth0
+sudo ip -6 addr add fd00:10::70/64 dev eth0
 ```
 
-Check `man 5 chrony.conf` — the entries for `server` and `pool` sit right next to each other and spell out exactly which options (`iburst`, `maxpoll`, `minpoll`, `prefer`) each one accepts, which is faster than guessing from memory under exam pressure.
+Check `man ip-address` — the `ip addr add ADDRESS dev DEVICE` form is documented there, including that `ADDRESS` takes CIDR notation directly (no separate netmask argument needed, unlike the old `ifconfig`). Doing this step first gives you immediate, fast feedback that the addresses are valid and don't conflict with anything already assigned, before you touch any persistent config — a live smoke test before committing to a config file.
 
-## Step 2: Understand `server` vs `pool`
+## Step 2a: Persist with Netplan (if active)
 
-```conf
-# server: one specific NTP host
-server 0.pool.ntp.org iburst
-
-# pool: a DNS name that resolves to *multiple* rotating hosts
-pool 1.pool.ntp.org iburst maxsources 4
+```yaml
+# /etc/netplan/50-astro-ats-003-lab-010-secondary.yaml
+network:
+  version: 2
+  ethernets:
+    eth0:
+      addresses:
+        - 192.168.10.70/24
+        - 192.168.10.71/24
+        - fd00:10::70/64
 ```
 
-`pool.ntp.org` addresses are round-robin DNS names backed by many volunteer servers, so chrony is told to treat them as a pool and pick several distinct hosts behind the name. A plain `server` line is a single fixed host. The task names four *.pool.ntp.org-style hostnames, so `pool` is the technically correct directive for all of them, though `server` also works functionally (chrony will just resolve one A/AAAA record from the pool name rather than diversifying). Using `pool` here is more correct because it matches what these hostnames are designed for.
-
-## Step 3: Configure the main NTP servers
-
-Edit the config and remove any existing `pool`/`server` lines that conflict, then add:
-
-```conf
-# Main time sources
-pool 0.pool.ntp.org iburst maxpoll 10
-pool 1.pool.ntp.org iburst maxpoll 10
-```
-
-- `iburst` tells chrony to send a burst of closely-spaced probe packets when a source is first contacted (or after an outage), instead of waiting a full poll interval for the first reachability data — this dramatically speeds up initial sync, which matters right after a reload or boot.
-Check `man 5 chrony.conf` and search for `maxpoll` — the description explicitly states the argument is "the maximum interval... in seconds, but expressed as a power of 2" — this is exactly the kind of exact wording you can only get by reading the page, not by recalling a number.
-
-- `maxpoll 10` sets the maximum polling interval as `2^10 = 1024` seconds — the closest supported power-of-two to the requested 1000 seconds. There is no way to set an arbitrary non-power-of-two interval; chrony's poll interval is always expressed as an exponent of two by design (this bounds the polling algorithm's step size). `maxpoll 10` (1024s) is the honest, defensible answer to "maximum poll interval should be 1000 seconds" since 1000 itself is not achievable exactly.
-
-## Step 4: Configure the fallback NTP servers
-
-```conf
-# Fallback time sources
-server ntp.ubuntu.com iburst maxpoll 10
-server 0.debian.pool.ntp.org iburst maxpoll 10
-```
-
-There is no chrony keyword that literally means "only use this if the main ones fail." chrony's source-selection algorithm continuously scores every configured source on stratum, root distance, and jitter, and always picks the statistically best one(s) — all configured sources are active candidates simultaneously. The realistic way to express "these are fallback/less-preferred sources" is to leave the main pool servers with default preference (or add `prefer` to them) and let chrony's own selection algorithm naturally favor the lower-jitter, lower-stratum main sources unless they become unreachable, at which point chrony automatically promotes the next best source — which is exactly the *behavior* the task is asking for, just achieved through chrony's normal selection logic rather than a named "fallback" flag.
-
-If you want to make the preference explicit and auditable, mark the main servers with `prefer`:
-
-```conf
-pool 0.pool.ntp.org iburst maxpoll 10 prefer
-pool 1.pool.ntp.org iburst maxpoll 10 prefer
-server ntp.ubuntu.com iburst maxpoll 10
-server 0.debian.pool.ntp.org iburst maxpoll 10
-```
-
-`prefer` tells chrony's mitigation algorithm to favor these sources when multiple sources are otherwise close in quality, which is the closest real, documented approximation of "main" vs "fallback."
-
-## Step 5: The "connection retry 20 seconds" requirement
-
-Run `man -k poll` or search `man 5 chrony.conf` for "retry" first — you'll find no match, which is itself useful confirmation that this phrase does not map to any literal chrony directive; chrony has no setting named `retry`. The two real knobs in this space are:
-
-- `minpoll` — the *shortest* interval (again as a power-of-two exponent) chrony will use when a source needs more frequent measurement, e.g. right after startup or when jitter is high.
-- chrony's internal unreachable-source retry behavior, which is not user-configurable as a flat "N seconds" value — it is driven by the poll interval back-off/recovery algorithm itself.
-
-The defensible, honest configuration is to set `minpoll` to the exponent closest to 20 seconds. `2^4 = 16` and `2^5 = 32`; 16 is the closer power of two to 20:
-
-```conf
-pool 0.pool.ntp.org iburst minpoll 4 maxpoll 10 prefer
-pool 1.pool.ntp.org iburst minpoll 4 maxpoll 10 prefer
-server ntp.ubuntu.com iburst minpoll 4 maxpoll 10
-server 0.debian.pool.ntp.org iburst minpoll 4 maxpoll 10
-```
-
-Document this reasoning inline as a config comment so a reviewer (or future you) understands why 20 became `minpoll 4`:
-
-```conf
-# minpoll 4 (16s) approximates the requested 20s minimum re-check interval;
-# chrony has no literal "connection retry" directive — minpoll is the
-# closest real mechanism for how soon a source is re-polled.
-```
-
-## Step 6: Validate and reload
+Check `man 5 netplan` and search `/addresses` — the `addresses:` key under an interface takes a YAML list, and it accepts both IPv4 and IPv6 CIDR strings mixed in the same list, which is why the primary, secondary, and IPv6 addresses can all live in one block. Note that Netplan's `addresses:` list is authoritative for that interface — the primary address 192.168.10.70/24 must be listed too, or Netplan may leave it unmanaged/removed depending on how the interface was originally defined; when in doubt, check the existing Netplan file for eth0 and add to it rather than creating a second conflicting file.
 
 ```bash
-# Syntax/sanity check without touching the running daemon
-sudo chronyd -Q -f /etc/chrony/chrony.conf 'server 0.pool.ntp.org iburst' 2>&1 | head -5
-
-# Restart the running daemon to pick up the edited file
-sudo systemctl restart chrony
+sudo netplan generate
+sudo netplan apply
 ```
 
-Some chrony builds don't support a live `reload` for source changes and need a `restart`; if `reload` errors or silently doesn't pick up new sources, `restart` is the safe fallback — it's a short daemon blip, not a service that anything else depends on synchronously.
+`netplan generate` renders the YAML into the backend renderer's native config without applying it — a safe dry-run-adjacent step to catch YAML/schema errors before `apply` actually touches the live network.
 
-## Step 7: Confirm with chronyc
+## Step 2b: Persist with NetworkManager (if active)
 
 ```bash
-chronyc sources -v
+sudo nmcli con show
+sudo nmcli con mod "eth0" +ipv4.addresses 192.168.10.71/24
+sudo nmcli con mod "eth0" +ipv6.addresses fd00:10::70/64
+sudo nmcli con up "eth0"
 ```
 
-The symbol in the leftmost column tells you the source's role in the current selection: `*` is the currently synced-to source, `+` is a acceptable candidate also being combined into the estimate, `?` means unreachable, `x` means a falseticker excluded by the algorithm.
+Check `man nmcli` and search `/ipv4.addresses` — the `+` prefix on `+ipv4.addresses` is documented as an *append* operation (add to the existing list) rather than the plain form, which would overwrite the whole property and drop the primary address. This distinction is the single most common way this step goes wrong.
+
+## Step 3: Add the /etc/hosts entry for forward and reverse resolution
 
 ```bash
-chronyc tracking
+sudo tee -a /etc/hosts > /dev/null <<'EOF'
+192.168.10.71 astro-ats-003-lab-010
+EOF
 ```
 
-`Stratum`, `Reference ID`, and `System time` offset here prove chrony is actually disciplining the clock, not merely configured to try.
+Check `man 5 hosts` — the file format is `IP_address canonical_hostname [aliases...]`, one mapping per line. This single line serves both directions: forward lookups of `astro-ats-003-lab-010` return `192.168.10.71`, and reverse lookups of `192.168.10.71` return `astro-ats-003-lab-010`, because glibc's `files` NSS backend scans `/etc/hosts` in both directions from the same table — there's no separate "reverse zone" file needed the way DNS requires a PTR record.
+
+If `astro-ats-003-lab-010` already has an `/etc/hosts` entry for its primary address, decide deliberately whether the new line should replace it or add an alias — duplicate hostname entries resolve to whichever line the NSS backend encounters first when scanning top-to-bottom, which for forward lookups means the first matching line wins.
+
+## Step 4: Confirm hostname vs hosts-file distinction
+
+```bash
+hostnamectl status
+cat /etc/hostname
+```
+
+Check `man hostnamectl` — this only reports and sets the machine's *own* name (static, transient, pretty), which is unrelated to the `/etc/hosts` mapping you just added. The task doesn't ask you to rename the host, only to make the existing hostname resolve to the new address — don't touch `/etc/hostname` or run `hostnamectl set-hostname` here, that would be solving a different problem.
+
+## Step 5: Confirm the resolution order
+
+```bash
+grep '^hosts:' /etc/nsswitch.conf
+```
+
+Check `man 5 nsswitch.conf`, search `/hosts` — confirm the line reads `hosts: files dns` (or similar, with `files` before `dns`), which guarantees `/etc/hosts` is consulted before any DNS server, so your new line takes effect immediately without depending on DNS at all.
 
 ## Verification
 
 ```bash
-chronyc sources
+ip -br addr show eth0
 ```
 
-Expected output (four sources, all reachable eventually — reachability register fills in over the next few polls):
+Expected (both IPv4 addresses and the IPv6 address present):
 
 ```text
-MS Name/IP address         Stratum Poll Reach LastRx Last sample
-===============================================================================
-^* pool-a.ntp.org                 2  10   377    45   -123us[ -200us] +/-   12ms
-^+ pool-b.ntp.org                 2  10   377    50   +456us[ +400us] +/-   15ms
-^? ntp.ubuntu.com                 3   4     0     -     +0ns[   +0ns] +/-    0ns
-^? 0.debian.pool.ntp.org          2   4     0     -     +0ns[   +0ns] +/-    0ns
+eth0             UP             192.168.10.70/24 192.168.10.71/24 fd00:10::70/64 fe80::.../64
 ```
 
 ```bash
-chronyc tracking
+ip -6 addr show dev eth0
 ```
 
 ```text
-Reference ID    : XXXXXXXX (pool-a.ntp.org)
-Stratum         : 3
-Ref time (UTC)  : ...
-System time     : 0.000123456 seconds fast of NTP time
-Leap status     : Normal
+inet6 fd00:10::70/64 scope global
+inet6 fe80::.../64 scope link
 ```
 
-`Leap status: Normal` and a populated `Reference ID` confirm chrony has locked onto a source, not just started up.
+```bash
+getent hosts astro-ats-003-lab-010
+```
+
+```text
+192.168.10.71   astro-ats-003-lab-010
+```
+
+```bash
+getent hosts 192.168.10.71
+```
+
+```text
+192.168.10.71   astro-ats-003-lab-010
+```
+
+```bash
+ping -c1 fd00:10::70
+```
+
+Should succeed locally, confirming the IPv6 address is actually bound and answering, not just listed.
 
 ## Command Summary
 
 ```bash
-sudo cp /etc/chrony/chrony.conf /etc/chrony/chrony.conf.bak
-sudo $EDITOR /etc/chrony/chrony.conf
-# add:
-#   pool 0.pool.ntp.org iburst minpoll 4 maxpoll 10 prefer
-#   pool 1.pool.ntp.org iburst minpoll 4 maxpoll 10 prefer
-#   server ntp.ubuntu.com iburst minpoll 4 maxpoll 10
-#   server 0.debian.pool.ntp.org iburst minpoll 4 maxpoll 10
-sudo systemctl reload chrony || sudo systemctl restart chrony
-chronyc sources -v
-chronyc tracking
-timedatectl status
+ip -br addr show
+systemctl is-active NetworkManager 2>/dev/null
+systemctl is-active systemd-networkd 2>/dev/null
+ls /etc/netplan/ 2>/dev/null
+
+sudo ip addr add 192.168.10.71/24 dev eth0
+sudo ip -6 addr add fd00:10::70/64 dev eth0
+
+# Netplan path:
+sudo $EDITOR /etc/netplan/50-astro-ats-003-lab-010-secondary.yaml
+sudo netplan generate
+sudo netplan apply
+
+# NetworkManager path:
+sudo nmcli con mod "eth0" +ipv4.addresses 192.168.10.71/24
+sudo nmcli con mod "eth0" +ipv6.addresses fd00:10::70/64
+sudo nmcli con up "eth0"
+
+sudo tee -a /etc/hosts > /dev/null <<'EOF'
+192.168.10.71 astro-ats-003-lab-010
+EOF
+
+grep '^hosts:' /etc/nsswitch.conf
+
+ip -br addr show eth0
+getent hosts astro-ats-003-lab-010
+getent hosts 192.168.10.71
+ping -c1 fd00:10::70
 ```

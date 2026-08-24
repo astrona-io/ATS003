@@ -1,9 +1,20 @@
-# lab-040: OpenSSH Server Hardening with Match Blocks
+# Challenge Lab 040: Time and Name Services Capstone (Section Capstone)
 
-QEMU VM for the LFCS course — hardening `sshd_config` with global directives and per-user `Match` block overrides.
+This is the **unguid challenge lab** that serves as the section capstone assessment.
 
-## Run
-
+## Start the Sandbox VM
+To spin up this certification challenge sandbox in your host terminal, run:
 ```bash
 astrona run --git git@github.com:astrona-io/ATS003.git -c labs/lab-040
+```
+
+## Learning Path & Objectives
+This challenge lab tests the integrated concepts learned across all modules in Section 040. Open the prompt file inside the VM to read the scenario goals:
+```bash
+cat docs/question.md
+```
+
+Implement your changes, and run the validation scripts inside the VM to verify your solutions:
+```bash
+/usr/local/bin/validate-*.sh
 ```

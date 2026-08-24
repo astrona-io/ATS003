@@ -1,9 +1,20 @@
-# lab-060: Static Routing Across Multiple Interfaces
+# Challenge Lab 060: Connection Recovery and Audit Capstone (Section Capstone)
 
-Two QEMU VMs for the LFCS course, joined on a real `backend-net` segment (10.10.20.0/24) via `runtime.networks` — `target` (10.10.20.5, the host you configure) and `gateway` (10.10.20.1, fronts the partner subnet `10.10.30.0/24` via its own `dummy0`). Adding and persisting a static route to a remote subnet, verified end to end by actually pinging through it.
+This is the **unguid challenge lab** that serves as the section capstone assessment.
 
-## Run
-
+## Start the Sandbox VM
+To spin up this certification challenge sandbox in your host terminal, run:
 ```bash
 astrona run --git git@github.com:astrona-io/ATS003.git -c labs/lab-060
+```
+
+## Learning Path & Objectives
+This challenge lab tests the integrated concepts learned across all modules in Section 060. Open the prompt file inside the VM to read the scenario goals:
+```bash
+cat docs/question.md
+```
+
+Implement your changes, and run the validation scripts inside the VM to verify your solutions:
+```bash
+/usr/local/bin/validate-*.sh
 ```

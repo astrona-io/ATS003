@@ -1,174 +1,99 @@
 # Solution
 
-## Step 0: Back up the config and confirm current state
+## Step 1: Query the name using the system's default resolver
 
 ```bash
-sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
-sudo sshd -T | grep -iE 'x11forwarding|passwordauthentication|banner'
+dig data-001.internal.example.com
 ```
 
-`sshd -T` prints the fully resolved effective configuration (as if for a connection matching no `Match` blocks) — a good baseline snapshot before you start changing anything, and a fast way to prove your edits actually took effect later.
+Check `man dig` and read the output top to bottom once without `+short` — the full, un-abbreviated response is worth reading in full at least once so the section layout is familiar before relying on `+short` for everything else. The key sections:
 
-## Step 1: Disable X11Forwarding globally
+- **QUESTION** — echoes back exactly what was asked (name, class `IN`, type `A` by default)
+- **ANSWER** — the actual resource record(s) returned, each with its own TTL (seconds remaining before a resolver should re-query), class, type, and value
+- **AUTHORITY** — nameservers considered authoritative for the zone, populated especially on referrals or when there's no direct answer
+- **ADDITIONAL** — supplementary records, often the resolved IPs for anything named in AUTHORITY, saving an extra round trip
 
-Edit `/etc/ssh/sshd_config` and set (or add, if absent):
+The `;; SERVER:` line near the bottom of the output shows exactly which resolver actually answered this query — worth checking any time the result looks unexpected, since it confirms whether the system default resolver (from `/etc/resolv.conf`) was used.
 
-```
-X11Forwarding no
-```
-
-This must be a **global** directive — it applies to everyone, with no exception requested in the task, so it belongs above any `Match` block, in the main body of the file. `X11Forwarding no` prevents `ssh -X`/`ssh -Y` sessions from tunneling X11 traffic through the SSH connection at all, closing off a class of attacks where a compromised or malicious client-side X server could be leveraged against processes on the server.
-
-## Step 2: Disable PasswordAuthentication globally, then re-enable it for elena
-
-Still in the global section:
-
-```
-PasswordAuthentication no
-```
-
-Then, **after** all global directives, add a `Match` block:
-
-```
-Match User elena
-    PasswordAuthentication yes
-```
-
-Check `man 5 sshd_config` and search `/Match` — the man page states verbatim that keywords inside a matched block "override those set in the global section of the config file," which is the exact rule this step depends on; worth confirming from the source rather than trusting recall on exam day.
-
-The global `no` becomes the default for every account. The `Match User elena` block is evaluated only for connections where the authenticating username is exactly `elena`; when it matches, its `PasswordAuthentication yes` overrides the global `no` for that connection only, per OpenSSH's documented Match-block override behavior. Every other user — including victor — falls through to the global default and gets password auth disabled, which is precisely "for everyone but elena."
-
-Indentation of directives inside a `Match` block is a readability convention, not a syntax requirement, but keep it consistent so the block's scope is visually obvious to the next person editing this file.
-
-## Step 3: Enable the Banner for elena and victor only
-
-Add a second `Match` block, after the first:
-
-```
-Match User elena,victor
-    Banner /etc/ssh/sshd-banner
-```
-
-Check `man 5 sshd_config`, search `/Banner` — confirm it's listed among the keywords "matchable" inside `Match` blocks before relying on this pattern; not every directive is legal there, and the man page's `Match` section explicitly enumerates which ones are.
-
-`Match User` accepts a comma-separated list, so one block covers both accounts — no need for two separate blocks. `Banner` is a Match-legal keyword, and since there's no global `Banner` directive set (the compiled-in default is effectively "none"), every user *other* than elena and victor continues to see no banner at all, while these two see the contents of `/etc/ssh/sshd-banner` before authentication.
-
-Create the banner file's content (any text satisfies the task; a real environment would put a legal/warning notice here):
+## Step 2: Get a bare, scriptable answer
 
 ```bash
-sudo tee /etc/ssh/sshd-banner > /dev/null <<'EOF'
-Authorized access only. All activity may be monitored and logged.
-EOF
+dig +short data-001.internal.example.com
 ```
 
-## Step 4: Review the final structure
+Check `man dig` for `+short` — it strips all the protocol framing and prints only the answer value(s), one per line, nothing else. This is the right form for piping into a script or a quick sanity check, but the full form from Step 1 is what you want when actually diagnosing a discrepancy, since `+short` throws away the TTL, the answering server, and the section structure that tells you *why* an answer looks the way it does.
+
+## Step 3: Query a specific, known-good server directly — bypassing the system resolver entirely
 
 ```bash
-sudo grep -vE '^\s*#|^\s*$' /etc/ssh/sshd_config | tail -20
+dig @8.8.8.8 data-001.internal.example.com
 ```
 
-Expected shape (order matters — both `Match` blocks after all global lines):
-
-```
-X11Forwarding no
-PasswordAuthentication no
-
-Match User elena
-    PasswordAuthentication yes
-
-Match User elena,victor
-    Banner /etc/ssh/sshd-banner
-```
-
-## Step 5: Syntax-test before touching the running daemon
+Check `man dig` — the `@server` syntax (documented right in the SYNOPSIS) sends the query directly to that IP/hostname, completely ignoring whatever is configured in `/etc/resolv.conf`. This is the single most useful move for isolating a DNS problem: if this returns something different from Step 1's system-resolver query, the problem is local to `terminal`'s resolver configuration or cache, not the record itself. For an internal-only name like this scenario's, querying the organization's actual authoritative/internal DNS server directly (rather than a public resolver like `8.8.8.8`, which won't know an internal-only zone at all) is the realistic move — the public-resolver example above is shown for a public-name variant of the same technique.
 
 ```bash
-sudo sshd -t
+DNS="$(getent hosts astrona-ats-003-lab-040-dns | awk '{print $1}')"
+dig @"$DNS" data-001.internal.example.com
 ```
 
-No output means success. Any output is a fatal syntax problem — fix it before proceeding. This is the single most important step in the whole lab: `sshd -t` parses the file exactly as the daemon would, without affecting the currently running `sshd` process or any existing sessions at all.
+Comparing this against Step 1's result is the actual diagnostic step the scenario calls for — a match means the record and both resolvers agree (problem is elsewhere, e.g. the application, not DNS at all); a mismatch means `terminal`'s own resolver is the layer at fault. In this lab that's a genuinely independent check: Step 1 went through `terminal`'s configured resolver (`/etc/resolv.conf`), while this step talks directly to the authoritative server on a separate VM, bypassing local resolver config entirely.
 
-You can also dump the effective config for a hypothetical connection as a specific user to sanity-check `Match` resolution before reload:
+## Step 4: Check MX and NS records for the domain
 
 ```bash
-sudo sshd -T -C user=elena,host=data-002,addr=192.168.10.80 | grep -iE 'passwordauthentication|banner'
-sudo sshd -T -C user=victor,host=data-002,addr=192.168.10.80 | grep -iE 'passwordauthentication|banner'
+dig internal.example.com MX
+dig internal.example.com NS
 ```
 
-This shows exactly what sshd would apply per user without needing a live test connection — `passwordauthentication yes` for elena, `passwordauthentication no` for victor, and `banner /etc/ssh/sshd-banner` for both.
+The record type is simply appended after the name (`dig NAME TYPE`) — `dig` defaults to `A` when no type is given, as seen in every prior step. `MX` answers "which mail server(s) handle email for this domain, and in what priority order" (a lower preference number means higher priority); `NS` answers "which nameservers are authoritative for this zone" — two different, non-interchangeable questions that happen to share the same query syntax.
 
-## Step 6: Reload sshd — keep your current session open
+## Step 5: Reverse-lookup the IP the record is supposed to point to
 
 ```bash
-sudo systemctl reload sshd 2>/dev/null || sudo systemctl reload ssh
+dig -x 192.168.10.80
 ```
 
-The service unit is named `sshd` on RHEL-family distros and `ssh` on Debian/Ubuntu — try one, fall back to the other. `reload` (not `restart`) re-reads the config and applies it to new connections without dropping your current authenticated session, which is exactly the safety margin you want: if something is still wrong, your existing terminal remains your way back in.
+Check `man dig` for `-x` — it's a convenience flag that automatically builds the correct `in-addr.arpa` (or `ip6.arpa` for IPv6) PTR query for the given address and swaps the octet order for you, so there's no need to hand-construct `80.10.168.192.in-addr.arpa` manually. A working forward record with no matching reverse (PTR) record is a common, legitimate asymmetry — not every environment maintains reverse zones — but confirming it either way is often part of a full DNS health check, especially for mail-related troubleshooting where missing PTR records commonly cause deliverability problems.
 
-**Do not close your current session yet.** Open a second terminal/connection to validate before you consider the change complete.
+## Step 6: Trace the full delegation path if the record appears to be missing entirely
+
+```bash
+dig +trace data-001.internal.example.com
+```
+
+Check `man dig` for `+trace` — instead of asking one resolver for a final answer, this makes `dig` start at a root server and walk the delegation chain itself: root → TLD (or, for an internal zone, wherever the trace bottoms out) → the zone's own authoritative servers, printing the referral at each hop. This is the tool for the specific case where a plain query just returns NXDOMAIN or times out with no further explanation — `+trace` shows exactly which hop in the chain stopped producing a useful referral, which is far more actionable than a bare "not found." For a genuinely internal-only zone not delegated from the public root at all, `+trace` will visibly demonstrate that the chain never reaches an authoritative answer through the public hierarchy — itself useful confirmation that the name only resolves via an internal resolver/zone, not a diagnosis dead-end.
 
 ## Verification
 
-From a separate session (do not close your first one until these pass):
-
 ```bash
-# elena: password auth should still work
-ssh -v elena@data-002
-# expect the auth negotiation to offer/accept password, and login to succeed
-# with password "elena"
+dig +short data-001.internal.example.com
+# 192.168.10.80
 
-# victor: password auth should now be rejected
-ssh -v victor@data-002
-# expect: "Permission denied (publickey)." — password method not offered/accepted
+dig @"$DNS" +short data-001.internal.example.com
+# 192.168.10.80
+# (matches system resolver's answer -> record + both resolvers agree)
 
-# Banner should appear before authentication for both elena and victor
-ssh victor@data-002
-# expect the banner text to print before the password prompt
+dig -x 192.168.10.80 +short
+# data-001.internal.example.com.
+
+dig internal.example.com NS +short
+# ns1.internal.example.com.
+
+dig internal.example.com MX +short
+# 10 mail.internal.example.com.
 ```
 
-Confirm X11Forwarding is off:
-
-```bash
-ssh -v elena@data-002 2>&1 | grep -i x11forwarding
-```
-
-Expect to see the negotiated value reflect `no` (X11 forwarding request refused/not offered), which you can also confirm directly:
-
-```bash
-sudo sshd -T | grep -i x11forwarding
-```
-
-```text
-x11forwarding no
-```
+Matching output between the system-resolver query and the direct-server query confirms the record itself is correct and consistent — any remaining "it doesn't resolve" complaint at that point points at the application or a client-side cache, not DNS.
 
 ## Command Summary
 
 ```bash
-sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
-sudo sshd -T | grep -iE 'x11forwarding|passwordauthentication|banner'
-
-sudo $EDITOR /etc/ssh/sshd_config
-# global section:
-#   X11Forwarding no
-#   PasswordAuthentication no
-# after all global lines:
-#   Match User elena
-#       PasswordAuthentication yes
-#
-#   Match User elena,victor
-#       Banner /etc/ssh/sshd-banner
-
-sudo tee /etc/ssh/sshd-banner > /dev/null <<'EOF'
-Authorized access only. All activity may be monitored and logged.
-EOF
-
-sudo sshd -t
-sudo sshd -T -C user=elena,host=data-002,addr=192.168.10.80 | grep -iE 'passwordauthentication|banner'
-sudo sshd -T -C user=victor,host=data-002,addr=192.168.10.80 | grep -iE 'passwordauthentication|banner'
-
-sudo systemctl reload sshd 2>/dev/null || sudo systemctl reload ssh
-
-ssh -v elena@data-002
-ssh -v victor@data-002
+dig data-001.internal.example.com
+dig +short data-001.internal.example.com
+DNS="$(getent hosts astrona-ats-003-lab-040-dns | awk '{print $1}')"
+dig @"$DNS" data-001.internal.example.com
+dig internal.example.com MX
+dig internal.example.com NS
+dig -x 192.168.10.80
+dig +trace data-001.internal.example.com
 ```

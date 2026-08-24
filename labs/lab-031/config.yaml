@@ -1,0 +1,49 @@
+metadata:
+  name: "ats-003-lab-031"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+
+bootstrap:
+  init:
+    - name: "nftables-lab-setup"
+      description: "Installs nftables if missing, resets to an empty ruleset, and starts a local listener on port 6001 so the port 6000->6001 redirect is testable end-to-end"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-port-5000-drop"
+      description: "Confirms TCP port 5000 is dropped in the inet filter input chain"
+      type: "file"
+      source: "validation/validate-port-5000-drop.sh"
+
+    - name: "verify-port-6000-redirect"
+      description: "Confirms TCP port 6000 is redirected to local port 6001 via the nat table's prerouting chain, and that 6001 has a live listener"
+      type: "file"
+      source: "validation/validate-port-6000-redirect.sh"
+
+    - name: "verify-port-6002-source-restriction"
+      description: "Confirms port 6002 is accepted from 192.168.10.80 and dropped for everyone else, with the accept rule ordered before the catch-all drop"
+      type: "file"
+      source: "validation/validate-port-6002-source-restriction.sh"
+
+    - name: "verify-egress-block"
+      description: "Confirms outgoing traffic to 192.168.10.70 is dropped in the inet filter output chain"
+      type: "file"
+      source: "validation/validate-egress-block-192-168-10-70.sh"
+
+teardown:
+  keepCluster: false

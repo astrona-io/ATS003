@@ -1,5 +1,0 @@
-# Question
-
-The data team reports that an internal service name isn't resolving correctly when tools on `terminal` try to reach it, but they can't tell whether the DNS record is wrong, whether `terminal`'s resolver is caching something stale, or whether it's a local `/etc/hosts` issue overriding DNS entirely. Using `dig`, methodically isolate which layer is actually at fault: check what the system resolver currently returns for the name, compare that against querying a known-good DNS server directly, check the domain's MX and NS records while you're in there, do a reverse lookup on the IP the record is supposed to point to, and if the record appears to be missing entirely, trace the full delegation path to find out where it breaks down.
-
-**Lab environment note:** this lab is two VMs — the client (`terminal`'s role) and the internal DNS server, reachable as `astrona-ats-003-lab-110-dns`. The client's system resolver is already pointed at it; use `getent hosts astrona-ats-003-lab-110-dns` to get its address for the direct `@server` query.

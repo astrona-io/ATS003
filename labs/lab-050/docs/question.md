@@ -1,7 +1,5 @@
 # Question
 
-The data team needs `astro-ats-003-lab-050` reachable under a dedicated secondary address before they will point their pipeline configs at it. On interface eth0 (primary address 192.168.10.70/24), add a second static IPv4 address 192.168.10.71/24 and a static IPv6 address fd00:10::70/64 from the site's ULA range.
+Solve this question on: `web-srv1`
 
-Both addresses must survive a reboot. Additionally, ensure the hostname `astro-ats-003-lab-050` resolves to 192.168.10.71 via `/etc/hosts`, and that reverse lookups of 192.168.10.71 resolve back to `astro-ats-003-lab-050`.
-
-Confirm resolution works with `getent`.
+Server `web-srv1` is hosting two applications, one accessible on port `1111` and one on `2222`. These are served using Nginx and it's not allowed to change their config. The IP of `web-srv1` is `192.168.10.60`. Create a new HTTP LoadBalancer on that server which: Listens on port `8001` and redirects all traffic to `192.168.10.60:2222/special`. Listens on port `8000` and balances traffic between `192.168.10.60:1111` and `192.168.10.60:2222` in a Random or Round Robin fashion. Nginx is already preinstalled and is recommended to be used for the implementation.

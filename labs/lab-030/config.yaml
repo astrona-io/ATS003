@@ -18,37 +18,32 @@ runtime:
 
 bootstrap:
   init:
-    - name: "install-nginx"
-      description: "Installs nginx via apt-get and enables/starts the service"
+    - name: "nftables-lab-setup"
+      description: "Installs nftables if missing, resets to an empty ruleset, and starts a local listener on port 6001 so the port 6000->6001 redirect is testable end-to-end"
       type: "folder"
-      source: "bootstrap/10-install-nginx/"
-
-    - name: "deploy-existing-apps"
-      description: "Deploys the two pre-existing, off-limits apps on ports 1111 and 2222 (with /special on 2222) that the new reverse proxy/load balancer config must route around without modifying"
-      type: "folder"
-      source: "bootstrap/20-deploy-existing-apps/"
+      source: "bootstrap/"
 
 validation:
   scripts:
-    - name: "verify-nginx-syntax"
-      description: "Confirms `nginx -t` reports the full merged configuration as syntactically valid"
+    - name: "verify-port-5000-drop"
+      description: "Confirms TCP port 5000 is dropped in the inet filter input chain"
       type: "file"
-      source: "validation/validate-nginx-syntax.sh"
+      source: "validation/validate-port-5000-drop.sh"
 
-    - name: "verify-existing-apps-untouched"
-      description: "Confirms the pre-existing apps on ports 1111 and 2222 (including /special on 2222) still serve their original, unmodified content"
+    - name: "verify-port-6000-redirect"
+      description: "Confirms TCP port 6000 is redirected to local port 6001 via the nat table's prerouting chain, and that 6001 has a live listener"
       type: "file"
-      source: "validation/validate-existing-apps-untouched.sh"
+      source: "validation/validate-port-6000-redirect.sh"
 
-    - name: "verify-proxy-8001"
-      description: "Confirms port 8001 reverse-proxies every request through to the 2222 app's /special path"
+    - name: "verify-port-6002-source-restriction"
+      description: "Confirms port 6002 is accepted from 192.168.10.80 and dropped for everyone else, with the accept rule ordered before the catch-all drop"
       type: "file"
-      source: "validation/validate-proxy-8001.sh"
+      source: "validation/validate-port-6002-source-restriction.sh"
 
-    - name: "verify-loadbalancer-8000"
-      description: "Confirms port 8000 load-balances traffic across both the 1111 and 2222 backends"
+    - name: "verify-egress-block"
+      description: "Confirms outgoing traffic to 192.168.10.70 is dropped in the inet filter output chain"
       type: "file"
-      source: "validation/validate-loadbalancer-8000.sh"
+      source: "validation/validate-egress-block-192-168-10-70.sh"
 
 teardown:
   keepCluster: false

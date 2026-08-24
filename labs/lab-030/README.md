@@ -1,9 +1,20 @@
-# lab-030: Reverse Proxy and Load Balancer with Nginx
+# Challenge Lab 030: Host Security and Filtering Capstone (Section Capstone)
 
-QEMU VM for the LFCS course — building an Nginx reverse proxy and load balancer in front of two pre-existing, off-limits apps on ports 1111 and 2222.
+This is the **unguid challenge lab** that serves as the section capstone assessment.
 
-## Run
-
+## Start the Sandbox VM
+To spin up this certification challenge sandbox in your host terminal, run:
 ```bash
 astrona run --git git@github.com:astrona-io/ATS003.git -c labs/lab-030
+```
+
+## Learning Path & Objectives
+This challenge lab tests the integrated concepts learned across all modules in Section 030. Open the prompt file inside the VM to read the scenario goals:
+```bash
+cat docs/question.md
+```
+
+Implement your changes, and run the validation scripts inside the VM to verify your solutions:
+```bash
+/usr/local/bin/validate-*.sh
 ```

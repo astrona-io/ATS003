@@ -1,0 +1,39 @@
+metadata:
+  name: "ats-003-lab-013"
+  docs:
+    solution: "docs/solution.md"
+    question: "docs/question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+
+bootstrap:
+  init:
+    - name: "network-tools-lab-setup"
+      description: "Installs curl and dnsutils (dig), and creates /opt/course for recording the private and public addresses"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-private-ip"
+      description: "Confirms /opt/course/private_ip holds an RFC1918 address that is actually bound to a local interface"
+      type: "file"
+      source: "validation/validate-private-ip.sh"
+
+    - name: "verify-public-ip"
+      description: "Confirms /opt/course/public_ip holds a plausible non-private IPv4 address, cross-checked against a live lookup when reachable"
+      type: "file"
+      source: "validation/validate-public-ip.sh"
+
+teardown:
+  keepCluster: false

@@ -1,5 +1,5 @@
 # Question
 
-Solve this question on: `web-srv1`
+Solve this question on: `data-002`
 
-Server `web-srv1` is hosting two applications, one accessible on port `1111` and one on `2222`. These are served using Nginx and it's not allowed to change their config. The IP of `web-srv1` is `192.168.10.60`. Create a new HTTP LoadBalancer on that server which: Listens on port `8001` and redirects all traffic to `192.168.10.60:2222/special`. Listens on port `8000` and balances traffic between `192.168.10.60:1111` and `192.168.10.60:2222` in a Random or Round Robin fashion. Nginx is already preinstalled and is recommended to be used for the implementation.
+Server `data-002` is used for big data and provides internally used APIs for various data operations. You're asked to implement network packet filters on interface `eth0` on `data-002`: Port `5000` should be closed. Redirect all traffic on port `6000` to local port `6001`. Port `6002` should only be accessible from IP `192.168.10.80` (server `data-001`). Block all outgoing traffic to IP `192.168.10.70` (server `app-srv1`).
