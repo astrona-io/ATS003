@@ -1,4 +1,4 @@
-## Understanding network interfaces and IP addresses
+## Understanding network interfaces and IPv4 & IPv6 Addressing
 
 A Linux machine can have one or more network interfaces. A network interface is a physical or virtual connection that allows the machine to communicate with a network.
 
