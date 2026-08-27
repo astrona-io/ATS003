@@ -18,10 +18,10 @@ By completing this section, you will acquire three core capabilities:
 This section is divided into four focused textbook modules, followed by four dedicated guided sandboxes and one unguided capstone:
 
 ### Theoretical Concepts & Metaphors
-*   **[Module 1: IPv4 & IPv6 Addressing](./module-01/course.md)**
-*   **[Module 2: Static Hostname Management](./module-02/course.md)**
-*   **[Module 3: Public IP Discovery Behind NAT](./module-03/course.md)**
-*   **[Module 4: Local Hostname Name Resolution](./module-04/course.md)**
+*   **[Module 1: Understanding network interfaces and IPv4 & IPv6 Addressing](./module-01/course.md)**
+*   **[Module 2: Managing Linux Hostnames](./module-02/course.md)**
+*   **[Module 3: Discovering Your Public IP Address](./module-03/course.md)**
+*   **[Module 4: Local Hostname Resolution](./module-04/course.md)**
 
 ### Guided Training Labs
 *   **[Hands-on Training Lab 1 (Addressing)](../../labs/lab-011)**
