@@ -33,6 +33,23 @@ Software bridges are commonly used by:
 - Software-defined networking platforms.
 - Linux routers and firewalls.
 
+## Learning objectives
+
+After this module you can:
+
+- Explain what a Linux software bridge is, why it operates at Layer 2, and why an IP address belongs on the bridge rather than on a port.
+- Create a temporary bridge with `ip link`, attach an interface with `master`, and confirm membership with `bridge link show`.
+- Describe how a bridge learns MAC addresses into its forwarding database (FDB) and read it with `bridge fdb show`.
+- Explain how a Layer 2 loop forms and what STP does about it, and enable or disable STP on a bridge.
+- Move an IP address from a port to the bridge and verify the result with `ip addr show`.
+- Explain why an `ip`-created bridge is lost on reboot, and state how a bridge differs from a bond.
+
+## Before you start
+
+This module assumes you can open a shell, run commands with `sudo`, and have seen interface names like `enp0s2` and a prefixed IPv4 address such as `192.168.60.10/24`. Ethernet frame, MAC address, Layer 2 and Layer 3, ARP, DHCP, and STP are all defined as they come up. The bonding module is useful background for the closing comparison but is not required.
+
+The playground gives you a throwaway Linux VM with three usable interfaces: one management NIC that carries your SSH session and holds an address — leave it alone — and two spare NICs, address-less, both on the **same** isolated `192.168.60.0/24` segment. Both spares sharing one segment is deliberate: it lets the STP checkpoint build a real Layer 2 loop. That segment has no other host, no DHCP server, and no LACP switch, so dynamically learned FDB entries and DHCP-on-a-bridge cannot be shown here — the text says so where each comes up.
+
 ## Key terms
 
 | Term | Meaning in this chapter |

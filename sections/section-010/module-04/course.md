@@ -39,6 +39,23 @@ Linux can obtain this mapping from several sources, including:
 
 A useful mental model: when something on the machine needs the address for a name, it does not go straight to DNS. It asks a switchboard — the **Name Service Switch (NSS)** — which consults a configured list of sources in order and returns the first answer. `/etc/hosts` is usually the first source on that list. This chapter is about that local source and the switchboard in front of it.
 
+## Learning objectives
+
+After this module you can:
+
+- Read an `/etc/hosts` line and identify the IP address, the canonical hostname, and any aliases.
+- Explain why the NSS switchboard, not DNS directly, decides where a name lookup goes, and read the `hosts:` line in `/etc/nsswitch.conf` to see the order.
+- Add or remove an `/etc/hosts` entry with `sudo` and confirm it resolves immediately with `getent hosts`.
+- Explain why `getent` is a cleaner test of name resolution than `ping`.
+- Choose between a loopback address such as `127.0.1.1` and an interface address for a hostname entry, based on how the name is used.
+- Explain why an `/etc/hosts` entry resolves only on the machine that holds it, and when DNS is the right tool instead.
+
+## Before you start
+
+This module assumes you can open a shell, run commands with `sudo`, edit a text file, and have seen a dotted IPv4 address like `192.168.1.50`. It assumes you know a machine has a static hostname set with `hostnamectl`, from the previous module. DNS, NSS, canonical hostname, and loopback are all defined as they come up.
+
+The playground gives you a throwaway Linux VM with a prepared `/etc/hosts`: the static hostname `prod-app-01` mapped to the loopback address `127.0.1.1` with alias `app-server`, plus a `db-primary` (alias `db`) line pointing at `192.168.50.10` where nothing is listening — it is there so you can watch a name resolve and still fail to connect. The playground network has no DNS server, so `files` is the only source that ever answers. Editing `/etc/hosts` here is safe and reversible.
+
 ## Key terms
 
 | Term | Meaning in this chapter |

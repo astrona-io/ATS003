@@ -37,6 +37,23 @@ Depending on the bonding mode you choose, this can provide:
 
 Bonding does not automatically guarantee high availability. Its behaviour depends on the bonding mode, the switch configuration, the cabling, the upstream network design, and whether failures are actually detected.
 
+## Learning objectives
+
+After this module you can:
+
+- Explain what a Linux bond is, why an IP address belongs on `bond0` rather than on its members, and what "member interface" means.
+- Compare the common bonding modes — active-backup (1), balance-tlb (5), and 802.3ad/LACP (4) — by purpose, switch requirement, and whether more than one link carries traffic at once.
+- Build a temporary active-backup bond with `ip link` and read its state from `/proc/net/bonding/bond0`.
+- Configure MII link monitoring with `miimon` and state what it detects and what it does not.
+- Trigger a failover by taking the active member down and identify the new `Currently Active Slave`.
+- Explain why an `ip`-created bond is lost on reboot and name the systems that make one persistent.
+
+## Before you start
+
+This module assumes you can open a shell, run commands with `sudo`, and have seen interface names like `enp0s2` and a dotted IPv4 address with a prefix such as `192.168.50.50/24`. MAC address, Layer 2 and Layer 3, switch, LACP, and hash are all defined as they come up. Familiarity with `ip link` and `ip addr` from the interfaces module helps but is not assumed.
+
+The playground gives you a throwaway Linux VM with three usable interfaces: one management NIC that carries your SSH session and holds an address — leave it alone — and two spare NICs, `DOWN` and address-less, on isolated `192.168.50.0/24` and `192.168.51.0/24` segments. Those two are the bond members for every checkpoint. The bonding driver is preloaded. The isolated segments have no LACP-capable switch, so mode 4 cannot be built here; the checkpoints use active-backup (mode 1), which needs nothing from the switch.
+
 ## Key terms
 
 | Term | Meaning in this chapter |

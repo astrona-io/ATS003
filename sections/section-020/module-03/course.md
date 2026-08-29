@@ -20,6 +20,23 @@ For every outgoing packet, Linux must work out:
 
 This matters most when a machine has several network interfaces connected to different networks.
 
+## Learning objectives
+
+After this module you can:
+
+- Read a routing-table line and identify the destination prefix, outgoing interface, gateway (if any), scope, and source address.
+- Explain longest-prefix matching and predict which of several overlapping routes Linux picks for a given destination.
+- Add, replace, and remove a static route with `ip route`, and explain why the `via` gateway must be on-link.
+- Use `ip route get` to see the interface, gateway, and source address Linux would choose for a destination, without sending a packet.
+- Explain what a route metric does when two routes share a prefix, and why a lower metric on its own is not failover.
+- Work an unreachable destination in order — interface, address, route, next hop, return path — using `ip link`, `ip addr`, `ip route`, `ip neigh`, and `ping`.
+
+## Before you start
+
+This module assumes you can open a shell, run commands with `sudo`, and have seen a dotted IPv4 address with a prefix such as `10.0.0.50/24`. Route, connected route, gateway / next hop, metric, and longest-prefix matching are defined as they come up, and the "Reading network prefixes" section below refreshes prefix length first. Familiarity with `ip addr` and `ip link` from the interfaces module helps but is not assumed.
+
+The playground gives you a throwaway Linux VM with three addressed interfaces: the management NIC that carries your SSH session — it holds the low-metric default route, so leave it alone — and two lab NICs on `10.0.0.0/24` and `192.168.70.0/24`. No router sits on either lab segment, so every static route you add points at a next hop that does not answer. That is deliberate: `ip route get` still resolves the route (it sends no packet), while `ping` and `traceroute` are the failing case on purpose. Every route added with `ip route` is runtime-only and is cleared by the reboot checkpoint.
+
 ## Reading network prefixes
 
 Routes are written with a network address and a **prefix length**, such as `10.0.0.0/24`. The number after the slash is how many leading bits are fixed:

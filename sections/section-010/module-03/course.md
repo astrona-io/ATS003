@@ -20,6 +20,23 @@ Two questions with two different answers:
 
 The gap between those two answers is what NAT creates, and this chapter is about measuring it.
 
+## Learning objectives
+
+After this module you can:
+
+- Identify whether an address from `ip addr show` is private (an RFC 1918 range) or public, by matching it to the three private blocks.
+- Explain why the address on your interface can differ from the address an Internet server sees, in terms of NAT and SNAT.
+- Read `ip route show` to find the default gateway, and explain why that gateway address is normally private, not your public address.
+- Query an external HTTP or DNS service to discover the observed public egress address, and add a timeout so a blocked request fails fast instead of hanging.
+- Explain why HTTP-based and DNS-based discovery can return different addresses.
+- State what a discovered public address does *not* tell you about whether the Internet can reach the machine.
+
+## Before you start
+
+This module assumes you can open a shell and run commands, that you have seen a dotted IPv4 address like `192.168.1.50`, and that an interface has a name such as `enp0s1`. Private-versus-public ranges, NAT, SNAT, default gateway, and egress address are all defined as they come up. Discovery uses `curl` and `dig`; both are already installed in the playground.
+
+The playground gives you a throwaway Linux VM on two private ranges at once — the management interface in `10.0.0.0/8` and an extra NIC in `172.16.0.0/12` — with no public address configured anywhere on it. Whether the VM can reach the Internet to *ask* for its egress address depends on how the environment was provisioned; the discovery checkpoint is written to work either way, and a request that times out is part of the lesson, not a failure to fix.
+
 ## Key terms
 
 | Term | Meaning in this chapter |
