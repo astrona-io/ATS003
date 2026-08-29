@@ -1,5 +1,14 @@
 # Link Aggregation with Linux Bonding
 
+<!-- astrona:playground -->
+> [!NOTE]
+> 🧪 **Hands-on playground for this module** — a clean, throwaway machine to explore on. No task, no grading. Folder: [`playground/`](https://github.com/astrona-io/ATS003/tree/main/sections/section-020/module-01/playground)
+>
+> ```sh
+> astrona run --git ssh://git@github.com/astrona-io/ATS003.git -c sections/section-020/module-01/playground
+> astrona destroy linux-bonding-playground
+> ```
+
 Linux bonding combines multiple network interfaces into one logical interface, commonly named `bond0`.
 
 For example, a machine with two physical interfaces:

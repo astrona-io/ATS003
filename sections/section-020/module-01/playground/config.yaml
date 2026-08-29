@@ -1,0 +1,48 @@
+# Link Aggregation with Linux Bonding (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+#
+# Runtime: a single qemu VM (a plain Linux host, no Kubernetes). The VM gets
+# its normal astrona management interface plus two extra, unconfigured NICs on
+# isolated segments — the member interfaces you practise bonding with.
+
+metadata:
+  name: "linux-bonding-playground"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Install bonding/link tools, make the bonding module available, leave the lab NICs unconfigured."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  networks:
+    # Two isolated L2 segments. Nothing assigns an IP on them — that is for you
+    # to do on bond0 while exploring.
+    - name: bond-net-a
+      cidr: 192.168.50.0/24
+    - name: bond-net-b
+      cidr: 192.168.51.0/24
+  qemu:
+    - name: "host"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
+      arch: "arm64"
+      cpus: 2
+      memoryMB: 2048
+      diskSizeGB: 20
+      networks:
+        # Extra member NICs, in addition to the default management interface.
+        - { name: bond-net-a }
+        - { name: bond-net-b }
+      sshPasswordAuth: false
