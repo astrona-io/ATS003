@@ -1,0 +1,49 @@
+# Software Bridging (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+#
+# Runtime: a single qemu VM (a plain Linux host, no Kubernetes). The VM gets
+# its normal astrona management interface plus two extra, unconfigured NICs on
+# ONE shared L2 segment — bridge those two ports together and you have a
+# deliberate Layer 2 loop to watch the Spanning Tree Protocol block.
+
+metadata:
+  name: "linux-bridging-playground"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Install bridge/link tools, leave the two lab NICs down and unconfigured."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  networks:
+    # One isolated L2 segment with BOTH lab NICs on it. Nothing assigns an IP
+    # here — that is for you to do on br0 while exploring. Bridging two ports
+    # that face the same segment is a loop on purpose: STP is the point.
+    - name: bridge-net
+      cidr: 192.168.60.0/24
+  qemu:
+    - name: "host"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
+      arch: "arm64"
+      cpus: 2
+      memoryMB: 2048
+      diskSizeGB: 20
+      networks:
+        # Two extra bridge-port NICs, in addition to the default management
+        # interface, both on the same segment.
+        - { name: bridge-net }
+        - { name: bridge-net }
+      sshPasswordAuth: false
