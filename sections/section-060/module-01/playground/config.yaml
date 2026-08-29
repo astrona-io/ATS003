@@ -1,0 +1,45 @@
+# Persistent Network Managers (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+#
+# Runtime: a single qemu VM — a plain Ubuntu 24.04 server with ONE extra NIC on
+# an isolated segment (192.168.120.0/24, no DHCP, no router). OS prep installs
+# NetworkManager and tells it to manage ONLY that spare NIC — the management
+# interface that carries your SSH session is left `unmanaged`, so nothing you do
+# with nmcli can drop the session. The spare NIC starts with no connection
+# profile: building persistent profiles with nmcli is the point.
+
+metadata:
+  name: "networkmanager-nmcli-playground"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Install NetworkManager, restrict it to the spare NIC, leave the SSH NIC unmanaged."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  networks:
+    - name: nm-net
+      cidr: 192.168.120.0/24
+  qemu:
+    - name: "host"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
+      arch: "arm64"
+      cpus: 1
+      memoryMB: 1536
+      diskSizeGB: 20
+      networks:
+        - { name: nm-net }
+      sshPasswordAuth: false

@@ -1,0 +1,40 @@
+# Active Socket Diagnostics (ss) (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+#
+# Runtime: a single qemu VM — a plain Ubuntu 24.04 server. OS prep starts a
+# spread of sockets so every `ss` view has something to show: TCP listeners
+# bound to all addresses, to localhost only, and to IPv6; a UDP listener; a
+# Unix-domain listener; and one long-lived established TCP connection. Nothing
+# to build — the point is reading `ss` against a machine that already has
+# interesting sockets.
+
+metadata:
+  name: "ss-socket-diagnostics-playground"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Start TCP/UDP/Unix listeners and one held connection for ss to display."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  qemu:
+    - name: "host"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
+      arch: "arm64"
+      cpus: 1
+      memoryMB: 1536
+      diskSizeGB: 20
+      sshPasswordAuth: false

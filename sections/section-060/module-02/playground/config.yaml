@@ -1,0 +1,44 @@
+# Netplan YAML Configurations (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+#
+# Runtime: a single qemu VM — a plain Ubuntu 24.04 server with ONE extra NIC on
+# an isolated segment (192.168.130.0/24, no DHCP, no router). Netplan is native
+# on Ubuntu (renderer: systemd-networkd). The spare NIC has NO netplan file —
+# writing one, rendering it, and using `netplan try` on it is the point. The
+# management interface keeps its own cloud-init netplan file; leave it alone.
+
+metadata:
+  name: "netplan-yaml-playground"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Confirm netplan is present, identify the spare NIC, tighten file perms."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  networks:
+    - name: np-net
+      cidr: 192.168.130.0/24
+  qemu:
+    - name: "host"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
+      arch: "arm64"
+      cpus: 1
+      memoryMB: 1536
+      diskSizeGB: 20
+      networks:
+        - { name: np-net }
+      sshPasswordAuth: false

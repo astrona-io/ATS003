@@ -1,0 +1,40 @@
+# OpenSSH Server Hardening (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+#
+# Runtime: a single qemu VM — a plain Ubuntu 24.04 server. The catch with an
+# SSH-hardening topic is that breaking sshd_config can lock you out. So OS prep
+# stands up a SECOND, throwaway sshd on port 2222 with its own config file
+# (/etc/ssh/sshd_test.conf) and two local test users. Every hardening change and
+# every Match block goes in that file and is tested against :2222 — the real
+# astrona session on :22 is never touched.
+
+metadata:
+  name: "ssh-hardening-playground"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Stand up a second sshd on :2222 with its own config + test users alice/bob."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  qemu:
+    - name: "host"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
+      arch: "arm64"
+      cpus: 1
+      memoryMB: 1536
+      diskSizeGB: 20
+      sshPasswordAuth: false

@@ -1,0 +1,71 @@
+# NTP Server Mode and Stratums (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+#
+# Runtime: TWO qemu VMs on one isolated segment (192.168.101.0/24):
+#   * ntp-server (192.168.101.10) — chrony running with `local stratum 10` so it
+#     HAS a clock to serve, but NO `allow` line, so it refuses every client
+#     query. Opening it up is what you do here.
+#   * ntp-client (192.168.101.20) — chrony already pointed at the server
+#     (`server 192.168.101.10 iburst`). Its source sits in the `?` (unreachable)
+#     state until the server allows it, then locks on — cause and effect in one
+#     view.
+# No firewall on either VM, so the `allow` directive is the only gate.
+
+metadata:
+  name: "ntp-server-playground"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "common"
+      description: "Install chrony + inspection tools on both VMs."
+      type: "file"
+      source: "bootstrap/prepare-common.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  networks:
+    - name: ntp-net
+      cidr: 192.168.101.0/24
+  qemu:
+    - name: "ntp-server"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
+      arch: "arm64"
+      cpus: 1
+      memoryMB: 1024
+      diskSizeGB: 20
+      networks:
+        - { name: ntp-net, ipv4: 192.168.101.10 }
+      sshPasswordAuth: false
+      bootstrap:
+        init:
+          - name: "server-config"
+            description: "chrony with local stratum 10 but no allow line — refuses clients."
+            type: "file"
+            source: "bootstrap/prepare-server.sh"
+    - name: "ntp-client"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
+      arch: "arm64"
+      cpus: 1
+      memoryMB: 1024
+      diskSizeGB: 20
+      networks:
+        - { name: ntp-net, ipv4: 192.168.101.20 }
+      sshPasswordAuth: false
+      bootstrap:
+        init:
+          - name: "client-config"
+            description: "chrony pointed at 192.168.101.10 — polls, but is refused until allowed."
+            type: "file"
+            source: "bootstrap/prepare-client.sh"

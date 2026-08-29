@@ -1,0 +1,40 @@
+# Raw Packet Capturing (tcpdump) (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+#
+# Runtime: a single qemu VM — a plain Ubuntu 24.04 server. OS prep starts a
+# local HTTP server on 127.0.0.1:8080 and a small loop that generates steady
+# loopback traffic (an HTTP GET, an ICMP echo, and a UDP datagram to a closed
+# port) every couple of seconds, plus writes a sample .pcap. So `tcpdump -i lo`
+# always has packets, and every filter / output flag has something to show —
+# offline, no external network.
+
+metadata:
+  name: "tcpdump-capture-playground"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Start an HTTP server + a loopback traffic loop, save a sample .pcap."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  qemu:
+    - name: "host"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
+      arch: "arm64"
+      cpus: 1
+      memoryMB: 1536
+      diskSizeGB: 20
+      sshPasswordAuth: false

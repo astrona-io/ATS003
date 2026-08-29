@@ -1,0 +1,40 @@
+# DNS Verification with dig (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+#
+# Runtime: a single qemu VM — a plain Ubuntu 24.04 server. OS prep installs
+# `dig` and a local authoritative BIND server holding a made-up zone
+# `lab.example` (plus its reverse zone), so every dig query type — A, AAAA, MX,
+# CNAME, TXT, NS, SOA, PTR, AXFR — resolves offline with no internet DNS.
+# The forward zone allows zone transfer from localhost; the reverse zone does
+# not, so `dig AXFR` shows both the allowed and the refused case.
+
+metadata:
+  name: "dns-dig-playground"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Install dig + BIND, load the lab.example zone, point the resolver at localhost."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  qemu:
+    - name: "host"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
+      arch: "arm64"
+      cpus: 1
+      memoryMB: 1536
+      diskSizeGB: 20
+      sshPasswordAuth: false
