@@ -1,4 +1,4 @@
-# Chapter 2: Software Bridging
+# Software Bridging
 
 <!-- astrona:playground -->
 > [!NOTE]

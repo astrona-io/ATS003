@@ -1,4 +1,4 @@
-# Chapter 1: Link Aggregation with Linux Bonding
+# Link Aggregation with Linux Bonding
 
 <!-- astrona:playground -->
 > [!NOTE]

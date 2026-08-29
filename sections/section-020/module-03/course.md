@@ -1,4 +1,4 @@
-# Chapter 3: Multi-Interface Static Routing
+# Multi-Interface Static Routing
 
 <!-- astrona:playground -->
 > [!NOTE]
