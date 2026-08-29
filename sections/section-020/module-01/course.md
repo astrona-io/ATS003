@@ -1,4 +1,4 @@
-# Link Aggregation with Linux Bonding
+# Chapter 1: Link Aggregation with Linux Bonding
 
 <!-- astrona:playground -->
 > [!NOTE]
@@ -9,7 +9,9 @@
 > astrona destroy linux-bonding-playground
 > ```
 
-Linux bonding combines multiple network interfaces into one logical interface, commonly named `bond0`.
+A **network interface** is the point where the operating system connects to a network. It is usually a network card (a NIC) or a virtual equivalent, it has a name such as `eth0` or `enp0s2`, and it can carry one or more IP addresses.
+
+Linux **bonding** takes several network interfaces and presents them to the rest of the system as one interface, commonly named `bond0`. `bond0` is a *logical* interface: it is software in the kernel that sits on top of real network cards, not a physical port you can plug a cable into.
 
 For example, a machine with two physical interfaces:
 
@@ -24,16 +26,28 @@ can combine them into:
 bond0
 ```
 
-Applications and network services use `bond0` instead of communicating through `eth1` or `eth2` directly.
+Applications and network services then use `bond0` instead of talking to `eth1` or `eth2` directly.
 
-Depending on the selected bonding mode, this can provide:
+Depending on the bonding mode you choose, this can provide:
 
-- Network redundancy.
-- Automatic failover.
-- Distribution of traffic across multiple interfaces.
-- Increased total throughput across multiple network connections.
+- **Redundancy** — more than one interface can do the job, so one can fail without an outage.
+- **Automatic failover** — traffic moves to a working interface when the active one fails.
+- **Traffic distribution** — outgoing (and sometimes incoming) traffic is spread across several interfaces.
+- **Higher total throughput** — more combined data-per-second capacity across multiple connections.
 
-Bonding does not automatically guarantee high availability. Its behaviour depends on the bonding mode, switch configuration, cabling, upstream network design, and whether failures are detected correctly.
+Bonding does not automatically guarantee high availability. Its behaviour depends on the bonding mode, the switch configuration, the cabling, the upstream network design, and whether failures are actually detected.
+
+## Key terms
+
+| Term | Meaning in this chapter |
+|---|---|
+| **MAC address** | The hardware address of an interface. Used to deliver Ethernet frames on the local network segment. |
+| **Layer 2** | Local delivery on one network segment, using MAC addresses (Ethernet). |
+| **Layer 3** | Delivery between networks, using IP addresses and routing. |
+| **Switch** | The device network cables plug into. It forwards Ethernet frames between ports on the same local network. |
+| **Default route / gateway** | Where the machine sends traffic for any network it has no specific route for — normally a router on the local segment. |
+| **LACP** | Link Aggregation Control Protocol (IEEE 802.3ad). A standard by which a host and a switch agree which links form one aggregated group. |
+| **Hash** | A function that turns fields such as source and destination IP into a number, used to pick which member link a given flow uses. |
 
 ## Bond terminology
 
@@ -42,11 +56,11 @@ A bonding configuration contains:
 - A **bond interface**, such as `bond0`.
 - Two or more **member interfaces**, such as `eth1` and `eth2`.
 - A **bonding mode** that controls how the interfaces are used.
-- A link-monitoring method that detects interface failures.
+- A **link-monitoring method** that detects interface failures.
 
-The bond interface is sometimes called the **master** interface. Its attached physical interfaces have traditionally been called **slaves**, but **member interfaces** is now the preferred term.
+The bond interface is sometimes called the **master** interface. Its attached physical interfaces have traditionally been called **slaves**, but **member interfaces** is now the preferred term. Some kernel output still prints the word `Slave`.
 
-IP addresses should normally be assigned to the bond interface rather than its individual members.
+IP addresses should normally be assigned to the bond interface rather than to its individual members.
 
 Example:
 
@@ -56,15 +70,33 @@ bond0: 192.168.1.50/24
 └── eth2
 ```
 
-In this configuration, `bond0` owns the IP address. The member interfaces transport traffic on behalf of the bond.
+Here `bond0` owns the IP address. The member interfaces carry traffic on behalf of the bond.
+
+> [!TIP]
+> **Try it — see the raw interfaces before any bond exists**
+>
+> ```sh
+> ip -brief link show
+> ```
+>
+> Expect something like:
+>
+> ```text
+> lo               UNKNOWN        00:00:00:00:00:00 <LOOPBACK,UP,LOWER_UP>
+> enp0s1           UP             52:54:00:11:22:33 <BROADCAST,MULTICAST,UP,LOWER_UP>
+> enp0s2           DOWN           52:54:00:aa:bb:cc <BROADCAST,MULTICAST>
+> enp0s3           DOWN           52:54:00:dd:ee:ff <BROADCAST,MULTICAST>
+> ```
+>
+> The interface names on your machine will differ. One interface carries your SSH session and has an IP — leave that one alone. The other two (here `enp0s2` and `enp0s3`) have no IP and no bond yet; those are the member interfaces you will bond together in the checkpoints below.
 
 ## Common bonding modes
 
-Linux supports several bonding modes. The correct mode depends on whether the goal is failover, load distribution, or integration with a switch using the Link Aggregation Control Protocol (LACP).
+Linux supports several bonding modes. The right one depends on whether the goal is failover, load distribution, or integration with a switch using LACP.
 
 ### Mode 1: Active-backup
 
-Active-backup mode uses one interface for traffic while the other member interfaces remain ready as backups.
+Active-backup mode uses one interface for traffic while the other members wait as backups.
 
 ```text
 bond0
@@ -93,15 +125,53 @@ Active-backup mode provides:
 - No requirement for a switch-side link aggregation group.
 - Compatibility with most switches.
 
-It does not combine the bandwidth of all member interfaces. If two 1 Gbit/s interfaces are bonded, the bond normally still provides up to 1 Gbit/s of active bandwidth.
+It does not combine the bandwidth of all members. If two 1 Gbit/s interfaces are bonded, the bond normally still provides up to 1 Gbit/s of active bandwidth.
 
-Active-backup mode is often a good starting point when redundancy is more important than additional throughput.
+Active-backup is often a good starting point when redundancy matters more than extra throughput.
+
+> [!TIP]
+> **Try it — build a temporary active-backup bond and inspect it**
+>
+> Replace `enp0s2` and `enp0s3` with the two non-SSH interface names you saw above. These commands only touch the spare member interfaces, so they will not drop your session — but never run them against the interface carrying your SSH connection.
+>
+> ```sh
+> sudo ip link add bond0 type bond mode active-backup miimon 100
+> sudo ip link set enp0s2 down
+> sudo ip link set enp0s3 down
+> sudo ip link set enp0s2 master bond0
+> sudo ip link set enp0s3 master bond0
+> sudo ip link set bond0 up
+> sudo ip link set enp0s2 up
+> sudo ip link set enp0s3 up
+> cat /proc/net/bonding/bond0
+> ```
+>
+> Expect something like:
+>
+> ```text
+> Ethernet Channel Bonding Driver: v6.8.0
+>
+> Bonding Mode: fault-tolerance (active-backup)
+> Currently Active Slave: enp0s2
+> MII Status: up
+> MII Polling Interval (ms): 100
+>
+> Slave Interface: enp0s2
+> MII Status: up
+> Link Failure Count: 0
+> Permanent HW addr: 52:54:00:aa:bb:cc
+>
+> Slave Interface: enp0s3
+> MII Status: up
+> Link Failure Count: 0
+> Permanent HW addr: 52:54:00:dd:ee:ff
+> ```
+>
+> `Bonding Mode` confirms active-backup, and exactly one member is listed as `Currently Active Slave` — the other is standing by. `ip link show master bond0` lists the same two members from the interface side.
 
 ### Mode 5: Adaptive transmit load balancing
 
-Adaptive transmit load balancing distributes outgoing traffic between available member interfaces.
-
-Incoming traffic is normally received through one interface.
+Adaptive transmit load balancing (`balance-tlb`) distributes *outgoing* traffic across the available members. Incoming traffic is normally received through one interface.
 
 This mode is configured as:
 
@@ -121,11 +191,13 @@ Balance-TLB provides:
 - Automatic failover.
 - No requirement for a switch-side link aggregation group.
 
-Because incoming and outgoing traffic are handled differently, the performance benefit depends on the traffic pattern. A single network connection should not be expected to use the combined bandwidth of all interfaces.
+Because incoming and outgoing traffic are handled differently, the benefit depends on the traffic pattern. A single network connection should not be expected to use the combined bandwidth of all interfaces.
+
+In the playground you can tear the bond down with `sudo ip link del bond0` and rebuild it with `mode balance-tlb` instead of `mode active-backup`; the `Bonding Mode` line in `/proc/net/bonding/bond0` changes to `transmit load balancing`.
 
 ### Mode 4: IEEE 802.3ad LACP
 
-Mode 4 creates a dynamic link aggregation group using IEEE 802.3ad and the Link Aggregation Control Protocol.
+Mode 4 creates a dynamic link aggregation group using IEEE 802.3ad and LACP.
 
 This mode is configured as:
 
@@ -139,7 +211,7 @@ or:
 mode=802.3ad
 ```
 
-LACP allows the Linux machine and network switch to negotiate which links belong to the aggregation group.
+LACP lets the Linux machine and the switch negotiate which links belong to the aggregation group.
 
 It can provide:
 
@@ -148,11 +220,11 @@ It can provide:
 - Higher total throughput when multiple network flows are active.
 - Detection and management of links within the aggregation group.
 
-LACP requires compatible configuration on both the Linux machine and the connected switch. The switch ports must belong to the same LACP aggregation group.
+LACP requires matching configuration on both ends. The switch ports must belong to the same LACP aggregation group.
 
-A single network flow normally uses only one physical interface because traffic is distributed using a hash. Multiple simultaneous flows can be distributed across different member interfaces.
+A single network flow normally uses only one physical interface, because traffic is placed on a member by hashing packet fields. Multiple simultaneous flows can land on different members. Two 1 Gbit/s links may therefore provide close to 2 Gbit/s across many flows, while a single transfer stays near 1 Gbit/s.
 
-Two 1 Gbit/s links may therefore provide close to 2 Gbit/s of total capacity across multiple flows, but a single transfer will normally remain limited to approximately 1 Gbit/s.
+> Mode 4 cannot be exercised in this module's playground: its two extra segments are isolated Layer 2 networks with no LACP-capable switch on the other end, so no aggregation group can form. The active-backup checkpoints (mode 1) are used instead because they need nothing from the switch.
 
 ## Comparing common bonding modes
 
@@ -164,11 +236,9 @@ Two 1 Gbit/s links may therefore provide close to 2 Gbit/s of total capacity acr
 
 ## Link monitoring
 
-A bond needs a way to detect whether a member interface is still operational.
+A bond needs a way to detect whether a member interface is still working.
 
-One common method is Media Independent Interface monitoring, known as **MII monitoring**.
-
-The following setting checks the link state every 100 milliseconds:
+One common method is Media Independent Interface monitoring, or **MII monitoring**. The following setting checks the link state every 100 milliseconds:
 
 ```text
 miimon=100
@@ -181,25 +251,51 @@ MII monitoring can detect conditions such as:
 - A failed physical interface.
 - Loss of the local Ethernet carrier.
 
-MII monitoring only checks the local link state. It does not confirm that the default gateway or a remote service is reachable.
+MII monitoring only checks the *local* link state. It does not confirm that the default gateway or a remote service is reachable. The link can stay "up" even if a router farther upstream has failed. This is the difference between **link state** (is this cable electrically alive?) and **end-to-end reachability** (can I actually reach the other host?).
 
-For example, the link may remain operational even if a router farther upstream has failed.
+> [!TIP]
+> **Try it — force a failover and watch MII monitoring react**
+>
+> With the active-backup bond from earlier still up, take the *currently active* member down. Use the member name shown as `Currently Active Slave`, not your SSH interface:
+>
+> ```sh
+> sudo ip link set enp0s2 down
+> cat /proc/net/bonding/bond0
+> ```
+>
+> Expect something like:
+>
+> ```text
+> Bonding Mode: fault-tolerance (active-backup)
+> Currently Active Slave: enp0s3
+> MII Status: up
+>
+> Slave Interface: enp0s2
+> MII Status: down
+> Link Failure Count: 1
+>
+> Slave Interface: enp0s3
+> MII Status: up
+> Link Failure Count: 0
+> ```
+>
+> Within about 100 ms of the link dropping, `MII Status` for that member flips to `down`, its `Link Failure Count` increments, and `Currently Active Slave` moves to the other member. Bring it back with `sudo ip link set enp0s2 up`. Interface names, MACs, and counts are examples.
 
 ## Creating a temporary bond
 
-The `ip` command can create a bond directly in the running Linux system:
+The `ip` command can create a bond directly in the running system:
 
 ```bash
 sudo ip link add name bond0 type bond mode active-backup miimon 100
 ```
 
-This command creates:
+This creates:
 
 - A bond named `bond0`.
 - An active-backup configuration.
 - MII link monitoring every 100 milliseconds.
 
-The configuration is temporary and is normally lost when the machine restarts.
+This configuration is temporary. It is normally lost when the machine restarts.
 
 Before adding an interface to a bond, bring it down:
 
@@ -215,7 +311,7 @@ sudo ip link set eth1 master bond0
 sudo ip link set eth2 master bond0
 ```
 
-Enable the bond and its member interfaces:
+Enable the bond and its members:
 
 ```bash
 sudo ip link set bond0 up
@@ -223,41 +319,61 @@ sudo ip link set eth1 up
 sudo ip link set eth2 up
 ```
 
-These commands can interrupt network connectivity. Do not modify the interface used for your current SSH session unless you have console access or another recovery method.
+**Warning:** these commands can interrupt network connectivity. Do not modify the interface used for your current SSH session unless you have console access or another recovery method. In the playground, that means only ever touching the two spare member NICs, never the management interface.
 
 ## Assigning an IP address to the bond
 
-An IP address should normally be assigned to the bond instead of its member interfaces:
+An IP address should normally be assigned to the bond, not to its members:
 
 ```bash
 sudo ip addr add 192.168.1.50/24 dev bond0
 ```
 
-If the machine needs to communicate with other networks, it may also require a default route:
+If the machine needs to reach other networks, it may also need a default route:
 
 ```bash
 sudo ip route add default via 192.168.1.1 dev bond0
 ```
 
-The example values must be replaced with addresses appropriate for the local network.
+Replace the example values with addresses appropriate for the local network.
 
 Member interfaces should normally not keep their own Layer 3 addresses after joining the bond. The bond becomes the logical Layer 3 interface used by the operating system.
 
+> [!TIP]
+> **Try it — give the bond an address**
+>
+> The playground's spare NICs sit on the `192.168.50.0/24` and `192.168.51.0/24` segments, so pick an address in one of those ranges:
+>
+> ```sh
+> sudo ip addr add 192.168.50.50/24 dev bond0
+> ip addr show dev bond0
+> ```
+>
+> Expect something like:
+>
+> ```text
+> 5: bond0: <BROADCAST,MULTICAST,MASTER,UP,LOWER_UP> mtu 1500 ...
+>     inet 192.168.50.50/24 scope global bond0
+>        valid_lft forever preferred_lft forever
+> ```
+>
+> The address lands on `bond0`, not on `enp0s2` or `enp0s3`. The members stay at Layer 2 and carry the traffic; the bond is the interface the OS routes through. Remove it again with `sudo ip addr del 192.168.50.50/24 dev bond0`. The interface index (`5:`) and names are examples.
+
 ## Inspecting a bond
 
-Display the bond interface:
+Show the bond interface:
 
 ```bash
 ip link show bond0
 ```
 
-Display its assigned addresses:
+Show its assigned addresses:
 
 ```bash
 ip addr show dev bond0
 ```
 
-Display the attached member interfaces:
+Show the attached members:
 
 ```bash
 ip link show master bond0
@@ -278,22 +394,22 @@ MII Polling Interval (ms): 100
 Currently Active Slave: eth1
 ```
 
-Important fields include:
+Important fields:
 
-- `Bonding Mode`: The mode used by the bond.
-- `MII Status`: Whether the bond currently detects a working link.
-- `MII Polling Interval`: How frequently the link state is checked.
-- `Currently Active Slave`: The member currently carrying traffic in active-backup mode.
-- `Link Failure Count`: The number of detected failures for a member.
-- `Permanent HW addr`: The original MAC address of a member interface.
+- `Bonding Mode` — the mode the bond is running.
+- `MII Status` — whether the bond currently detects a working link.
+- `MII Polling Interval` — how often the link state is checked.
+- `Currently Active Slave` — the member currently carrying traffic in active-backup mode.
+- `Link Failure Count` — how many failures have been detected for a member.
+- `Permanent HW addr` — the original MAC address of a member interface.
 
-The kernel interface still uses the historical word `Slave` in some output even though the interfaces can be described as bond members in documentation.
+The kernel still uses the historical word `Slave` in some output, even though the interfaces can be described as bond members in documentation.
 
 ## Temporary and persistent configuration
 
-Bonding created with the `ip` command is runtime configuration. It normally disappears after a restart.
+A bond created with the `ip` command is **runtime** configuration. It normally disappears after a restart.
 
-A persistent bond should be configured using the network-management system provided by the Linux distribution, such as:
+A persistent bond should be configured through the network-management system your distribution provides, such as:
 
 - NetworkManager.
 - Netplan.
@@ -301,7 +417,30 @@ A persistent bond should be configured using the network-management system provi
 - `ifupdown`.
 - Distribution-specific network configuration files.
 
-Do not configure the same interfaces through multiple network-management systems at the same time. Conflicting configurations can cause interfaces to change state unexpectedly.
+Do not configure the same interfaces through more than one network-management system at once. Conflicting configurations can make interfaces change state unexpectedly.
+
+> [!TIP]
+> **Try it — confirm the runtime bond does not survive a reboot**
+>
+> This one restarts the whole VM, so it will drop your SSH session for a minute. That is safe in a throwaway playground; reconnect afterwards with `astrona ssh linux-bonding-playground`.
+>
+> ```sh
+> sudo reboot
+> ```
+>
+> After reconnecting:
+>
+> ```sh
+> cat /proc/net/bonding/bond0
+> ```
+>
+> Expect:
+>
+> ```text
+> cat: /proc/net/bonding/bond0: No such file or directory
+> ```
+>
+> The bonding *driver* is still loaded (the playground's bootstrap arranges that), but `bond0` and everything you built with `ip` is gone. Anything that must come back after a reboot has to be written into one of the network-management systems listed above.
 
 ## High-availability considerations
 
@@ -316,6 +455,6 @@ For meaningful redundancy, consider whether the member interfaces use:
 - Independent power sources.
 - Independent upstream network paths.
 
-Connecting both interfaces to the same switch protects against a cable or port failure, but it does not protect against failure of the entire switch.
+Connecting both interfaces to the same switch protects against a cable or port failure, but not against failure of the whole switch.
 
-When member interfaces connect to different switches, the switches must support the chosen design. Multi-switch LACP normally requires technologies such as switch stacking, MLAG, or an equivalent vendor-specific feature.
+When members connect to different switches, the switches must support the chosen design. Multi-switch LACP normally requires technologies such as switch stacking, MLAG, or an equivalent vendor-specific feature.
