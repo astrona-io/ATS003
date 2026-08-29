@@ -115,6 +115,22 @@ The `/64` identifies the network portion of the address.
 
 An interface can hold IPv4 and IPv6 addresses at the same time; the two protocols operate independently of each other.
 
+### Link-local IPv6 addresses
+
+An IPv6-capable interface that is `UP` also configures itself a **link-local** address in the `fe80::/64` range, with no DHCP server and no manual step. You will often see it as an extra `inet6 fe80::…` line alongside any regular address. A link-local address is only valid on the one network segment the interface is attached to — it is never routed to other networks — so on its own it does not make the interface reachable from elsewhere. It is normal to see a link-local address even on an interface that has no other IP.
+
+## Prefix length: `/8`, `/24`, `/64`
+
+The number after the slash is the **prefix length** — how many leading bits of the address are fixed as the network identifier. The remaining bits identify a host on that network. It works the same way for IPv4 and IPv6; only the totals differ, because IPv4 has 32 bits and IPv6 has 128.
+
+```text
+127.0.0.1/8            loopback — first 8 bits are the network part
+192.168.50.10/24       IPv4 host — first 24 bits are the network part
+2001:db8:50::10/64     IPv6 host — first 64 bits are the network part
+```
+
+Two addresses whose network bits match, at the same prefix length, are on the same local network and can normally communicate directly. A different network means the traffic goes through a router.
+
 ## Viewing network interfaces in Linux
 
 Use the following command to list the network interfaces known to Linux:
@@ -130,6 +146,10 @@ This displays information such as:
 - Its physical or virtual link state (`LOWER_UP` when a carrier is detected).
 - Its MAC address.
 - Its Maximum Transmission Unit (MTU).
+
+The **MAC address** (for example `52:54:00:11:22:33`) is the hardware address of the interface. It is used to deliver frames to the right device on the local network segment, one hop at a time, underneath the IP layer. Every real interface has its own; the loopback's is all zeros because it never puts a frame on a wire.
+
+The **MTU** (for example `1500`) is the largest packet, in bytes, the interface will send in one piece. A packet larger than the MTU is fragmented or rejected, depending on the protocol. `1500` is the common default for Ethernet.
 
 To display the IPv4 and IPv6 addresses assigned to each interface, run:
 
@@ -169,7 +189,9 @@ These commands only display the current configuration. They do not make changes,
 > enp0s3           UP
 > ```
 >
-> `enp0s2` carries one IPv4 address and one IPv6 address at once, each with its own prefix length (`/24` and `/64`). `enp0s3` is `UP` but its address column is empty — enabled, no IP, unreachable at Layer 3. `lo` shows the standard loopback pair `127.0.0.1/8` and `::1/128`. Interface names and the management address vary.
+> `enp0s2` carries one IPv4 address and one IPv6 address at once, each with its own prefix length (`/24` and `/64`). `enp0s3` is `UP` but its address column is empty — enabled, no routable IP, unreachable at Layer 3. `lo` shows the standard loopback pair `127.0.0.1/8` and `::1/128`. Interface names and the management address vary, and you may also see an `fe80::` link-local address on the IPv6-capable interfaces.
+
+To see why one interface differs from another, inspect them one at a time. `ip link show dev <name>` answers a link-layer question — is it on, does it have a carrier, what are its MAC address and MTU. `ip addr show dev <name>` answers a separate question — which IP addresses are bound to it. An interface can pass the first check and still have nothing to show for the second.
 
 > [!TIP]
 > **Try it — an interface that is UP but has no address**
@@ -188,7 +210,92 @@ These commands only display the current configuration. They do not make changes,
 >     link/ether 52:54:00:dd:ee:ff brd ff:ff:ff:ff:ff:ff
 > ```
 >
-> `ip link show` reports `state UP` with a MAC address and an MTU — the interface is switched on. `ip addr show` for the same interface prints no `inet` or `inet6` line at all. That gap is the point: UP is an administrative state, not a guarantee of an address or of reachability.
+> `ip link show` reports `state UP` with a MAC address and an MTU — the interface is switched on. `ip addr show` for the same interface prints no routable `inet` or `inet6` line. (An `inet6 fe80::…` link-local line may still appear; a link-local address is self-assigned and valid only on the directly attached segment, so it is not the address the interface needs to be reachable across networks.) That gap is the point: UP is an administrative state, not a guarantee of a usable address or of reachability.
+
+## Enabled, connected, reachable
+
+These three describe different things, and it is common to confuse them.
+
+- **Enabled (UP)** is the administrative state. You, or a boot-time service, asked the kernel to switch the interface on. `ip link show` prints `UP` in the flag list and `state UP` at the end of the line.
+- **Connected (LOWER_UP)** means the kernel detects a carrier — a live link partner on the other end, such as a switch port or a virtual segment that is wired up. An interface can be `UP` without `LOWER_UP` when nothing is plugged in.
+- **Reachable** means a packet can actually travel from this machine to some other host and back. That needs an address, a route, a working path, and a host at the far end that answers. None of the flags on an interface can promise it.
+
+The playground's two extra segments are isolated: each has one host (this VM) and no router. You can watch link state change, but a `ping` to any address beyond the VM's own will not get a reply — the link-state half is visible here, the end-to-end half is not.
+
+You can change the administrative state yourself. The command below is safe **only** on one of the two spare NICs. Never run it on the interface carrying your SSH session — bringing that down cuts you off from the machine.
+
+> [!TIP]
+> **Try it — turn a spare interface off and back on**
+>
+> ```sh
+> sudo ip link set enp0s3 down
+> ip -brief link show dev enp0s3
+> sudo ip link set enp0s3 up
+> ip -brief link show dev enp0s3
+> ```
+>
+> Expect the state to read `DOWN` after the first change and `UP` again after the last:
+>
+> ```text
+> enp0s3           DOWN           52:54:00:dd:ee:ff <BROADCAST,MULTICAST>
+> enp0s3           UP             52:54:00:dd:ee:ff <BROADCAST,MULTICAST,UP,LOWER_UP>
+> ```
+>
+> The MAC address never changes; only the state and the flags do. `UP` is something a command sets and clears — an administrative switch, not a property of the hardware. This change is runtime-only and resets on reboot.
+
+## Reaching other networks: the default gateway
+
+An address and its prefix length tell the machine which other addresses sit on its own local network — the ones it can reach directly. For anything outside that range, the machine consults its **routing table**: a list of destination networks and how to reach each one. The catch-all entry is the **default route**, and the router it points to is the **default gateway** — where traffic goes when no more specific route matches.
+
+`ip route show` prints the table. It reads state only and changes nothing.
+
+> [!TIP]
+> **Try it — show the routing table**
+>
+> ```sh
+> ip route show
+> ```
+>
+> Expect something like:
+>
+> ```text
+> default via 10.10.0.1 dev enp0s1 proto dhcp src 10.10.0.20 metric 100
+> 10.10.0.0/24 dev enp0s1 proto kernel scope link src 10.10.0.20
+> 192.168.50.0/24 dev enp0s2 proto kernel scope link src 192.168.50.10
+> ```
+>
+> The `default via 10.10.0.1` line is the default gateway, reached through the management interface. The `scope link` lines are directly connected networks — one per interface that has an address, so `enp0s3` (no address) contributes none. There is no gateway on the `192.168.50.0/24` or `192.168.51.0/24` segments, which is why traffic from them toward the wider world has nowhere to go. Addresses and gateway vary.
+
+## The loopback interface
+
+Every Linux machine has a loopback interface, named `lo`. It is virtual — there is no hardware behind it — and it exists so the machine can send network traffic to itself. Local services that listen on `127.0.0.1` or `::1` are reached through it. Its standard addresses are `127.0.0.1/8` for IPv4 and `::1/128` for IPv6, and traffic on `lo` never leaves the machine.
+
+Loopback is the one interface that is reachable by definition — a useful contrast with the spare NIC that is `UP` but answers nothing.
+
+> [!TIP]
+> **Try it — send traffic to the machine itself**
+>
+> ```sh
+> ping -c 2 127.0.0.1
+> ping -c 2 ::1
+> ```
+>
+> Expect replies with a near-zero round-trip time:
+>
+> ```text
+> 64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.041 ms
+> 64 bytes from 127.0.0.1: icmp_seq=2 ttl=64 time=0.052 ms
+> ```
+>
+> Both the IPv4 and IPv6 loopback addresses answer immediately, over `lo`, with no physical network involved. Pinging an address on one of the isolated extra segments would simply time out — same machine, different interface, no host to answer.
+
+## Runtime changes versus persistent configuration
+
+Everything the `ip` command changes — an address added with `ip addr add`, a state set with `ip link set` — takes effect immediately and is held only in the running kernel. A reboot clears all of it. That is fine for exploring and for a temporary fix, but it is not how an address is meant to stay in place.
+
+Persistent addressing is configured through the distribution's network-management system — NetworkManager, Netplan, or `systemd-networkd` on common Linux distributions. That system writes the configuration to disk and reapplies it on every boot. A single interface should be managed by only one such system at a time; two of them configuring the same interface will conflict.
+
+It is also worth separating the two kinds of command you have seen. `ip ... show` and `ip route show` **verify** — they report current state and change nothing. `ip addr add`, `ip addr del`, and `ip link set` **configure** — they change kernel state and need `sudo`.
 
 > [!TIP]
 > **Try it — add an address at runtime, then remove it**
@@ -207,4 +314,4 @@ These commands only display the current configuration. They do not make changes,
 > enp0s3           UP             192.168.51.20/24
 > ```
 >
-> The address appears immediately and is gone again after the `del`. Anything added this way is runtime-only — a reboot clears it. Persistent addressing is configured through the distribution's network-management system (NetworkManager, Netplan, `systemd-networkd`, or similar), and the same interface should not be configured through more than one of them at once.
+> The address appears immediately and is gone again after the `del`. Nothing about this survives a reboot — to make an address stick, configure it through NetworkManager, Netplan, or `systemd-networkd` instead.
