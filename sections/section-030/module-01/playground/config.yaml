@@ -1,0 +1,49 @@
+# Packet Filtering with nftables (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+#
+# Runtime: a single qemu VM — a plain Ubuntu 24.04 server, no Kubernetes. The
+# nftables ruleset is left EMPTY on purpose: building the table -> chain -> rule
+# structure yourself, and watching it filter live traffic, is the whole point.
+# OS prep installs `nft` and a few test tools, brings up one extra NIC so you
+# have a second local source address for `ip saddr` rules, and flushes the
+# ruleset so `nft list ruleset` starts blank.
+
+metadata:
+  name: "nftables-filtering-playground"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Install nftables + test tools, address the extra NIC, flush the ruleset so it starts empty."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  networks:
+    # One isolated L2 segment. Nothing else is on it — it exists only so the VM
+    # has a second local IPv4 address (192.168.80.10) to aim `ip saddr` rules
+    # at, tested with `curl --interface`.
+    - name: nft-net
+      cidr: 192.168.80.0/24
+  qemu:
+    - name: "host"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
+      arch: "arm64"
+      cpus: 2
+      memoryMB: 2048
+      diskSizeGB: 20
+      networks:
+        # One extra interface on top of the default management interface.
+        - { name: nft-net, ipv4: 192.168.80.10 }
+      sshPasswordAuth: false

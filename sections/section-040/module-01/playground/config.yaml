@@ -1,0 +1,70 @@
+# NTP Client Time Synchronization (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+#
+# Runtime: TWO qemu VMs on one isolated segment (192.168.100.0/24), so the
+# client can actually lock onto a source and you can watch the offset shrink:
+#   * ntp-server (192.168.100.10) — chrony configured as a local NTP server
+#     (`local stratum 8`, `allow 192.168.100.0/24`). Ready to serve on boot.
+#   * ntp-client (192.168.100.20) — chrony installed, its default pool/server
+#     lines commented out so `chronyc sources` starts EMPTY. Adding a source
+#     and watching it sync is what you do here.
+# Neither VM has outbound internet NTP; the server is the source.
+
+metadata:
+  name: "ntp-chrony-playground"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "common"
+      description: "Install chrony + inspection tools on both VMs."
+      type: "file"
+      source: "bootstrap/prepare-common.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  networks:
+    - name: ntp-net
+      cidr: 192.168.100.0/24
+  qemu:
+    - name: "ntp-server"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
+      arch: "arm64"
+      cpus: 1
+      memoryMB: 1024
+      diskSizeGB: 20
+      networks:
+        - { name: ntp-net, ipv4: 192.168.100.10 }
+      sshPasswordAuth: false
+      bootstrap:
+        init:
+          - name: "server-config"
+            description: "Write a local-stratum chrony server config and restart."
+            type: "file"
+            source: "bootstrap/prepare-server.sh"
+    - name: "ntp-client"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
+      arch: "arm64"
+      cpus: 1
+      memoryMB: 1024
+      diskSizeGB: 20
+      networks:
+        - { name: ntp-net, ipv4: 192.168.100.20 }
+      sshPasswordAuth: false
+      bootstrap:
+        init:
+          - name: "client-config"
+            description: "Comment out default sources so chronyc sources starts empty."
+            type: "file"
+            source: "bootstrap/prepare-client.sh"
