@@ -1,0 +1,53 @@
+# Multi-Interface Static Routing (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+#
+# Runtime: a single qemu VM (a plain Linux host, no Kubernetes). The VM keeps
+# its normal astrona management interface (with a real default route) plus two
+# extra NICs on two isolated segments, 10.0.0.0/24 and 192.168.70.0/24. OS prep
+# addresses and brings up those two NICs so their connected routes exist; the
+# ROUTING TABLE is otherwise bare, so the static routes, metrics, and route
+# lookups are yours to build and inspect.
+
+metadata:
+  name: "static-routing-playground"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Install ip/route/trace tools, address the two lab NICs, leave the routing table otherwise bare."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  networks:
+    # Two isolated L2 segments. No router lives on either, so a `via` address
+    # such as 10.0.0.1 is on-link (route add succeeds) but nothing answers it —
+    # `ip route get` still resolves through it because it is a lookup, not a
+    # send. See docs/overview.md.
+    - name: route-net-a
+      cidr: 10.0.0.0/24
+    - name: route-net-b
+      cidr: 192.168.70.0/24
+  qemu:
+    - name: "host"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
+      arch: "arm64"
+      cpus: 2
+      memoryMB: 2048
+      diskSizeGB: 20
+      networks:
+        # Two extra interfaces on top of the default management interface.
+        - { name: route-net-a, ipv4: 10.0.0.50 }
+        - { name: route-net-b, ipv4: 192.168.70.50 }
+      sshPasswordAuth: false
