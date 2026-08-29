@@ -21,6 +21,27 @@ Linux often gives interfaces names such as `eth0`, `ens18`, `enp1s0`, or `wlan0`
 
 A useful mental model: the **interface** is the doorway between the operating system and a network, and an **IP address** is the address written on that doorway so other machines know where to send traffic. One doorway can carry several addresses, or none at all.
 
+## Learning objectives
+
+After this module you can:
+
+- List the network interfaces on a Linux machine and read their state, MAC address, and MTU with `ip link show`.
+- Explain what an IPv4 address, an IPv6 address, and a prefix length (`/24`, `/64`) each describe, and decide whether two addresses are on the same local network.
+- Show the IPv4 and IPv6 addresses bound to each interface with `ip addr show`, including an interface that has none.
+- Distinguish *enabled* (UP), *connected* (LOWER_UP), and *reachable*, and say which command reports which.
+- Read a routing table with `ip route show` and identify the default gateway.
+- Explain why a change made with `ip addr add` or `ip link set` disappears on reboot, and name the systems that make addressing persistent.
+
+## Before you start
+
+This module assumes you can open a shell on a Linux machine and run commands, and that you have seen a dotted IPv4 address like `192.168.1.10` before. No prior networking theory is needed — Layer 3, prefix length, gateway, and MAC address are all defined as they come up.
+
+The playground gives you a throwaway Linux VM with four interfaces already in place: the loopback `lo`, one management interface that carries your SSH session and has a real address and a default gateway, and two spare NICs on isolated segments — one with an address, one deliberately left with none. Every inspection command below works against that machine as provisioned; the few state-changing commands are called out and are safe only on the spare NICs.
+
+## Where this fits
+
+Interfaces and addressing are the base layer the rest of Linux networking stands on. Routing decides which interface a packet leaves by, and it can only choose among the addresses and prefixes configured here. Name resolution (DNS) hands back the very kind of address you bind to an interface. Every service that listens on a port binds either to one of these addresses or to all of them at once. When a later problem shows up as "the service is unreachable," the first cuts you make are the distinctions in this module: is the interface up, does it have an address, is there a route.
+
 ## Key terms
 
 | Term | Meaning in this chapter |
@@ -130,6 +151,8 @@ The number after the slash is the **prefix length** — how many leading bits of
 ```
 
 Two addresses whose network bits match, at the same prefix length, are on the same local network and can normally communicate directly. A different network means the traffic goes through a router.
+
+As a worked case, take `10.4.1.9/24` and `10.4.2.9/24`. At `/24` the first 24 bits are the network part, so `10.4.1` and `10.4.2` have to match — they do not, so these are different networks and traffic between them goes through a router. Change both to `/16` and only the first 16 bits count: `10.4` matches for both, so now they are on the same network and talk directly. The digits never changed; the prefix length decided the answer.
 
 ## Viewing network interfaces in Linux
 
@@ -243,6 +266,8 @@ You can change the administrative state yourself. The command below is safe **on
 >
 > The MAC address never changes; only the state and the flags do. `UP` is something a command sets and clears — an administrative switch, not a property of the hardware. This change is runtime-only and resets on reboot.
 
+A concrete trap: `ip link show dev enp0s3` prints `<BROADCAST,MULTICAST,UP,LOWER_UP>` and `state UP`, and it is tempting to read that as "another machine can ping `enp0s3` now." It cannot. `UP` and `LOWER_UP` report only administrative and link state. Reachability also needs an address on the interface, a route to the other machine, a working path, and a host at the far end that answers — check the first two with `ip addr show dev enp0s3` and `ip route show`. In this playground `enp0s3` has no address, so nothing beyond the VM answers whatever the flags say.
+
 ## Reaching other networks: the default gateway
 
 An address and its prefix length tell the machine which other addresses sit on its own local network — the ones it can reach directly. For anything outside that range, the machine consults its **routing table**: a list of destination networks and how to reach each one. The catch-all entry is the **default route**, and the router it points to is the **default gateway** — where traffic goes when no more specific route matches.
@@ -315,3 +340,12 @@ It is also worth separating the two kinds of command you have seen. `ip ... show
 > ```
 >
 > The address appears immediately and is gone again after the `del`. Nothing about this survives a reboot — to make an address stick, configure it through NetworkManager, Netplan, or `systemd-networkd` instead.
+
+> [!WARNING]
+> **Common pitfalls**
+>
+> - **Reading `UP` as "reachable".** An interface can be `UP`, even `LOWER_UP`, with no address and no route. Confirm with `ip addr show` and `ip route show`, not `ip link show` alone.
+> - **`::` more than once in an IPv6 address.** `2001:db8::1::2` is invalid — a reader (and the parser) cannot tell how many zero groups each `::` stands for. It may appear at most once.
+> - **Comparing digits instead of prefixes.** `192.168.1.10/24` and `192.168.2.10/24` look similar but are different networks; the `/24` fixes `192.168.1` versus `192.168.2` as the network part. "Same network" needs matching network bits *at the same prefix length*.
+> - **Confusing the MAC address with the IP address.** They belong to different layers. An interface with no IP still has a MAC; adding or removing an IP never changes the MAC.
+> - **Expecting `ip` changes to persist.** Anything set with `ip addr add`, `ip addr del`, or `ip link set` lives only in the running kernel and is gone after reboot. Persistent addressing goes through NetworkManager, Netplan, or `systemd-networkd`.
