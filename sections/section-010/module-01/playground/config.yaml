@@ -1,0 +1,51 @@
+# Network Interfaces and IPv4 & IPv6 Addressing (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+#
+# Runtime: a single qemu VM (a plain Linux host, no Kubernetes). The VM gets its
+# normal astrona management interface plus two extra NICs on isolated segments.
+# bootstrap/prepare.sh gives one of them an IPv4 address and an IPv6 address and
+# leaves the other UP with no address, so `ip link show` and `ip addr show` have
+# something real to show.
+
+metadata:
+  name: "network-interfaces-playground"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Install ip/link tools; address one extra NIC (v4 + v6), leave the other UP with no IP."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  networks:
+    # Two isolated L2 segments. Only the CIDR is declared here; the actual
+    # address assignment happens in bootstrap/prepare.sh so the reader can see
+    # exactly what was configured, and change it.
+    - name: iface-net-a
+      cidr: 192.168.50.0/24
+    - name: iface-net-b
+      cidr: 192.168.51.0/24
+  qemu:
+    - name: "host"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
+      arch: "arm64"
+      cpus: 2
+      memoryMB: 2048
+      diskSizeGB: 20
+      networks:
+        # Two extra NICs on top of the default management interface.
+        - { name: iface-net-a }
+        - { name: iface-net-b }
+      sshPasswordAuth: false

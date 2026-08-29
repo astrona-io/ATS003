@@ -1,0 +1,39 @@
+# Local Hostname Resolution (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+#
+# Runtime: a single qemu VM (a plain Ubuntu host, no Kubernetes). Everything
+# this module explores — /etc/hosts, getent, /etc/nsswitch.conf, hostnamectl —
+# is local to one machine, so one VM is all that is needed. bootstrap/prepare.sh
+# sets the static hostname and seeds a couple of extra /etc/hosts entries to
+# inspect.
+
+metadata:
+  name: "hostname-resolution-playground"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Set the static hostname, install lookup tools, seed sample /etc/hosts entries."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  qemu:
+    - name: "host"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
+      arch: "arm64"
+      cpus: 2
+      memoryMB: 2048
+      diskSizeGB: 20
+      sshPasswordAuth: false

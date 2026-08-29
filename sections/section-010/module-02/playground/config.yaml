@@ -1,0 +1,40 @@
+# Managing Linux Hostnames (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+#
+# Runtime: a single qemu VM (a plain Ubuntu host with systemd, no Kubernetes).
+# Everything this module covers — hostnamectl, /etc/hostname, the static /
+# transient / pretty hostname types — is local to one machine.
+# bootstrap/prepare.sh seeds a plain static hostname, an unset pretty hostname,
+# and a deliberately different transient hostname so all three are visible in
+# `hostnamectl status`.
+
+metadata:
+  name: "linux-hostnames-playground"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Seed static / transient / pretty hostnames so hostnamectl status shows all three."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  qemu:
+    - name: "host"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
+      arch: "arm64"
+      cpus: 2
+      memoryMB: 2048
+      diskSizeGB: 20
+      sshPasswordAuth: false
