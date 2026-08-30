@@ -5,9 +5,10 @@
 #
 # Runtime: a single qemu VM (a plain Linux host, no Kubernetes). The VM gets its
 # normal astrona management interface plus two extra NICs on isolated segments.
-# bootstrap/prepare.sh gives one of them an IPv4 address and an IPv6 address and
-# leaves the other UP with no address, so `ip link show` and `ip addr show` have
-# something real to show.
+# Each extra NIC gets a baseline IPv4 from config (the runtime requires one on a
+# segment with no DHCP server). bootstrap/prepare.sh then adds an IPv6 address to
+# the first and flushes the second back to "UP, no address", so `ip link show`
+# and `ip addr show` have two different, real states to show.
 
 metadata:
   name: "network-interfaces-playground"
@@ -28,9 +29,11 @@ teardown:
 runtime:
   type: "qemu"
   networks:
-    # Two isolated L2 segments. Only the CIDR is declared here; the actual
-    # address assignment happens in bootstrap/prepare.sh so the reader can see
-    # exactly what was configured, and change it.
+    # Two isolated L2 segments. The CIDR is declared here; each VM NIC below
+    # takes a baseline `ipv4` from inside that range (the runtime requires one
+    # because these segments have no DHCP server). Everything else — the IPv6
+    # address, the flushed no-address state — is done in bootstrap/prepare.sh so
+    # the reader can see exactly what was configured, and change it.
     - name: iface-net-a
       cidr: 192.168.50.0/24
     - name: iface-net-b
@@ -45,7 +48,9 @@ runtime:
       memoryMB: 2048
       diskSizeGB: 20
       networks:
-        # Two extra NICs on top of the default management interface.
-        - { name: iface-net-a }
-        - { name: iface-net-b }
+        # Two extra NICs on top of the default management interface. `ipv4` is a
+        # plain address (no /prefix — that comes from the segment's cidr) and
+        # must fall inside the matching runtime.networks entry's range.
+        - { name: iface-net-a, ipv4: 192.168.50.10 }
+        - { name: iface-net-b, ipv4: 192.168.51.10 }
       sshPasswordAuth: false
