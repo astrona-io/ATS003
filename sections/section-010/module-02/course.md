@@ -9,19 +9,11 @@
 > astrona destroy linux-hostnames-playground
 > ```
 
-A hostname is the name used to identify a Linux machine. It provides a human-readable identity, making the machine easier to recognize than using only its IP address.
+A **hostname** is the name that identifies a Linux machine. It gives the machine a human-readable identity, so people and tools can refer to `prod-app-01` instead of `192.168.1.50`. A well-chosen name also carries information: `prod-app-01` reads as "the first application server in production."
 
-For example, a hostname such as `prod-app-01` can indicate that the machine is the first application server in a production environment.
+On a `systemd` system the picture is a little larger than one name. `systemd` tracks **three** hostname values at once — static, transient, and pretty — and this module is about seeing all three, changing each on its own, and knowing which ones survive a reboot.
 
-Hostnames are commonly used by:
-
-- System administrators.
-- Monitoring and logging systems.
-- Configuration-management tools.
-- Network services.
-- Other machines on the network.
-
-Setting a hostname does not automatically make the machine reachable by that name. A name-resolution mechanism, such as DNS or `/etc/hosts`, must map the hostname to an IP address.
+One thing a hostname does *not* do: setting it does not make the machine reachable by that name. A separate name-resolution mechanism — DNS or `/etc/hosts` — has to map the name to an IP address. That is the next module; here the focus is the name itself.
 
 ## Learning objectives
 
@@ -36,148 +28,58 @@ After this module you can:
 
 ## Before you start
 
-This module assumes you can open a shell on a Linux machine, run commands with `sudo`, and have seen a dotted IPv4 address like `192.168.1.50` before. It assumes a distribution that uses `systemd` — nearly every current one — because every command here is `hostnamectl`. No prior knowledge of DNS or `/etc/hosts` is needed; name resolution is only sketched, and has its own module.
+This module assumes you can open a shell, run commands with `sudo`, and have seen a dotted IPv4 address such as `192.168.1.50`. It assumes a distribution that uses `systemd` — nearly every current one — because every command here is `hostnamectl`. No knowledge of DNS or `/etc/hosts` is needed; name resolution is only sketched, and has its own module.
 
-The playground gives you a throwaway Linux VM that starts with a deliberate split: the static hostname `web-01` written on disk, and a *different* transient hostname `dhcp-guest-42` handed out at boot, so `hostnamectl status` shows both lines. No pretty hostname is set. Every command below is safe on this VM; the final checkpoint reboots it and drops your SSH session for about a minute.
+Open a shell on the playground VM with `astrona ssh astro-linux-hostnames-playground`. It starts with a deliberate split: the static hostname `web-01` written on disk, and a *different* transient hostname `dhcp-guest-42` set at boot, so `hostnamectl status` shows both lines. No pretty hostname is set. Every command below is safe on this VM; the final checkpoint reboots it and drops your SSH session for about a minute.
 
 ## Key terms
 
-| Term | Meaning in this chapter |
+| Term | Meaning in this module |
 |---|---|
 | **Hostname** | A name that identifies a machine. |
 | **`systemd`** | The init system and service manager on most current Linux distributions; it provides `hostnamectl`. |
-| **Static hostname** | The persistent technical name, stored on disk, restored on every boot. |
+| **Static hostname** | The persistent technical name, stored on disk in `/etc/hostname`, restored on every boot. |
 | **Transient hostname** | The name the running kernel currently uses. Set at runtime (sometimes by DHCP); not saved across a reboot on its own. |
 | **Pretty hostname** | An optional free-form description meant for people, never used as a network name. |
-| **`/etc/hostname`** | The file that holds the static hostname. |
 | **`hostnamectl`** | The `systemd` tool for viewing and changing all three hostname types. |
 
-## Hostname types
+## The three hostname types
 
-On Linux systems using `systemd`, a machine can have three types of hostnames:
+On a `systemd` system a machine has three hostname values, each with its own job:
 
-1. Static hostname.
-2. Transient hostname.
-3. Pretty hostname.
+- The **static** hostname is the name written down. It lives in `/etc/hostname`, survives a reboot, and acts as the machine's official technical name.
+- The **transient** hostname is the name the running kernel answers to right now. It can be handed out at boot (often by DHCP) and is forgotten on reboot unless something sets it again.
+- The **pretty** hostname is a label for humans — free-form text, never sent over the network.
 
-A way to hold the three apart: the **static** hostname is the name written down (it survives a reboot and acts as the machine's official name); the **transient** hostname is the name the running kernel answers to right now (it can be handed out at boot, and is forgotten on reboot unless something sets it again); the **pretty** hostname is a label for humans that never travels over the network.
+When a static hostname is configured it normally wins: `systemd` sets the transient hostname to match the static one, and `hostnamectl status` then shows a single hostname line. A separate `Transient hostname:` line appears **only when the two values differ** — which is exactly the state the playground is seeded in.
 
-### Static hostname
+### Naming rules
 
-The static hostname is the persistent technical name configured by the administrator.
+A static hostname should contain only:
 
-It is normally stored in:
+- lowercase letters `a`–`z`;
+- digits `0`–`9`;
+- hyphens (`-`).
 
-```text
-/etc/hostname
-```
+Avoid spaces and other special characters. Good examples: `prod-app-01`, `database-02`, `worker-node-03`.
 
-Because it is persistent, the static hostname remains configured after the machine restarts.
-
-Example:
-
-```text
-prod-app-01
-```
-
-A static hostname should normally contain:
-
-- Lowercase letters from `a` to `z`.
-- Numbers from `0` to `9`.
-- Hyphens (`-`).
-
-Avoid spaces and special characters in a static hostname.
-
-Good examples include:
-
-```text
-prod-app-01
-database-02
-worker-node-03
-```
-
-### Transient hostname
-
-The transient hostname is the hostname currently used by the running Linux kernel.
-
-It can be assigned dynamically during startup or received from a network service such as DHCP. Because it is a runtime value, it may change while the machine is running and might not be preserved after a restart.
-
-When a static hostname is configured, it normally takes priority: `systemd` sets the transient hostname to match the static one, and `hostnamectl status` then shows only a single hostname. A separate `Transient hostname:` line appears only when the two values differ.
-
-### Pretty hostname
-
-The pretty hostname is an optional, human-readable description of the machine.
-
-Unlike the static hostname, it can contain:
-
-- Spaces.
-- Uppercase letters.
-- Special characters.
-- UTF-8 characters.
-
-Example:
+The pretty hostname has no such restriction — spaces, uppercase, punctuation, and UTF-8 are all allowed, because it is only ever read by a person:
 
 ```text
 Marketing Server - Primary
 ```
 
-The pretty hostname is intended for people. It should not be used as a DNS name or as the machine's technical network identity.
+## `hostnamectl`: one tool for all three
 
-A machine can therefore have both a technical static hostname and a more descriptive pretty hostname:
+`hostnamectl` — read it as *hostname control* — is the `systemd` tool for viewing and changing every hostname value. The pattern is small:
 
-```text
-Static hostname: prod-app-01
-Pretty hostname: Marketing Server - Primary
-```
+- `hostnamectl status` (or just `hostnamectl`) — show everything.
+- `hostnamectl hostname` — print one value; add `--pretty` or `--transient` for those.
+- `sudo hostnamectl set-hostname <name> [--static|--pretty|--transient]` — change one value. With no flag it changes the static hostname and pulls the transient one along with it.
 
-## Viewing the current hostname
+`sudo` is needed for any `set-hostname` because it writes a system file and changes a system-wide setting. Reading needs no privilege.
 
-Use the `hostnamectl` command to inspect hostname information on a system running `systemd`:
-
-```bash
-hostnamectl status
-```
-
-On current `systemd` versions, running `hostnamectl` with no arguments prints the same information.
-
-Example output:
-
-```text
- Static hostname: prod-app-01
- Pretty hostname: Marketing Server - Primary
-       Icon name: computer-vm
-         Chassis: vm
-      Machine ID: 0123456789abcdef0123456789abcdef
-         Boot ID: abcdef0123456789abcdef0123456789
-  Virtualization: kvm
-Operating System: Ubuntu 24.04 LTS
-          Kernel: Linux 6.8.0
-    Architecture: x86-64
-```
-
-The exact output depends on the operating system and environment.
-
-Important fields include:
-
-- `Static hostname`: The persistent technical hostname.
-- `Pretty hostname`: The optional human-readable description.
-- `Chassis`: The type of machine, such as a server, desktop, or virtual machine.
-- `Virtualization`: The detected virtualization technology.
-- `Operating System`: The installed Linux distribution.
-- `Kernel`: The currently running Linux kernel.
-- `Architecture`: The machine's processor architecture.
-
-The `hostname` command can also display the hostname currently used by the system:
-
-```bash
-hostname
-```
-
-To inspect the persistent hostname file directly, run:
-
-```bash
-cat /etc/hostname
-```
+`hostnamectl status` also prints machine facts that are not hostnames — `Chassis`, `Virtualization`, `Operating System`, `Kernel`, `Architecture` — handy for orienting yourself on an unfamiliar box. Exact values depend on the image.
 
 > [!TIP]
 > **Try it — see all three hostname types the playground starts with**
@@ -199,37 +101,17 @@ cat /etc/hostname
 >
 > The playground seeded the static hostname as `web-01` and a *different* transient hostname `dhcp-guest-42`, so both lines show. There is no `Pretty hostname:` line because none is set. `cat /etc/hostname` prints `web-01` only — the file holds the static value. Field values vary by image.
 
-## Setting a static hostname
+## Setting the static hostname
 
-Use `hostnamectl set-hostname` with the `--static` option to configure a persistent hostname:
+Use `set-hostname` with `--static` for the persistent technical name:
 
 ```bash
 sudo hostnamectl set-hostname prod-app-01 --static
 ```
 
-The `--static` option makes it explicit that the persistent technical hostname should be changed. `sudo` is required because this writes a system file (`/etc/hostname`) and changes a system-wide setting.
+The change takes effect immediately — no restart. It writes `/etc/hostname`, so it also survives a reboot. Because a configured static hostname normally overrides the transient one, `systemd` realigns the kernel's transient name to match, and the separate `Transient hostname:` line disappears.
 
-The new hostname should be available immediately. A system restart is normally not required.
-
-Display the configured static hostname:
-
-```bash
-hostnamectl hostname
-```
-
-(On older `systemd` versions this subcommand is `hostnamectl --static`.)
-
-You can also inspect the persistent hostname file:
-
-```bash
-cat /etc/hostname
-```
-
-Expected value:
-
-```text
-prod-app-01
-```
+Check the result with `hostnamectl hostname` (on older `systemd`, `hostnamectl --static`) or by reading `/etc/hostname` directly.
 
 > [!TIP]
 > **Try it — set the static hostname and watch the transient one fall in line**
@@ -241,36 +123,17 @@ prod-app-01
 > hostnamectl status
 > ```
 >
-> Expect `hostnamectl hostname` and `/etc/hostname` to both read `prod-app-01`, and the `Transient hostname:` line to have **disappeared** from `hostnamectl status`. Setting the static hostname made `systemd` align the kernel's transient name with it, so there is no longer a second value to report. The change is live immediately — no restart. Your shell prompt keeps the old name until you start a new session.
+> Expect `hostnamectl hostname` and `/etc/hostname` to both read `prod-app-01`, and the `Transient hostname:` line to have **disappeared** from `hostnamectl status`. Setting the static hostname made `systemd` align the kernel's transient name with it, so there is no longer a second value to report. The change is live immediately — no restart. Your shell prompt keeps the old name until you open a new session.
 
-## Setting a pretty hostname
+## Setting the pretty hostname
 
-Use the `--pretty` option to configure a human-readable description:
+Use `--pretty` for the human-readable description. Quote it if it contains spaces:
 
 ```bash
 sudo hostnamectl set-hostname "Marketing Server - Primary" --pretty
 ```
 
-Quotation marks are required because the description contains spaces.
-
-The pretty hostname does not replace the static hostname. The machine now has two different names for different purposes:
-
-```text
-Static hostname: prod-app-01
-Pretty hostname: Marketing Server - Primary
-```
-
-Display the pretty hostname:
-
-```bash
-hostnamectl hostname --pretty
-```
-
-Display all hostname information:
-
-```bash
-hostnamectl status
-```
+The pretty hostname does not replace the static one. The machine now carries two names for two purposes — a technical `prod-app-01` for anything that talks to the network, and `Marketing Server - Primary` for a person reading a screen.
 
 > [!TIP]
 > **Try it — add a pretty hostname without touching the technical one**
@@ -281,17 +144,17 @@ hostnamectl status
 > hostnamectl hostname
 > ```
 >
-> `hostnamectl hostname --pretty` returns the free-form description; `hostnamectl hostname` still returns the plain static name, unchanged. One machine, two names, two jobs — the pretty one for a person reading a screen, the static one for anything technical.
+> `hostnamectl hostname --pretty` returns the free-form description; `hostnamectl hostname` still returns the plain static name, unchanged. One machine, two names, two jobs.
 
-## Setting a transient hostname
+## Setting the transient hostname
 
-The transient hostname is the name the running kernel uses right now. You rarely set it by hand — it is normally left to track the static hostname, or handed out by DHCP at boot — but `hostnamectl` can set it on its own with `--transient`:
+The transient hostname is the name the running kernel uses right now. You rarely set it by hand — it is normally left to track the static hostname, or handed out by DHCP at boot — but `--transient` sets it on its own:
 
 ```bash
 sudo hostnamectl set-hostname build-scratch --transient
 ```
 
-This changes only the runtime value. `/etc/hostname` is not touched, and the name is dropped on the next reboot. Because a configured static hostname normally overrides the transient one, the effect is only visible once you deliberately let the two values differ — which is exactly what `--transient` does.
+This changes only the runtime value. `/etc/hostname` is untouched, and the name is dropped on the next reboot. Because a configured static hostname normally overrides the transient one, the effect is visible only once you deliberately let the two values differ — which is what `--transient` does.
 
 > [!TIP]
 > **Try it — set a transient-only name and watch the split reappear**
@@ -308,28 +171,20 @@ This changes only the runtime value. `/etc/hostname` is not touched, and the nam
 
 ## Hostnames and name resolution
 
-A hostname identifies the machine, but it does not automatically provide network name resolution.
+A hostname identifies the machine; it does not provide network name resolution. For another machine to connect to `prod-app-01` by name, that name has to be mapped to an IP address by one of:
 
-For another machine to connect to `prod-app-01` by name, the name must be mapped to an IP address using a mechanism such as:
+- a DNS record;
+- an entry in `/etc/hosts`, for example `192.168.1.50 prod-app-01`;
+- a local name-resolution service.
 
-- A DNS record.
-- An entry in `/etc/hosts`.
-- A local name-resolution service.
+Without such a mapping the hostname still identifies the local machine, but other systems cannot resolve it. Local and network name resolution are the next module.
 
-For example, an `/etc/hosts` entry might look like this:
-
-```text
-192.168.1.50 prod-app-01
-```
-
-Without such a mapping, the hostname can still identify the local machine, but other systems might not be able to resolve it to an IP address.
-
-Local and network name resolution are covered in a separate module.
+The static and pretty values are on disk, so they come back after a reboot. A transient hostname set only with `--transient` does not.
 
 > [!TIP]
 > **Try it — confirm which values survive a reboot**
 >
-> This restarts the VM and drops your SSH session for about a minute; reconnect with `astrona ssh linux-hostnames-playground`.
+> This restarts the VM and drops your SSH session for about a minute; reconnect with `astrona ssh astro-linux-hostnames-playground`.
 >
 > ```sh
 > sudo reboot
@@ -342,4 +197,13 @@ Local and network name resolution are covered in a separate module.
 > cat /etc/hostname
 > ```
 >
-> The static hostname (and a pretty hostname, if you set one) are still there — they are stored on disk. A transient hostname set only with `--transient` would be gone. This is the practical difference between the persistent static name and the runtime transient one.
+> The static hostname (and a pretty hostname, if you set one) are still there — they are stored on disk. A transient hostname set only with `--transient` is gone. This is the practical difference between the persistent static name and the runtime transient one.
+
+> [!WARNING]
+> **Common pitfalls**
+>
+> - **Expecting the name alone to make the machine reachable.** `hostnamectl set-hostname` changes identity, not resolution. Until the name is in DNS or `/etc/hosts`, other machines cannot connect to it by name — and even `sudo` on the machine itself may print `unable to resolve host <name>` until a local entry exists.
+> - **Waiting for the shell prompt to update.** The change is live immediately, but your current session captured the old name at login. Open a new shell to see the new prompt; it is not a sign the change failed.
+> - **Using the old `hostname <name>` command for a permanent change.** That sets only the transient value and is lost on reboot. Use `hostnamectl set-hostname … --static` (which writes `/etc/hostname`) for a change that persists.
+> - **Treating the pretty hostname as a network name.** It can contain spaces and capitals precisely because nothing technical ever reads it. Never use it as a DNS name or in configuration that expects a hostname.
+> - **Expecting a `Transient hostname:` line when the values match.** After a `--static` change the transient name is realigned, so `hostnamectl status` shows one hostname line. The second line is a sign the two values differ, not a sign something is wrong.

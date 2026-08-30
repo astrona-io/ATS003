@@ -9,35 +9,9 @@
 > astrona destroy hostname-resolution-playground
 > ```
 
-A hostname gives a Linux machine a human-readable identity. Name resolution translates that hostname into an IP address that applications can use.
+A hostname gives a machine a human-readable identity; **name resolution** turns that name into an IP address an application can connect to. For example, resolution can turn `prod-app-01` into a loopback address such as `127.0.1.1`, or into an interface address such as `192.168.1.50`.
 
-For example, name resolution can translate:
-
-```text
-prod-app-01
-```
-
-into:
-
-```text
-127.0.1.1
-```
-
-or an address assigned to a network interface:
-
-```text
-192.168.1.50
-```
-
-Linux can obtain this mapping from several sources, including:
-
-- The local `/etc/hosts` file.
-- A DNS server.
-- Multicast DNS (mDNS).
-- A system service such as `systemd-resolved`.
-- Other name services configured on the machine.
-
-A useful mental model: when something on the machine needs the address for a name, it does not go straight to DNS. It asks a switchboard — the **Name Service Switch (NSS)** — which consults a configured list of sources in order and returns the first answer. `/etc/hosts` is usually the first source on that list. This chapter is about that local source and the switchboard in front of it.
+Linux can get that mapping from several sources: the local `/etc/hosts` file, a DNS server, multicast DNS, a service such as `systemd-resolved`, and others. When something on the machine needs the address for a name, it does not go straight to DNS. It asks a switchboard — the **Name Service Switch (NSS)** — which consults a configured list of sources in order and returns the first answer. `/etc/hosts` is usually first on that list. This module is about that local source and the switchboard in front of it.
 
 ## Learning objectives
 
@@ -52,15 +26,14 @@ After this module you can:
 
 ## Before you start
 
-This module assumes you can open a shell, run commands with `sudo`, edit a text file, and have seen a dotted IPv4 address like `192.168.1.50`. It assumes you know a machine has a static hostname set with `hostnamectl`, from the previous module. DNS, NSS, canonical hostname, and loopback are all defined as they come up.
+This module assumes you can open a shell, run commands with `sudo`, edit a text file, and have seen a dotted IPv4 address such as `192.168.1.50`. It assumes you know a machine has a static hostname set with `hostnamectl`, from the previous module. DNS, NSS, canonical hostname, and loopback are all defined as they come up.
 
-The playground gives you a throwaway Linux VM with a prepared `/etc/hosts`: the static hostname `prod-app-01` mapped to the loopback address `127.0.1.1` with alias `app-server`, plus a `db-primary` (alias `db`) line pointing at `192.168.50.10` where nothing is listening — it is there so you can watch a name resolve and still fail to connect. The playground network has no DNS server, so `files` is the only source that ever answers. Editing `/etc/hosts` here is safe and reversible.
+Open a shell on the playground VM with `astrona ssh astro-hostname-resolution-playground`. It starts with a prepared `/etc/hosts`: the static hostname `prod-app-01` mapped to the loopback address `127.0.1.1` with alias `app-server`, plus a `db-primary` (alias `db`) line pointing at `192.168.50.10` where nothing is listening — it is there so you can watch a name resolve and still fail to connect. The playground network has no DNS server, so `files` is the only source that ever answers. Editing `/etc/hosts` here is safe and reversible.
 
 ## Key terms
 
-| Term | Meaning in this chapter |
+| Term | Meaning in this module |
 |---|---|
-| **Hostname** | The machine's human-readable name, such as `prod-app-01`. The *static* hostname is stored on disk and set with `hostnamectl`. |
 | **Name resolution** | Turning a name into an IP address (or the reverse). |
 | **`/etc/hosts`** | A plain-text file of static `IP name [aliases]` mappings, local to one machine. |
 | **Canonical hostname** | The first name after the IP on an `/etc/hosts` line; any further names on the line are aliases. |
@@ -69,27 +42,12 @@ The playground gives you a throwaway Linux VM with a prepared `/etc/hosts`: the 
 | **`getent`** | A tool that performs a lookup through NSS, exactly as a normal application would. |
 | **DNS** | The network-wide name service; out of scope here except as a contrast. |
 
-## Hostnames and `/etc/hosts`
+## `/etc/hosts`: static name-to-address mappings
 
-The `/etc/hosts` file contains static mappings between IP addresses and hostnames.
-
-Display its current contents:
-
-```bash
-cat /etc/hosts
-```
-
-A simple file might look like this:
+`/etc/hosts` holds static mappings, one per line, in the form:
 
 ```text
-127.0.0.1 localhost
-127.0.1.1 prod-app-01
-```
-
-Each entry starts with an IP address followed by one or more names:
-
-```text
-IP_ADDRESS CANONICAL_HOSTNAME OPTIONAL_ALIASES
+IP_ADDRESS   CANONICAL_HOSTNAME   [ALIAS ...]
 ```
 
 For example:
@@ -98,13 +56,7 @@ For example:
 192.168.1.50 prod-app-01 app-server
 ```
 
-In this entry:
-
-- `192.168.1.50` is the IP address.
-- `prod-app-01` is the primary (canonical) hostname.
-- `app-server` is an additional alias.
-
-Both names resolve to the same address.
+Here `192.168.1.50` is the address, `prod-app-01` is the **canonical hostname** (the primary name), and `app-server` is an alias. Both names resolve to the same address. Separate the fields with one or more spaces or tabs.
 
 > [!TIP]
 > **Try it — read the static table the playground starts with**
@@ -124,84 +76,115 @@ Both names resolve to the same address.
 >
 > The playground set the static hostname to `prod-app-01` and mapped it to the loopback address `127.0.1.1`, with `app-server` as an alias. The last line maps `db-primary` (alias `db`) to a non-loopback address — nothing is listening there; it exists so you can see a name resolve to an interface-style address. Exact contents vary by image.
 
-## Should every hostname be added to `/etc/hosts`?
+## `getent`: look up a name the way an application does
 
-Changing the static hostname does not always require an `/etc/hosts` entry.
+Reading `/etc/hosts` with `cat` shows what is *in the file*. It does not tell you what the system would actually return for a name — that depends on NSS and every source it is configured to consult. `getent` — read it as *get entries* — queries an NSS database directly, following the same sources and order a normal program would:
 
-The hostname might already be resolved by:
+```bash
+getent hosts prod-app-01
+```
 
-- A local DNS server.
-- A DNS record managed by the network.
-- A DHCP and DNS integration.
-- Another name-resolution service.
+`hosts` is the database name. `getent` has others (`passwd`, `group`, …); `hosts` is the one for name resolution. Two more specific forms return address records only:
 
-However, adding the machine's hostname to `/etc/hosts` can ensure that it resolves locally even when DNS is unavailable.
+```bash
+getent ahostsv4 prod-app-01     # IPv4 answers
+getent ahostsv6 prod-app-01     # IPv6 answers
+```
 
-If the local hostname cannot be resolved, some applications might display warnings similar to:
+`getent` reads state and changes nothing.
+
+> [!TIP]
+> **Try it — resolve the seeded names through NSS**
+>
+> ```sh
+> getent hosts prod-app-01
+> getent hosts app-server
+> getent hosts db-primary
+> ```
+>
+> Expect something like:
+>
+> ```text
+> 127.0.1.1       prod-app-01 app-server
+> 127.0.1.1       prod-app-01 app-server
+> 192.168.50.10   db-primary db
+> ```
+>
+> The canonical name and its alias resolve to the same address — `getent` returns the whole matching line either way. `db-primary` resolves to its interface-style address. Every one of these answers came from `/etc/hosts`, because that is the only source with anything to say on this network.
+
+## Name-resolution order: `/etc/nsswitch.conf`
+
+NSS decides which sources to consult and in what order. The configuration is `/etc/nsswitch.conf`; the line that matters here is `hosts:`.
+
+```bash
+grep '^hosts:' /etc/nsswitch.conf
+```
+
+A minimal line reads:
+
+```text
+hosts: files dns
+```
+
+`files` means local files such as `/etc/hosts`; `dns` means the configured DNS service. Sources are consulted **left to right**, first answer wins — so `files` before `dns` means `/etc/hosts` is checked before DNS, and an entry there overrides whatever DNS would say for the same name. A current system often lists more:
+
+```text
+hosts: files mdns4_minimal resolve dns
+```
+
+- `files` — `/etc/hosts`;
+- `resolve` — `systemd-resolved`;
+- `mdns4_minimal` / `mdns` — multicast DNS, for `*.local` names;
+- `myhostname` — the machine's own hostname, via an NSS module.
+
+Do not change this line without understanding the machine's resolution setup; a wrong order can stop local *and* network names from resolving.
+
+> [!TIP]
+> **Try it — see which sources this machine consults, and in what order**
+>
+> ```sh
+> grep '^hosts:' /etc/nsswitch.conf
+> ```
+>
+> Expect something like:
+>
+> ```text
+> hosts: files ... dns
+> ```
+>
+> `files` sits before `dns`, so every lookup checks `/etc/hosts` first and only falls through to DNS on a miss. That ordering is why the entries from `cat /etc/hosts` win over anything a DNS server might say. In this playground there is no DNS server, so the `dns` step never returns anything — `files` is the whole story here.
+
+## Choosing the address for an entry
+
+You do not always need an `/etc/hosts` entry for a hostname — it may already be covered by DNS, a DHCP/DNS integration, or another service. But adding the machine's own name locally guarantees it resolves even when DNS is down. Without a local entry, some tools warn:
 
 ```text
 sudo: unable to resolve host prod-app-01: Name or service not known
 ```
 
-The exact behaviour depends on the Linux distribution and application configuration.
+When you do add an entry, the address depends on how the name is used:
 
-## Choosing the correct address
+- **A loopback address** such as `127.0.1.1` (common on Debian-based systems) when the name only needs to identify the *local* machine. Traffic to `127.0.0.0/8` never leaves the box.
+- **An interface address** such as `192.168.1.50` when the name should stand for a particular network connection.
+- **DNS**, not `/etc/hosts`, when *other* machines must resolve the name reliably.
 
-Some Debian-based distributions commonly map the machine's hostname to `127.0.1.1`:
-
-```text
-127.0.1.1 prod-app-01
-```
-
-The `127.0.0.0/8` range is reserved for loopback traffic. Connections to these addresses remain inside the local machine and are not sent to the physical network.
-
-Other distributions may map the hostname to an address assigned to a network interface:
-
-```text
-192.168.1.50 prod-app-01
-```
-
-The correct choice depends on how the hostname should be used:
-
-- Use a loopback address when the name only needs to identify the local machine.
-- Use an interface address when the name should represent a particular network connection.
-- Use DNS when other machines must reliably resolve the hostname.
-
-Do not replace or remove the standard localhost entries:
+Leave the standard localhost lines alone:
 
 ```text
 127.0.0.1 localhost
-::1 localhost
-```
-
-These entries are used for local IPv4 and IPv6 communication.
-
-## Updating `/etc/hosts`
-
-The `/etc/hosts` file requires administrative privileges to modify.
-
-Open it in a text editor:
-
-```bash
-sudo nano /etc/hosts
-```
-
-A Debian-style configuration for a machine named `prod-app-01` might look like this:
-
-```text
-127.0.0.1 localhost
-127.0.1.1 prod-app-01
 ::1       localhost ip6-localhost ip6-loopback
 ```
 
-Separate the address and hostname using one or more spaces or tabs.
+They are how local IPv4 and IPv6 traffic finds `localhost`.
 
-Changes to `/etc/hosts` normally take effect immediately. A system restart is usually not required. Some setups run a caching layer (for example `systemd-resolved` or `nscd`) that can briefly hold an old answer.
+## Updating `/etc/hosts`
+
+`/etc/hosts` needs administrative privileges to change — edit it with `sudo nano /etc/hosts`, or append a line with `sudo tee -a`. Changes take effect immediately; no restart. A caching layer such as `systemd-resolved` or `nscd`, if present, can briefly hold an old answer.
 
 > [!TIP]
 > **Try it — add an entry and watch it resolve straight away**
 >
-> This appends one line to a system file, so it needs `sudo`. It is safe to undo by editing the line back out.
+> This appends one line to a system file, so it needs `sudo`. Undo it by editing the line back out.
 >
 > ```sh
 > echo '10.0.0.9 test-node' | sudo tee -a /etc/hosts
@@ -214,46 +197,14 @@ Changes to `/etc/hosts` normally take effect immediately. A system restart is us
 > 10.0.0.9        test-node
 > ```
 >
-> No service was restarted — the mapping is live the moment the file is saved. Remove it again with `sudo nano /etc/hosts` (delete the line). As an aside: if you set the static hostname to a name that has *no* `/etc/hosts` entry, `sudo` itself starts printing `unable to resolve host <name>` until you add one.
+> No service was restarted — the mapping is live the moment the file is saved. Remove it again with `sudo nano /etc/hosts` (delete the line).
 
-## Verifying local name resolution
+## Resolution is not reachability
 
-Use `getent` to test name resolution through the system's configured name-service mechanism:
-
-```bash
-getent hosts prod-app-01
-```
-
-Example response:
-
-```text
-127.0.1.1       prod-app-01
-```
-
-Unlike reading `/etc/hosts` directly, `getent` uses the name-resolution sources and priority configured for the system.
-
-You can also query the IPv4 host database:
-
-```bash
-getent ahostsv4 prod-app-01
-```
-
-If IPv6 is configured, query the IPv6 host database:
-
-```bash
-getent ahostsv6 prod-app-01
-```
-
-The `ping` command can provide an additional connectivity check:
-
-```bash
-ping -c 3 prod-app-01
-```
-
-However, `getent` is normally the better command for testing name resolution because `ping` also tests network reachability and ICMP responses. A name can resolve perfectly while the host it points at is unreachable.
+A name resolving tells you the mapping exists. It does not tell you the host behind the address answers. `getent` tests resolution only. `ping` resolves the name *and* then tries to reach the address, so a `ping` failure could be either problem — which is why `getent` is the cleaner test of resolution alone.
 
 > [!TIP]
-> **Try it — resolution is not the same as reachability**
+> **Try it — a name that resolves but does not connect**
 >
 > ```sh
 > getent hosts db-primary
@@ -272,88 +223,25 @@ However, `getent` is normally the better command for testing name resolution bec
 > 1 packets transmitted, 0 received, 100% packet loss
 > ```
 >
-> `getent` returns the mapping instantly from `/etc/hosts`. `ping` resolves the same name — notice it prints the address — then fails, because nothing is listening at `192.168.50.10`. Name resolution succeeded; connectivity did not. That is why `getent` is the cleaner test of resolution alone.
-
-## Name-resolution order
-
-Linux uses the Name Service Switch (NSS) configuration to determine where it should search for information such as hostnames, users, and groups.
-
-The configuration is stored in:
-
-```text
-/etc/nsswitch.conf
-```
-
-Display the hostname lookup configuration:
-
-```bash
-grep '^hosts:' /etc/nsswitch.conf
-```
-
-Example:
-
-```text
-hosts: files dns
-```
-
-In this example:
-
-- `files` tells Linux to search local files such as `/etc/hosts`.
-- `dns` tells Linux to query the configured DNS service.
-
-The sources are generally checked from left to right. With `files` before `dns`, Linux checks `/etc/hosts` before querying DNS.
-
-A modern system may contain additional sources:
-
-```text
-hosts: files mdns4_minimal resolve dns
-```
-
-Possible sources include:
-
-- `files`: Local entries in `/etc/hosts`.
-- `dns`: Traditional DNS queries.
-- `resolve`: Name resolution through `systemd-resolved`.
-- `mdns` or `mdns4_minimal`: Multicast DNS used for names such as `host.local`.
-- `myhostname`: Local hostname resolution provided by an NSS module.
-
-The exact configuration depends on the Linux distribution and installed services.
-
-Avoid changing `/etc/nsswitch.conf` unless you understand how the system performs name resolution. An incorrect configuration can prevent local and network hostnames from resolving.
-
-> [!TIP]
-> **Try it — see which sources this machine consults, and in what order**
->
-> ```sh
-> grep '^hosts:' /etc/nsswitch.conf
-> ```
->
-> Expect something like:
->
-> ```text
-> hosts: files ... dns
-> ```
->
-> `files` sits before `dns`, so every lookup checks `/etc/hosts` first and only falls through to DNS on a miss. That ordering is why the entries you saw in `cat /etc/hosts` win over anything a DNS server might say for the same name. In this playground there is no DNS server on the network, so the `dns` step never returns anything — `files` is the whole story here.
+> `getent` returns the mapping instantly from `/etc/hosts`. `ping` resolves the same name — note it prints the address — then fails, because nothing is listening at `192.168.50.10`. Name resolution succeeded; connectivity did not.
 
 ## Local resolution compared with DNS
 
-An `/etc/hosts` entry only affects the machine on which the file is configured.
+An `/etc/hosts` entry only affects the machine that holds the file. Adding `192.168.1.50 prod-app-01` lets *this* machine resolve `prod-app-01`; it does nothing for any other machine. For a name that many machines must resolve, register it in DNS instead.
 
-For example, adding this entry:
+`/etc/hosts` is the right tool for:
 
-```text
-192.168.1.50 prod-app-01
-```
+- local machine identity;
+- small or isolated environments;
+- temporary overrides;
+- systems that must work without DNS;
+- troubleshooting name-resolution problems.
 
-allows the local machine to resolve `prod-app-01`. It does not automatically make the name available to other machines.
-
-For network-wide name resolution, the hostname should normally be registered in a DNS service.
-
-The `/etc/hosts` file is most useful for:
-
-- Local machine identity.
-- Small or isolated environments.
-- Temporary overrides.
-- Systems that must operate without DNS.
-- Troubleshooting name-resolution problems.
+> [!WARNING]
+> **Common pitfalls**
+>
+> - **Expecting an `/etc/hosts` entry to work network-wide.** It resolves only on the machine that holds the file. Other machines need the name in DNS.
+> - **Editing or removing the `127.0.0.1 localhost` / `::1 localhost` lines.** Many programs assume `localhost` resolves locally; breaking those lines breaks them. Add your entries on new lines, leave these alone.
+> - **Testing resolution with `ping`.** `ping` also checks reachability, so a failure is ambiguous. Use `getent hosts <name>` to test resolution by itself.
+> - **Reading `/etc/hosts` with `cat` and calling it verified.** The file is one source; NSS may consult others first. `getent` shows what the system actually returns.
+> - **Pinning a public name in `/etc/hosts` as a quick fix.** It overrides DNS for that name on this host and then goes stale silently when the real address changes. Use it as a deliberate temporary override, not a permanent record.
