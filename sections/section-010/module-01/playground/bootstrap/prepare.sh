@@ -16,40 +16,28 @@ if command -v apt-get >/dev/null 2>&1; then
   apt-get install -y --no-install-recommends iproute2 iputils-ping ethtool || true
 fi
 
-# Find the extra NICs by the segment each one was addressed on in config.yaml:
-# iface-net-a -> 192.168.50.0/24, iface-net-b -> 192.168.51.0/24. The management
-# interface that carries SSH has a DHCP address on a different subnet, so it is
-# never matched and never touched here.
-nic_in_subnet() {
-  local prefix="$1" dev
-  for dev in $(ip -o link show | awk -F': ' '{print $2}' | grep -v '^lo$'); do
-    if ip -o -4 addr show dev "$dev" 2>/dev/null | grep -q "inet ${prefix}"; then
-      echo "$dev"
-      return 0
-    fi
-  done
-}
+# The two extra NICs are dummy devices created here — astrona's qemu backend
+# only does point-to-point segments (2 VMs each), so this one-VM sandbox cannot
+# attach an isolated segment. A `dummy` device shows up in `ip link` / `ip addr`
+# and behaves like a normal NIC for link-state and addressing. The management
+# interface that carries SSH is a separate real NIC and is never touched here.
+NIC_A="netlab-a"
+NIC_B="netlab-b"
 
-NIC_A="$(nic_in_subnet 192.168.50.)"
-NIC_B="$(nic_in_subnet 192.168.51.)"
+modprobe dummy 2>/dev/null || true
+ip link add "$NIC_A" type dummy 2>/dev/null || true
+ip link add "$NIC_B" type dummy 2>/dev/null || true
 
-# NIC A — one IPv4 address (already set from config.yaml) plus one IPv6 address,
-# interface UP. This is the "interface with addresses" the module inspects.
-# 2001:db8::/32 is the documentation prefix (RFC 3849), safe on an isolated
-# segment.
-if [ -n "$NIC_A" ]; then
-  ip addr add 192.168.50.10/24 dev "$NIC_A" 2>/dev/null || true
-  ip -6 addr add 2001:db8:50::10/64 dev "$NIC_A" 2>/dev/null || true
-  ip link set "$NIC_A" up || true
-fi
+# NIC A — one IPv4 address and one IPv6 address, interface UP. This is the
+# "interface with addresses" the module inspects. 2001:db8::/32 is the
+# documentation prefix (RFC 3849), safe on a device with no peer.
+ip addr add 192.168.50.10/24 dev "$NIC_A" 2>/dev/null || true
+ip -6 addr add 2001:db8:50::10/64 dev "$NIC_A" 2>/dev/null || true
+ip link set "$NIC_A" up || true
 
-# NIC B — flush the baseline IPv4 that config.yaml had to assign, leaving the
-# interface UP with NO address. This is the "UP does not mean it has an IP or can
-# reach anything" example from the module.
-if [ -n "$NIC_B" ]; then
-  ip addr flush dev "$NIC_B" 2>/dev/null || true
-  ip link set "$NIC_B" up || true
-fi
+# NIC B — interface UP but NO address. This is the "UP does not mean it has an IP
+# or can reach anything" example from the module.
+ip link set "$NIC_B" up || true
 
 echo
 echo "[playground] interface summary:"
