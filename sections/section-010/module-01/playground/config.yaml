@@ -32,11 +32,13 @@ runtime:
     - name: "host"
       image:
         type: "oci"
-        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
-      arch: "arm64"
+        # Same LFCS base image the graded labs use. {ARCH} is substituted by the
+        # CLI (arm64 / amd64).
+        source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
       cpus: 2
       memoryMB: 2048
       diskSizeGB: 20
+      display: false
       # No extra segments: the two NICs the module inspects are dummy devices
       # created in bootstrap/prepare.sh.
       sshPasswordAuth: false
