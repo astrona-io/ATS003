@@ -9,9 +9,7 @@
 > astrona destroy linux-bridging-playground
 > ```
 
-A Linux **software bridge** is a virtual Layer 2 switch built into the Linux kernel.
-
-Like a physical network switch, a bridge connects multiple network interfaces and forwards Ethernet frames between them. A **network interface** is the point where the operating system connects to a network — a physical network card, or a virtual one belonging to a virtual machine or container. The interfaces connected to a bridge are called **bridge ports** or **member interfaces**.
+A Linux **software bridge** is a virtual Layer 2 switch built into the kernel. Like a physical switch, it connects several network interfaces and forwards Ethernet frames between them by MAC address. The interfaces attached to a bridge are its **bridge ports** (or **member interfaces**).
 
 For example:
 
@@ -22,16 +20,7 @@ eth3 ──────────────── br0 ───────�
 Physical interface   Software bridge       Virtual interface
 ```
 
-Here the bridge lets a device connected through `vnet0` talk to the physical network through `eth3`.
-
-Software bridges are commonly used by:
-
-- Virtual machines.
-- Container platforms.
-- Network namespaces (isolated network stacks inside one Linux host).
-- Kubernetes and other orchestration systems.
-- Software-defined networking platforms.
-- Linux routers and firewalls.
+Here `br0` lets a virtual machine on `vnet0` reach the physical network through `eth3`. Software bridges are the backbone of virtual-machine and container networking, network namespaces, Kubernetes and other orchestrators, software-defined networking, and Linux routers and firewalls.
 
 ## Learning objectives
 
@@ -48,91 +37,62 @@ After this module you can:
 
 This module assumes you can open a shell, run commands with `sudo`, and have seen interface names like `enp0s2` and a prefixed IPv4 address such as `192.168.60.10/24`. Ethernet frame, MAC address, Layer 2 and Layer 3, ARP, DHCP, and STP are all defined as they come up. The bonding module is useful background for the closing comparison but is not required.
 
-The playground gives you a throwaway Linux VM with three usable interfaces: one management NIC that carries your SSH session and holds an address — leave it alone — and two spare NICs, address-less, both on the **same** isolated `192.168.60.0/24` segment. Both spares sharing one segment is deliberate: it lets the STP checkpoint build a real Layer 2 loop. That segment has no other host, no DHCP server, and no LACP switch, so dynamically learned FDB entries and DHCP-on-a-bridge cannot be shown here — the text says so where each comes up.
+Open a shell on the playground VM with `astrona ssh astro-linux-bridging-playground`. The machine has three usable interfaces: one management NIC that carries your SSH session and holds an address — leave it alone — and two spare NICs, `DOWN` and address-less, both on the **same** isolated `192.168.60.0/24` segment. Both spares sharing one segment is deliberate: it lets the STP checkpoint build a real Layer 2 loop. That segment has no other host, no DHCP server, and no LACP switch, so dynamically learned FDB entries and DHCP-on-a-bridge cannot be shown here — the text says so where each comes up.
+
+## Where this fits
+
+This section covers three ways Linux joins interfaces. A **bridge** (here) is a Layer 2 switch: it connects segments and virtual machines so frames pass between them. A **bond** (previous module) makes several NICs act as one link for redundancy or capacity. **Static routing** (next module) is Layer 3 — choosing which interface a packet leaves by. The three stack: a bridge port can be a bond, and the bridge itself gets the IP address and the routes.
 
 ## Key terms
 
-| Term | Meaning in this chapter |
+| Term | Meaning in this module |
 |---|---|
-| **Ethernet frame** | The unit of data sent on a local network. Carries a source and destination MAC address. |
-| **MAC address** | The hardware address of a network interface, such as `52:54:00:11:22:33`. Used to deliver frames on the local segment. |
-| **Layer 2** | Local delivery on one network segment, using MAC addresses (Ethernet). A bridge works here. |
-| **Layer 3** | Delivery between networks, using IP addresses and routing. |
+| **Ethernet frame** | The unit of data on a local segment; carries a source and destination MAC address. |
+| **MAC address** | The hardware address of an interface, such as `52:54:00:11:22:33`; used for local delivery. |
+| **Layer 2** | Local delivery on one segment, by MAC address. A bridge works here. |
+| **Layer 3** | Delivery between networks, by IP address and routing. |
 | **Broadcast frame** | A frame addressed to every device on the segment, such as an ARP request. |
-| **ARP** | Address Resolution Protocol — how a host finds the MAC address for a given IP on the local segment. |
-| **DHCP** | A protocol a host uses to lease an IP address and related settings from a server on the network. |
-| **STP** | Spanning Tree Protocol — detects redundant Layer 2 paths and blocks ports to stop loops. |
+| **ARP** | Address Resolution Protocol — how a host finds the MAC for a given local IP. |
+| **FDB** | Forwarding database — the bridge's table of "which MAC is behind which port". |
+| **STP** | Spanning Tree Protocol — detects redundant Layer 2 paths and blocks ports to break loops. |
 
-## Layer 2 and Layer 3 responsibilities
+## Layer 2 and Layer 3: where the address goes
 
-A bridge works mainly at Layer 2. It forwards Ethernet frames using MAC addresses. IP addresses belong to Layer 3.
+A bridge forwards frames by MAC address — that is Layer 2. IP addresses are Layer 3, and they belong on the bridge interface, not on a port.
 
-When a physical interface becomes a bridge port, its Layer 3 configuration should normally be moved to the bridge interface.
-
-Before bridging:
+Before bridging, the address is on the NIC:
 
 ```text
 eth3
 └── 192.168.1.50/24
 ```
 
-After bridging:
+After bridging, it moves to the bridge:
 
 ```text
 br0
 ├── 192.168.1.50/24
-└── eth3
+└── eth3   (Layer 2 port)
 ```
 
-In the second configuration:
+Now `br0` owns the address and is what applications use for Layer 3; `eth3` just forwards frames. A port *can* technically keep its own address, but addresses on both the bridge and a port cause confusing routes, unexpected paths, and name-resolution problems — avoid it.
 
-- `br0` owns the IP address.
-- `eth3` acts as a Layer 2 bridge port.
-- Applications use `br0` for Layer 3 communication.
-- Ethernet frames are still forwarded through `eth3`.
+## The `bridge` and `ip link` commands
 
-A Linux bridge port can technically keep its own IP address, but this is normally avoided. Assigning addresses to both the bridge and its ports can create confusing routes, unexpected traffic paths, and name-resolution problems.
+Two tools cover this module, both from `iproute2`:
 
-## How a bridge forwards traffic
+- **`ip link`** creates and wires interfaces: `ip link add name br0 type bridge` makes the bridge; `ip link set eth3 master br0` makes `eth3` a port; `ip link set eth3 nomaster` removes it. `ip -d link show dev br0` adds bridge detail such as STP state (`-d` = *detail*).
+- **`bridge`** inspects the running bridge. `bridge link show` lists ports and their forwarding state. `bridge fdb show` prints the **forwarding database** (FDB) — the learned "MAC → port" table.
 
-A Linux bridge looks at the source MAC address of every Ethernet frame it receives and uses it to build a **forwarding database**, commonly called the **FDB**.
+Memory hook: `ip link` *builds* the switch, `bridge` *looks inside* it.
 
-The forwarding database records which MAC addresses are reachable through which bridge ports.
-
-Example:
-
-```text
-MAC address          Bridge port
-52:54:00:11:22:33    eth3
-52:54:00:aa:bb:cc    vnet0
-```
-
-When the bridge receives a frame:
-
-1. It learns the source MAC address and the incoming port.
-2. It looks up the destination MAC address in the FDB.
-3. If the destination is known, it forwards the frame out the associated port.
-4. If the destination is unknown, it floods the frame out the other eligible ports.
-
-Broadcast frames, such as ARP requests, are also sent out the other eligible bridge ports. This behaviour is like a physical Ethernet switch.
-
-## Creating a temporary bridge
-
-Create a bridge named `br0`:
+## Creating a bridge
 
 ```bash
 sudo ip link add name br0 type bridge
 ```
 
-The bridge exists immediately but starts out disabled (administratively down).
-
-Display the new interface:
-
-```bash
-ip link show dev br0
-```
-
-This configuration is temporary and normally disappears after the machine restarts. (`sudo` is needed because creating an interface changes kernel network state; a plain user cannot.)
+The bridge exists immediately but starts administratively `DOWN` — it forwards nothing until you bring it up. `sudo` is needed because creating an interface changes kernel network state.
 
 > [!TIP]
 > **Try it — create the bridge and see it exist but stay down**
@@ -149,37 +109,26 @@ This configuration is temporary and normally disappears after the machine restar
 >     link/ether 1a:2b:3c:4d:5e:6f brd ff:ff:ff:ff:ff:ff
 > ```
 >
-> `br0` is present but `state DOWN` — it forwards nothing yet. Its MAC address is random for now; a bridge normally adopts the lowest MAC among its ports once interfaces are attached. The interface index (`4:`) and MAC are examples.
+> `br0` is present but `state DOWN`. Its MAC is random for now; a bridge normally adopts the lowest MAC among its ports once interfaces are attached. Index (`4:`) and MAC are examples.
 
-## Adding an interface to the bridge
+## Adding a port
 
-Before adding a physical interface to a bridge, bring it down:
+Bring the interface down, attach it with `master`, then bring both up:
 
 ```bash
 sudo ip link set eth3 down
-```
-
-Attach `eth3` to `br0`:
-
-```bash
 sudo ip link set eth3 master br0
-```
-
-The `master br0` argument makes `eth3` a port of the bridge.
-
-Enable the bridge and its member interface:
-
-```bash
 sudo ip link set br0 up
 sudo ip link set eth3 up
 ```
 
-**Warning:** these commands can interrupt network connectivity. Do not modify the interface used for your current SSH connection unless you have console access or another recovery method. In the playground, only ever touch the two spare NICs, never the management interface.
+> [!WARNING]
+> These commands can interrupt connectivity. Only ever touch the two spare NICs, never the management interface carrying your SSH session.
 
 > [!TIP]
-> **Try it — enslave one NIC and inspect bridge membership**
+> **Try it — attach one NIC and inspect bridge membership**
 >
-> Use one of the two spare interface names from `ip -brief link show` (not your SSH interface). The examples below call it `enp0s2`.
+> Use one of the two spare interface names from `ip -brief link show`. The examples call it `enp0s2`.
 >
 > ```sh
 > sudo ip link set enp0s2 master br0
@@ -187,7 +136,6 @@ sudo ip link set eth3 up
 > sudo ip link set enp0s2 up
 > bridge link show
 > ip link show master br0
-> bridge fdb show br br0
 > ```
 >
 > Expect something like:
@@ -196,42 +144,59 @@ sudo ip link set eth3 up
 > 3: enp0s2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master br0 state forwarding priority 32 cost 100
 > ```
 >
-> `bridge link show` lists `enp0s2` with `master br0` and `state forwarding` — it is now a live port. `ip link show master br0` shows the same members from the interface side. `bridge fdb show br br0` mostly lists `permanent` entries (the port's own MAC and multicast groups); dynamic learned entries only appear once another host sends frames through the bridge, which nothing does on this isolated segment. Names, priority, and cost are examples.
+> `bridge link show` lists `enp0s2` with `master br0` and `state forwarding` — a live port. `ip link show master br0` shows the same membership from the interface side. Names, priority, and cost are examples.
 
-## Moving an existing IP address
+## How a bridge learns: the forwarding database
 
-If `eth3` already has an IP address, that address should normally be moved to `br0`.
+A bridge builds its **forwarding database** (FDB) by watching the *source* MAC of every frame it receives and noting which port it arrived on:
 
-Show the current address configuration:
-
-```bash
-ip addr show dev eth3
+```text
+MAC address          Bridge port
+52:54:00:11:22:33    eth3
+52:54:00:aa:bb:cc    vnet0
 ```
 
-Remove an example address from `eth3`:
+For each incoming frame the bridge:
+
+1. learns the source MAC and the incoming port;
+2. looks up the destination MAC in the FDB;
+3. if known, forwards the frame out that one port;
+4. if unknown, floods it out every other eligible port.
+
+Broadcast frames, such as ARP requests, are always flooded to the other ports. This is exactly how a physical Ethernet switch behaves.
+
+> [!TIP]
+> **Try it — read the forwarding database**
+>
+> ```sh
+> bridge fdb show br br0
+> ```
+>
+> On this idle, single-host segment expect mostly `permanent` entries — the port's own MAC and multicast groups — and few or no dynamically learned ones:
+>
+> ```text
+> 52:54:00:aa:bb:cc dev enp0s2 master br0 permanent
+> 33:33:00:00:00:01 dev enp0s2 self permanent
+> ```
+>
+> Dynamic "MAC → port" entries only appear once another host sends frames through the bridge, and nothing else is on this segment. The learning mechanism is real; there is just no traffic here to populate it.
+
+## Moving the IP to the bridge
+
+If the port already has an address, remove it from the port and add it to the bridge; put any default route on the bridge too:
 
 ```bash
 sudo ip addr del 192.168.1.50/24 dev eth3
-```
-
-Assign the address to `br0`:
-
-```bash
 sudo ip addr add 192.168.1.50/24 dev br0
-```
-
-If a default route is required, it should also use the bridge:
-
-```bash
 sudo ip route add default via 192.168.1.1 dev br0
 ```
 
-Replace the example addresses with values appropriate for the local network. Moving an address from an interface can immediately interrupt active network connections that were using it.
+Moving an address can immediately break connections that were using it.
 
 > [!TIP]
 > **Try it — put the IP on the bridge, not the port**
 >
-> The playground's spare NICs face the `192.168.60.0/24` segment, so pick an address there. The spare ports have no address to move, so this just adds one to `br0`:
+> The spare NICs face `192.168.60.0/24`, and they have no address to move, so this just adds one to `br0`:
 >
 > ```sh
 > sudo ip addr add 192.168.60.10/24 dev br0
@@ -246,130 +211,31 @@ Replace the example addresses with values appropriate for the local network. Mov
 >        valid_lft forever preferred_lft forever
 > ```
 >
-> The address lands on `br0`. `ip addr show dev enp0s2` shows the port still has none — the port carries frames at Layer 2 while the bridge is the Layer 3 interface the host routes through. Remove it again with `sudo ip addr del 192.168.60.10/24 dev br0`.
+> The address is on `br0`. `ip addr show dev enp0s2` shows the port still has none — the port carries frames at Layer 2 while the bridge is the Layer 3 interface the host routes through. Remove it with `sudo ip addr del 192.168.60.10/24 dev br0`.
 
 ## Using DHCP with a bridge
 
-When DHCP is used, the DHCP client should normally run on the bridge rather than on an individual bridge port.
+When DHCP is used, the DHCP client runs on the bridge, not on a port — conceptually `DHCP client → br0 → eth3`. The exact configuration depends on the distribution's network-management system (NetworkManager, Netplan, `systemd-networkd`, `ifupdown`, …). Never run DHCP clients on both the bridge and a member at once.
 
-Conceptually the configuration changes from:
-
-```text
-DHCP client → eth3
-```
-
-to:
-
-```text
-DHCP client → br0 → eth3
-```
-
-The exact command depends on the Linux distribution and its network-management system. Possible systems include:
-
-- NetworkManager.
-- Netplan.
-- `systemd-networkd`.
-- `ifupdown`.
-- Distribution-specific networking services.
-
-Avoid running DHCP clients on both the bridge and its member interfaces at the same time.
-
-> This module's playground has no DHCP server on its isolated segment, so a DHCP client on `br0` would have nothing to answer it. The idea matters in practice; the mechanics need a DHCP server the sandbox does not provide.
-
-## Inspecting bridge membership
-
-Show the interfaces attached to Linux bridges:
-
-```bash
-bridge link show
-```
-
-Example output:
-
-```text
-3: eth3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master br0 state forwarding
-```
-
-Important fields:
-
-- `eth3` — the bridge port.
-- `master br0` — the bridge the interface belongs to.
-- `UP` — the interface is enabled.
-- `LOWER_UP` — Linux detects an active link on it.
-- `state forwarding` — the port can forward Ethernet frames.
-
-Show only ports attached to `br0`:
-
-```bash
-ip link show master br0
-```
-
-Show the bridge interface itself:
-
-```bash
-ip link show dev br0
-```
-
-Show the bridge's IP addresses:
-
-```bash
-ip addr show dev br0
-```
-
-## Inspecting the forwarding database
-
-Show the bridge forwarding database:
-
-```bash
-bridge fdb show
-```
-
-Show entries for one bridge:
-
-```bash
-bridge fdb show br br0
-```
-
-The output lists MAC addresses learned through the bridge ports. Some entries are learned dynamically from traffic; others are `permanent`, created by the kernel or an administrator. On an idle segment with no other hosts, expect mostly permanent entries.
+> This playground has no DHCP server on its isolated segment, so a DHCP client on `br0` would get no answer. The idea matters in practice; the mechanics need a server the sandbox does not provide.
 
 ## Spanning Tree Protocol
 
-Connecting bridges — or connecting two ports of one bridge to the same segment — can create a **Layer 2 loop**.
+Connecting two bridges — or attaching two ports of one bridge to the same segment — creates a **Layer 2 loop**. Frames then circulate endlessly, and broadcasts multiply until they saturate the network: a **broadcast storm**, with duplicate frames, MAC addresses flapping between ports, high CPU, and lost connectivity.
 
-A loop lets Ethernet frames circulate endlessly, which can cause:
-
-- Broadcast storms (broadcast frames multiplying until they saturate the network).
-- Duplicate frames.
-- Rapid MAC-address movement between ports.
-- High CPU and network utilization.
-- Loss of connectivity.
-
-The **Spanning Tree Protocol (STP)** detects redundant Layer 2 paths and blocks selected ports so exactly one path stays active.
-
-Show the bridge configuration, including STP fields:
+The **Spanning Tree Protocol (STP)** detects redundant Layer 2 paths and puts selected ports into a `blocking` state so exactly one path stays active. Toggle it per bridge:
 
 ```bash
-ip -d link show dev br0
+sudo ip link set dev br0 type bridge stp_state 1   # on
+sudo ip link set dev br0 type bridge stp_state 0   # off
 ```
 
-Enable STP on the bridge:
-
-```bash
-sudo ip link set dev br0 type bridge stp_state 1
-```
-
-Disable STP:
-
-```bash
-sudo ip link set dev br0 type bridge stp_state 0
-```
-
-Whether STP should be on depends on the topology. A bridge with one physical interface and one virtual interface has no redundant path and does not need it. More complex topologies need careful loop prevention.
+A bridge with one physical and one virtual port has no redundant path and does not need STP. More complex topologies do.
 
 > [!TIP]
 > **Try it — build a loop on purpose and watch STP block a port**
 >
-> Both spare NICs in this playground face the **same** segment, so bridging both is a deliberate loop. Enable STP **before** the second port comes up, so the loop is managed from the start rather than storming first:
+> Both spare NICs face the **same** segment, so bridging both is a deliberate loop. Enable STP **before** the second port comes up, so the loop is managed from the start rather than storming first:
 >
 > ```sh
 > sudo ip link set dev br0 type bridge stp_state 1
@@ -378,59 +244,35 @@ Whether STP should be on depends on the topology. A bridge with one physical int
 > bridge link show
 > ```
 >
-> Give STP its default timers about 30 seconds to settle, then re-run `bridge link show`. Expect something like:
+> Give STP's default timers about 30 seconds to settle, then re-run `bridge link show`. Expect something like:
 >
 > ```text
 > 3: enp0s2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master br0 state forwarding priority 32 cost 100
 > 4: enp0s3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master br0 state blocking priority 32 cost 100
 > ```
 >
-> One port is `forwarding`, the other `blocking` — STP kept the segment reachable while breaking the loop. `ip -d link show dev br0` shows `stp_state 1`. If you set `stp_state 0` again, both ports return to `forwarding` and the loop is live; broadcast traffic can then climb, so re-enable STP or run `sudo ip link set enp0s3 down` to calm it. Port names, priority, and cost are examples.
+> One port is `forwarding`, the other `blocking` — STP kept the segment reachable while breaking the loop. `ip -d link show dev br0` shows `stp_state 1`. Setting `stp_state 0` returns both ports to `forwarding` and the loop goes live; broadcast traffic then climbs, so re-enable STP or run `sudo ip link set enp0s3 down` to calm it. Names, priority, and cost are examples.
 
-## Removing an interface from a bridge
+## Removing a port and deleting the bridge
 
-Bring the member interface down:
-
-```bash
-sudo ip link set eth3 down
-```
-
-Detach it from the bridge:
+Detach a port with `nomaster`, then delete the bridge once no ports remain:
 
 ```bash
-sudo ip link set eth3 nomaster
-```
-
-Bring the interface back up if it is still needed:
-
-```bash
-sudo ip link set eth3 up
-```
-
-The `nomaster` argument removes the interface from its current bridge (or other master device).
-
-Before deleting a bridge, make sure it is no longer needed and its ports have been detached.
-
-Delete the bridge:
-
-```bash
+sudo ip link set enp0s3 down
+sudo ip link set enp0s3 nomaster
 sudo ip link delete br0 type bridge
 ```
 
-Deleting the bridge removes its runtime configuration and can interrupt connectivity for anything that was using it.
+Deleting the bridge removes its runtime configuration and interrupts anything that was using it.
 
-## Temporary and persistent configuration
+## Runtime versus persistent configuration
 
-Bridges created with the `ip` command are runtime-only. They normally disappear after the machine restarts.
-
-A persistent bridge should be defined through the network-management system your Linux distribution provides.
-
-Do not configure the same bridge and interfaces through more than one network-management system at once. Conflicting configurations can make addresses, routes, and bridge membership change unexpectedly.
+Bridges built with `ip` are runtime-only — normally gone after a restart. A persistent bridge is defined through the distribution's network-management system. Do not configure the same bridge through more than one such system; conflicting configurations make addresses, routes, and membership change unexpectedly.
 
 > [!TIP]
 > **Try it — confirm the runtime bridge does not survive a reboot**
 >
-> This restarts the whole VM and drops your SSH session for a minute. That is safe in a throwaway playground; reconnect afterwards with `astrona ssh linux-bridging-playground`.
+> This restarts the whole VM and drops your SSH session for about a minute; reconnect with `astrona ssh astro-linux-bridging-playground`.
 >
 > ```sh
 > sudo reboot
@@ -456,12 +298,10 @@ A bridge and a bond solve different problems.
 
 | Technology | Primary purpose | Comparable physical device |
 |---|---|---|
-| Bridge | Connect multiple Layer 2 network segments | Ethernet switch |
-| Bond | Combine interfaces for redundancy or traffic distribution | Link aggregation group |
+| Bridge | Connect multiple Layer 2 segments / VMs | Ethernet switch |
+| Bond | Combine interfaces for redundancy or distribution | Link aggregation group |
 
-A bridge connects interfaces so Ethernet frames can pass between them. A bond combines interfaces so they behave as one logical link.
-
-The two can be used together:
+They compose — a bond can be a single bridge port:
 
 ```text
 br0
@@ -470,11 +310,13 @@ br0
     └── eth2
 ```
 
-In this arrangement:
+`eth1` and `eth2` provide the physical links; `bond0` gives redundancy or distribution; `br0` gives Layer 2 connectivity and holds the IP address.
 
-- `eth1` and `eth2` provide the physical links.
-- `bond0` provides redundancy or traffic distribution.
-- `br0` provides Layer 2 connectivity.
-- The IP address is normally assigned to `br0`.
-
-The right arrangement depends on the operating system, virtualization platform, and network design.
+> [!WARNING]
+> **Common pitfalls**
+>
+> - **Leaving the IP on the port after bridging.** The address belongs on `br0`. An address on both the bridge and a port produces confusing routes and traffic paths.
+> - **Bridging two ports onto the same segment with STP off.** That is a loop. Broadcast frames storm within seconds. Enable `stp_state 1` first, or keep the second port down.
+> - **Expecting `bridge fdb show` to be full on an idle segment.** Dynamic entries need traffic from other hosts. On a single-host segment you see mostly `permanent` entries — that is normal, not a broken bridge.
+> - **Confusing a bridge with a bond.** A bridge connects different segments (switch); a bond merges NICs into one link (aggregation). They are not interchangeable.
+> - **Deleting a bridge with ports still attached.** Detach each port with `nomaster` first, then `ip link delete br0`.

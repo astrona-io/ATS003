@@ -9,16 +9,9 @@
 > astrona destroy static-routing-playground
 > ```
 
-A Linux machine uses its **routing table** to decide where to send Layer 3 network packets. **Layer 3** is the layer that moves packets between networks using IP addresses; a **route** is one entry in the table that says "traffic for this destination goes out that way."
+A Linux machine uses its **routing table** to decide where to send Layer 3 packets. **Layer 3** moves packets between networks using IP addresses; a **route** is one table entry that says "traffic for this destination goes out that way."
 
-For every outgoing packet, Linux must work out:
-
-- Which route matches the destination.
-- Which network interface should carry the packet.
-- Whether the destination is directly reachable, or must go through a gateway.
-- Which source IP address to use.
-
-This matters most when a machine has several network interfaces connected to different networks.
+For every outgoing packet Linux works out which route matches the destination, which interface carries the packet, whether the destination is directly reachable or must go through a gateway, and which source address to use. This matters most on a machine with several interfaces on different networks.
 
 ## Learning objectives
 
@@ -35,70 +28,47 @@ After this module you can:
 
 This module assumes you can open a shell, run commands with `sudo`, and have seen a dotted IPv4 address with a prefix such as `10.0.0.50/24`. Route, connected route, gateway / next hop, metric, and longest-prefix matching are defined as they come up, and the "Reading network prefixes" section below refreshes prefix length first. Familiarity with `ip addr` and `ip link` from the interfaces module helps but is not assumed.
 
-The playground gives you a throwaway Linux VM with three addressed interfaces: the management NIC that carries your SSH session — it holds the low-metric default route, so leave it alone — and two lab NICs on `10.0.0.0/24` and `192.168.70.0/24`. No router sits on either lab segment, so every static route you add points at a next hop that does not answer. That is deliberate: `ip route get` still resolves the route (it sends no packet), while `ping` and `traceroute` are the failing case on purpose. Every route added with `ip route` is runtime-only and is cleared by the reboot checkpoint.
+Open a shell on the playground VM with `astrona ssh astro-static-routing-playground`. It has three addressed interfaces: the management NIC that carries your SSH session — it holds the low-metric default route, so leave it alone — and two lab NICs on `10.0.0.0/24` and `192.168.70.0/24`. No router sits on either lab segment, so every static route you add points at a next hop that does not answer. That is deliberate: `ip route get` still resolves the route (it sends no packet), while `ping` and `traceroute` are the failing case on purpose. Every route added with `ip route` is runtime-only and is cleared by the reboot checkpoint.
 
 ## Reading network prefixes
 
-Routes are written with a network address and a **prefix length**, such as `10.0.0.0/24`. The number after the slash is how many leading bits are fixed:
+Routes are written as a network address plus a **prefix length**, such as `10.0.0.0/24`. The number after the slash is how many leading bits are fixed:
 
-- `10.0.0.0/24` — the first 24 bits are the network; the last 8 vary. Covers `10.0.0.0`–`10.0.0.255`.
-- `172.16.0.0/16` — the first 16 bits are fixed. Covers `172.16.0.0`–`172.16.255.255`.
-- `0.0.0.0/0` — nothing is fixed. Matches every IPv4 address. This is the **default route**.
+- `10.0.0.0/24` — first 24 bits fixed; covers `10.0.0.0`–`10.0.0.255`.
+- `172.16.0.0/16` — first 16 bits fixed; covers `172.16.0.0`–`172.16.255.255`.
+- `0.0.0.0/0` — nothing fixed; matches every IPv4 address. This is the **default route**.
 
-A larger prefix number means a smaller, more specific range. This idea drives most of route selection, so it is worth being comfortable with before continuing.
+A larger prefix number means a smaller, more specific range. This idea drives most of route selection.
 
 ## Key terms
 
-| Term | Meaning in this chapter |
+| Term | Meaning in this module |
 |---|---|
 | **Route** | One routing-table entry: a destination prefix plus how to reach it (interface, and a gateway if needed). |
-| **Connected route** | A route Linux adds automatically for a network attached to one of its own interfaces. No gateway needed. |
+| **Connected route** | A route Linux adds automatically for a network on one of its own interfaces. No gateway needed. |
 | **Gateway / next hop** | A router on a directly connected network that forwards packets toward a network you cannot reach directly. |
 | **Default route** | The `0.0.0.0/0` route, used when nothing more specific matches. |
-| **Metric** | A preference number on a route. Lower is preferred when two routes have the same prefix. |
+| **Metric** | A preference number on a route. Lower is preferred when two routes share a prefix. |
 | **Neighbour table** | Linux's record of which MAC address belongs to which local IP (built by ARP for IPv4). |
-| **Asymmetric routing** | When replies come back through a different interface or path than the one the request left by. |
+| **Asymmetric routing** | Replies returning by a different interface or path than the request left by. |
 | **Policy routing** | Choosing a route by more than the destination — for example by source address or incoming interface. |
 
-## A machine with multiple interfaces
+## The routing table and the `ip route` command
 
-Consider a Linux machine with two interfaces:
+`ip route` is the whole toolset for this module. Its verbs:
+
+- `ip route show` (or just `ip route`) — print the IPv4 table; `ip -6 route show` for IPv6.
+- `ip route add` / `ip route replace` / `ip route del` — change the table (needs `sudo`).
+- `ip route get <addr>` — ask which route Linux *would* use for one destination. A lookup only; it sends no packet.
+
+When you give an interface an address, Linux automatically adds a **connected route** for that network — no gateway, because the network is directly attached. Consider a machine with:
 
 ```text
 eth0: 192.168.1.50/24
 eth1: 10.0.0.50/24
 ```
 
-They connect the machine to two different networks:
-
-```text
-192.168.1.0/24 ─── eth0 ─── Linux host ─── eth1 ─── 10.0.0.0/24
-```
-
-Linux normally creates a directly connected route when an IP address is assigned to an interface. The routing table may then contain:
-
-```text
-192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.50
-10.0.0.0/24 dev eth1 proto kernel scope link src 10.0.0.50
-```
-
-These routes tell Linux that both networks are directly reachable.
-
-## Viewing the routing table
-
-Display the IPv4 routing table:
-
-```bash
-ip route show
-```
-
-The shorter form produces the same result:
-
-```bash
-ip route
-```
-
-Example output:
+Its table might read:
 
 ```text
 default via 192.168.1.1 dev eth0
@@ -107,18 +77,13 @@ default via 192.168.1.1 dev eth0
 192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.50
 ```
 
-This table contains:
+That is a default route through `192.168.1.1`, two connected routes (`proto kernel scope link` — kernel-created, directly reachable), and one hand-added static route to `172.16.0.0/16`. Reading the connected line field by field:
 
-- A default route through `192.168.1.1`.
-- A directly connected route for `10.0.0.0/24`.
-- A static route to `172.16.0.0/16`.
-- A directly connected route for `192.168.1.0/24`.
-
-Display the IPv6 routing table separately:
-
-```bash
-ip -6 route show
-```
+- `10.0.0.0/24` — destination network;
+- `dev eth1` — outgoing interface;
+- `proto kernel` — Linux created it automatically;
+- `scope link` — directly reachable, no gateway;
+- `src 10.0.0.50` — preferred source address for traffic using this route.
 
 > [!TIP]
 > **Try it — see the routing table the playground starts with**
@@ -138,56 +103,30 @@ ip -6 route show
 >
 > Three `proto kernel scope link` lines are connected routes — one per addressed interface, added automatically. The `default` line belongs to the management interface. Interface names and the management network vary; the two lab networks are `10.0.0.0/24` and `192.168.70.0/24`.
 
-## Understanding a connected route
+## Static routes
 
-Consider this route:
-
-```text
-10.0.0.0/24 dev eth1 proto kernel scope link src 10.0.0.50
-```
-
-Its fields mean:
-
-- `10.0.0.0/24` — the destination network.
-- `dev eth1` — the outgoing interface.
-- `proto kernel` — Linux created the route automatically.
-- `scope link` — the network is directly reachable, no gateway required.
-- `src 10.0.0.50` — the preferred source address for traffic using this route.
-
-No gateway is needed because the destination network is directly connected to `eth1`.
-
-## Understanding a static route
-
-A **static route** is one you configure by hand to tell Linux how to reach a network that is not directly connected.
-
-Example:
+A **static route** is one you configure by hand to reach a network that is not directly connected:
 
 ```bash
 sudo ip route add 172.16.0.0/16 via 10.0.0.1 dev eth1
 ```
 
-This tells Linux:
+Read as: to reach an address in `172.16.0.0/16`, send the packet to gateway `10.0.0.1` through `eth1`. The parts are the destination network (`172.16.0.0/16`), the next-hop router (`via 10.0.0.1`), and the outgoing interface (`dev eth1`).
 
-> To reach an address in `172.16.0.0/16`, send the packet to gateway `10.0.0.1` through `eth1`.
+The gateway must be **on-link** — reachable on a network directly connected to the chosen interface. Here `10.0.0.1` has to be inside `eth1`'s `10.0.0.0/24`. A `via` address that is not on-link is rejected with `Error: Nexthop has invalid gateway`.
 
-The parts are:
-
-- `172.16.0.0/16` — the destination network.
-- `via 10.0.0.1` — the next-hop router.
-- `dev eth1` — the outgoing interface.
-
-`sudo` is required because changing the routing table is a privileged operation. The gateway must normally be reachable on a network directly connected to the chosen interface — here `10.0.0.1` has to be inside `eth1`'s local `10.0.0.0/24`. A `via` address that is not on-link is rejected with `Error: Nexthop has invalid gateway`.
-
-A second example routes through `eth0`:
+`ip route get` resolves a route without sending anything, so it works even when the gateway has nobody home:
 
 ```bash
-sudo ip route add 10.50.0.0/16 via 192.168.1.254 dev eth0
+ip route get 172.16.50.1
 ```
+
+reports the interface, gateway, and source address Linux would use.
 
 > [!TIP]
 > **Try it — add a static route and ask Linux to resolve it**
 >
-> Use the interface name on the `10.0.0.0/24` segment (the examples call it `enp0s2`). `10.0.0.1` is on-link there, so the add succeeds even though no router actually sits at that address in the playground.
+> Use the interface on the `10.0.0.0/24` segment (the examples call it `enp0s2`). `10.0.0.1` is on-link there, so the add succeeds even though no router sits at that address in the playground.
 >
 > ```sh
 > sudo ip route add 172.16.0.0/16 via 10.0.0.1 dev enp0s2
@@ -204,31 +143,26 @@ sudo ip route add 10.50.0.0/16 via 192.168.1.254 dev eth0
 >     cache
 > ```
 >
-> The route appears in the table, and `ip route get` reports it would leave via `enp0s2` toward `10.0.0.1` using source `10.0.0.50`. `ip route get` is a lookup only — it sends no packet — which is why it works with a gateway nothing answers.
+> The route is in the table, and `ip route get` reports it would leave via `enp0s2` toward `10.0.0.1` using source `10.0.0.50` — a lookup only, which is why it works with a gateway nothing answers.
 
-## Understanding the default route
+## The default route
 
-A default route is used when no more specific route matches.
-
-Example:
+The default route is used when no more specific route matches. `default` stands for `0.0.0.0/0`, which matches any IPv4 destination — but a more specific route always wins:
 
 ```text
 default via 192.168.1.1 dev eth0
+172.16.0.0/16 via 10.0.0.1 dev eth1
 ```
 
-The word `default` stands for `0.0.0.0/0`, which can match any IPv4 destination — but a more specific route always wins. For example:
+- Traffic for `192.168.1.20` → the connected `192.168.1.0/24` route.
+- Traffic for `172.16.100.5` → the static `172.16.0.0/16` route.
+- Traffic for `8.8.8.8` → the default route.
 
-- Traffic for `192.168.1.20` uses the connected `192.168.1.0/24` route.
-- Traffic for `172.16.100.5` uses the static `172.16.0.0/16` route.
-- Traffic for `8.8.8.8` uses the default route.
-
-A host normally has one default route. Linux can hold more than one, distinguished by metric or by policy routing.
+A host normally has one default route. Linux can hold more, separated by metric or by policy routing.
 
 ## Longest-prefix matching
 
-When several routes match a destination, Linux normally picks the one with the **longest matching prefix** — the most specific.
-
-Consider these routes:
+When several routes match a destination, Linux picks the one with the **longest matching prefix** — the most specific. Given:
 
 ```text
 default via 192.168.1.1 dev eth0
@@ -236,13 +170,7 @@ default via 192.168.1.1 dev eth0
 172.16.100.0/24 via 192.168.1.254 dev eth0
 ```
 
-For `172.16.100.5`, both `172.16.0.0/16` and `172.16.100.0/24` match. The `/24` is more specific, so Linux selects:
-
-```text
-172.16.100.0/24 via 192.168.1.254 dev eth0
-```
-
-The default route has the shortest possible prefix, `/0`, so it is only chosen when nothing else matches.
+for `172.16.100.5` both the `/16` and the `/24` match; the `/24` is more specific, so Linux uses `172.16.100.0/24 via 192.168.1.254 dev eth0`. The default route's `/0` is the shortest possible prefix, so it loses to everything else.
 
 > [!TIP]
 > **Try it — watch a more specific route win**
@@ -262,28 +190,18 @@ The default route has the shortest possible prefix, `/0`, so it is only chosen w
 > 172.16.5.5 via 10.0.0.1 dev enp0s2 src 10.0.0.50 uid 1000
 > ```
 >
-> `172.16.100.5` matches both routes and takes the `/24` out `enp0s3`; `172.16.5.5` matches only the `/16` and takes that out `enp0s2`. Same destination prefix family, different interface, decided purely by prefix length.
+> `172.16.100.5` matches both routes and takes the `/24` out `enp0s3`; `172.16.5.5` matches only the `/16` and takes that out `enp0s2`. Same destination family, different interface, decided purely by prefix length.
 
 ## Route metrics
 
-When several routes have the **same** destination prefix, a **metric** says which is preferred. Lower is normally better.
-
-Example:
+When several routes have the **same** destination prefix, the **metric** decides which is preferred — lower is better:
 
 ```text
 default via 192.168.1.1 dev eth0 metric 100
 default via 10.0.0.1 dev eth1 metric 200
 ```
 
-Here the `eth0` route is preferred; the `eth1` route is a standby that may be used if the first is removed.
-
-Create a route with a metric:
-
-```bash
-sudo ip route add default via 10.0.0.1 dev eth1 metric 200
-```
-
-A lower metric does not by itself give full failover. Linux still has to notice that the preferred route or its interface is gone before it moves to the other one.
+The `eth0` route wins; the `eth1` route is a standby that may be used if the first is removed. A lower metric does **not** on its own give failover — Linux still has to notice the preferred route or its interface is gone before it moves.
 
 > [!TIP]
 > **Try it — add a higher-metric second default and see which one wins**
@@ -307,58 +225,20 @@ A lower metric does not by itself give full failover. Linux still has to notice 
 >
 > Both defaults sit in the table, ordered by metric, and the lower-metric one is still chosen. Remove the one you added with `sudo ip route del default via 10.0.0.1 dev enp0s2 metric 500`.
 
-## Inspecting the route to a destination
+## Source-address selection
 
-`ip route get` asks Linux which route it would use for one destination:
-
-```bash
-ip route get 8.8.8.8
-```
-
-Example output:
-
-```text
-8.8.8.8 via 192.168.1.1 dev eth0 src 192.168.1.50 uid 1000
-```
-
-Meaning:
-
-- `8.8.8.8` — the destination.
-- `192.168.1.1` — the selected gateway.
-- `eth0` — the selected outgoing interface.
-- `192.168.1.50` — the selected source address.
-
-For a destination reached through a static route:
-
-```bash
-ip route get 172.16.100.5
-```
-
-```text
-172.16.100.5 via 10.0.0.1 dev eth1 src 10.0.0.50
-```
-
-`ip route get` performs a route lookup only. It does not send a packet.
-
-## Selecting a source address
-
-A multi-interface host has several IP addresses, and Linux must pick a source address for each outgoing packet. By default it uses the address on the interface the route selected:
+A multi-interface host has several addresses, and Linux picks a source address per outgoing packet. By default it uses the address on the interface the route selected:
 
 ```text
 eth0: 192.168.1.50/24   →  traffic out eth0 uses 192.168.1.50
 eth1: 10.0.0.50/24      →  traffic out eth1 uses 10.0.0.50
 ```
 
-A preferred source can be pinned on a static route:
+A preferred source can be pinned on a static route with `src`, which affects locally generated traffic using that route:
 
 ```bash
-sudo ip route add 172.16.0.0/16 \
-  via 10.0.0.1 \
-  dev eth1 \
-  src 10.0.0.50
+sudo ip route add 172.16.0.0/16 via 10.0.0.1 dev eth1 src 10.0.0.50
 ```
-
-The `src` value affects locally generated traffic that uses that route.
 
 > [!TIP]
 > **Try it — see the source address follow the chosen interface**
@@ -377,59 +257,44 @@ The `src` value affects locally generated traffic that uses that route.
 >
 > Each lookup lands on a different interface and reports that interface's own address as `src`. No `via` appears because both destinations are on directly connected networks.
 
-## Replacing an existing route
+## Replacing and removing routes
 
-`ip route add` fails if an identical destination route already exists. Use `replace` to create or update in one step:
+`ip route add` fails if an identical destination route already exists. `ip route replace` creates or updates in one step — handy when the next hop or interface changes:
 
 ```bash
 sudo ip route replace 172.16.0.0/16 via 10.0.0.1 dev eth1
 ```
 
-This is handy when the next-hop gateway or outgoing interface needs to change. Changing a route can immediately interrupt active connections that were using it.
-
-## Removing a static route
-
-Remove a route by its destination:
+Remove a route by destination, optionally narrowing by gateway and interface:
 
 ```bash
 sudo ip route del 172.16.0.0/16
-```
-
-A more specific deletion can name the gateway and interface:
-
-```bash
 sudo ip route del 172.16.0.0/16 via 10.0.0.1 dev eth1
 ```
 
-Then re-display the table:
-
-```bash
-ip route show
-```
+Changing or deleting a route can immediately interrupt connections that were using it.
 
 ## Testing the next-hop gateway
 
-Before relying on a static route, confirm the next-hop gateway is reachable through the expected interface.
+Before relying on a static route, confirm the next hop actually answers through the expected interface.
 
 ```bash
 ping -c 3 -I eth1 10.0.0.1
 ```
 
-`-I eth1` tells `ping` to use `eth1`. A failed ping does not always prove the gateway is down — firewalls can block ICMP (the protocol `ping` uses) — but it is a useful first check.
+`-I eth1` forces `ping` to use that interface. A failed ping is not proof the gateway is down — firewalls can block ICMP, the protocol `ping` uses — but it is a useful first check.
 
-Show the neighbour table to see whether Linux has learned the gateway's MAC address:
+`ip neigh` shows the **neighbour table**: Linux's cache of which MAC address belongs to which local IP, built by ARP.
 
 ```bash
 ip neigh show dev eth1
 ```
 
-Example:
-
 ```text
 10.0.0.1 lladdr 52:54:00:12:34:56 REACHABLE
 ```
 
-A `REACHABLE` entry confirms the gateway answers at Layer 2.
+A `REACHABLE` entry with a MAC (`lladdr`) means the gateway answered at Layer 2. `FAILED` or an empty result means it did not.
 
 > [!TIP]
 > **Try it — what an unreachable next hop looks like**
@@ -448,17 +313,15 @@ A `REACHABLE` entry confirms the gateway answers at Layer 2.
 > 10.0.0.1  FAILED
 > ```
 >
-> The interface is up and the route is valid, yet nothing answers at `10.0.0.1`. That gap — a correct route to a next hop that is not actually there — is exactly what this check catches. A real reachable gateway would show `REACHABLE` with a MAC address.
+> The interface is up and the route is valid, yet nothing answers at `10.0.0.1`. That gap — a correct route to a next hop that is not there — is exactly what this check catches. A real reachable gateway would show `REACHABLE` with a MAC address.
 
 ## Tracing the path to a destination
 
-`traceroute` tries to show the Layer 3 hops between the local machine and a destination. Use numeric addresses to skip DNS lookups:
+`traceroute` tries to show the Layer 3 hops to a destination. `-n` skips DNS lookups:
 
 ```bash
 traceroute -n 172.16.100.5
 ```
-
-Example output:
 
 ```text
 traceroute to 172.16.100.5, 30 hops max
@@ -467,58 +330,26 @@ traceroute to 172.16.100.5, 30 hops max
  3  172.16.100.5   1.845 ms  1.802 ms  1.821 ms
 ```
 
-This suggests packets travel through the local gateway `10.0.0.1`, an intermediate router `172.16.0.1`, then the destination.
+Some routers and firewalls withhold the replies `traceroute` relies on, so hops can show as `*` without meaning forwarding stopped.
 
-Some routers and firewalls do not send the replies `traceroute` relies on, so hops may show as `*`. A missing reply does not by itself mean forwarding has stopped. The `traceroute` package is not installed by default on every distribution.
-
-> In this playground there is no router forwarding beyond the host, so `traceroute -n 172.16.100.5` just times out with `* * *` on every hop. A working trace needs at least one real forwarding router on the path, which the sandbox does not provide.
+> In this playground no router forwards beyond the host, so `traceroute -n 172.16.100.5` times out with `* * *` on every hop. A working trace needs at least one real forwarding router on the path, which the sandbox does not provide.
 
 ## Return paths and asymmetric routing
 
-A working outbound route is only half of a conversation. The destination also needs a route back to the source address.
+A working outbound route is only half of a conversation. The destination network also needs a route back to your source address. If the machine sends `10.0.0.50 → 172.16.100.5` but that network has no return route to `10.0.0.50`, requests arrive and replies never come back.
 
-If the machine sends:
-
-```text
-10.0.0.50 → 172.16.100.5
-```
-
-then the destination network must know how to return traffic to `10.0.0.50`. If that return route is missing, requests arrive but replies never come back.
-
-A reply can also return through a **different** interface than the request left by. This is **asymmetric routing**, and it can cause trouble for:
-
-- Stateful firewalls.
-- NAT gateways.
-- Reverse-path filtering.
-- Applications that expect a consistent path.
-- Troubleshooting and packet captures.
-
-Design multi-interface systems with both the outgoing and the return path in mind.
+A reply can also return through a **different** interface than the request left by — **asymmetric routing**. It causes trouble for stateful firewalls, NAT gateways, reverse-path filtering, and packet captures. Design multi-interface systems with both directions in mind.
 
 ## Policy routing
 
-The main routing table selects routes mostly by destination address. More advanced multi-interface setups sometimes need to decide by other things:
-
-- The source IP address.
-- The incoming interface.
-- A firewall mark.
-- A separate routing table.
-
-Linux supports this through **policy routing**.
-
-Show policy-routing rules:
+The main table selects routes mostly by destination. Advanced multi-uplink setups sometimes need to decide by source address, incoming interface, a firewall mark, or a separate table. Linux does this with **policy routing**, driven by a rule base:
 
 ```bash
-ip rule show
+ip rule show               # the rules
+ip route show table all    # every routing table, not just main
 ```
 
-Show all IPv4 routing tables:
-
-```bash
-ip route show table all
-```
-
-Policy routing is useful when a machine has multiple uplinks and traffic from each source network must leave through a specific gateway. Get comfortable with basic static routing before adding extra tables and rules.
+`ip rule` lists the ordered rules that pick *which table* a lookup uses. Policy routing works by inserting higher-priority rules (lower numbers) above `main`.
 
 > [!TIP]
 > **Try it — look at the rule base before changing anything**
@@ -535,26 +366,16 @@ Policy routing is useful when a machine has multiple uplinks and traffic from ea
 > 32767:  from all lookup default
 > ```
 >
-> These three rules are the default set every Linux host has: `local` first, then `main` (the table `ip route show` displays), then `default`. Policy routing works by inserting higher-priority rules — lower numbers — above `main`.
+> These three are the default set every Linux host has: `local` first, then `main` (the table `ip route show` displays), then `default`. Get comfortable with plain static routing before adding extra tables and rules.
 
-## Temporary and persistent routes
+## Runtime versus persistent routes
 
-Routes created with `ip route` are runtime-only. They normally disappear when the machine restarts.
-
-Persistent routes should be configured through the distribution's network-management system, such as:
-
-- NetworkManager.
-- Netplan.
-- `systemd-networkd`.
-- `ifupdown`.
-- Distribution-specific network configuration files.
-
-Do not configure the same interfaces and routes through more than one such system — routes can then appear, disappear, or change unexpectedly.
+Routes created with `ip route` are runtime-only — normally gone after a restart. Persistent routes are configured through the distribution's network-management system (NetworkManager, Netplan, `systemd-networkd`, `ifupdown`, …). Do not configure the same routes through more than one such system — they can then appear, disappear, or change unexpectedly.
 
 > [!TIP]
 > **Try it — confirm added routes do not survive a reboot**
 >
-> This restarts the VM and drops your SSH session for a minute; reconnect with `astrona ssh static-routing-playground`.
+> This restarts the VM and drops your SSH session for about a minute; reconnect with `astrona ssh astro-static-routing-playground`.
 >
 > ```sh
 > sudo reboot
@@ -570,15 +391,24 @@ Do not configure the same interfaces and routes through more than one such syste
 
 ## A structured troubleshooting order
 
-When a destination cannot be reached, it helps to check the network in order, narrowing down where the path breaks:
+When a destination cannot be reached, check the path in order so you narrow down where it breaks:
 
-1. Is the interface enabled? — `ip link show`
-2. Does it have the right IP address? — `ip addr show`
-3. What does the routing table contain? — `ip route show`
-4. Which route would Linux pick for this destination? — `ip route get 172.16.100.5`
-5. Is the next-hop gateway known at Layer 2? — `ip neigh show`
-6. Does the next-hop gateway respond? — `ping -c 3 -I eth1 10.0.0.1`
-7. Where does a trace toward the destination stop? — `traceroute -n 172.16.100.5`
+1. Interface enabled? — `ip link show`
+2. Right IP address? — `ip addr show`
+3. What is in the routing table? — `ip route show`
+4. Which route would Linux pick? — `ip route get 172.16.100.5`
+5. Is the next hop known at Layer 2? — `ip neigh show`
+6. Does the next hop respond? — `ping -c 3 -I eth1 10.0.0.1`
+7. Where does a trace stop? — `traceroute -n 172.16.100.5`
 8. Does the remote network have a valid **return** route?
 
-Walking these in order shows whether the problem is the interface, the local address, route selection, the gateway, an intermediate network, the destination, or the return path.
+Each step isolates one part: interface, local address, route selection, gateway, an intermediate network, the destination, or the return path.
+
+> [!WARNING]
+> **Common pitfalls**
+>
+> - **A `via` gateway that is not on-link.** `ip route add … via <addr>` needs `<addr>` on a network directly attached to `dev`. Otherwise: `Error: Nexthop has invalid gateway`. Add or confirm the connected route first.
+> - **Treating a low metric as failover.** Metric only orders routes with the same prefix. Linux still needs to detect the preferred route or interface is gone before it switches. Real failover needs link monitoring or a daemon.
+> - **`ip route get` succeeding and reading it as "reachable".** `ip route get` is a table lookup, not a send. It resolves fine through a next hop that answers nothing. Confirm reachability with `ping` / `ip neigh`.
+> - **Forgetting the return path.** A correct outbound route does nothing if the far network has no route back to your source address. Check both directions.
+> - **`ip route del` not matching.** A route added with a specific `via`/`dev`/`metric` may need the same qualifiers to delete. If `del <prefix>` fails, match the line as `ip route show` prints it.
