@@ -16,8 +16,21 @@ By completing this section, you will acquire three core capabilities:
 ## The Learning & Lab Path
 
 ### 1. Theoretical Concepts & Metaphors
+
+Each module has a short landing page and a set of ordered deep-dive parts. Read the landing page first, then the parts in order.
+
 *   **[Module 1: Packet Filtering with nftables](./module-01/course.md)**
+    1.  [Netfilter and the packet path](./module-01/course-01-netfilter-and-packet-flow.md)
+    2.  [Tables and address families](./module-01/course-02-tables-and-families.md)
+    3.  [Chains, hooks, priority, and policy](./module-01/course-03-chains-hooks-priority.md)
+    4.  [Rules: matches and verdicts](./module-01/course-04-rules-matches-verdicts.md)
+    5.  [Connection tracking, sets, and maps](./module-01/course-05-conntrack-sets-maps.md)
+    6.  [Persistence and operating a ruleset](./module-01/course-06-persistence-and-operations.md)
 *   **[Module 2: firewalld Zones and Services](./module-02/course.md)**
+    1.  [Architecture and the nftables backend](./module-02/course-01-architecture-and-backends.md)
+    2.  [Zones](./module-02/course-02-zones.md)
+    3.  [Services, ports, and rich rules](./module-02/course-03-services-ports-richrules.md)
+    4.  [Runtime, permanent, and operations](./module-02/course-04-runtime-permanent-operations.md)
 
 ### 2. Guided Training Labs
 *   **Hands-on Training Lab 1 (nftables):** **[section-030/module-01](../../labs/section-030/module-01/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-030/module-01/lab-01")

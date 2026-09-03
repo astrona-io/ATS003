@@ -193,6 +193,30 @@ modules:
         path: sections/section-030/module-01/course.md
 
       - type: reading
+        title: "Module 1.1: Netfilter and the packet path"
+        path: sections/section-030/module-01/course-01-netfilter-and-packet-flow.md
+
+      - type: reading
+        title: "Module 1.2: Tables and address families"
+        path: sections/section-030/module-01/course-02-tables-and-families.md
+
+      - type: reading
+        title: "Module 1.3: Chains, hooks, priority, and policy"
+        path: sections/section-030/module-01/course-03-chains-hooks-priority.md
+
+      - type: reading
+        title: "Module 1.4: Rules — matches and verdicts"
+        path: sections/section-030/module-01/course-04-rules-matches-verdicts.md
+
+      - type: reading
+        title: "Module 1.5: Connection tracking, sets, and maps"
+        path: sections/section-030/module-01/course-05-conntrack-sets-maps.md
+
+      - type: reading
+        title: "Module 1.6: Persistence and operating a ruleset"
+        path: sections/section-030/module-01/course-06-persistence-and-operations.md
+
+      - type: reading
         title: Question
         path: labs/section-030/module-01/lab-01/question.md
 
@@ -207,6 +231,22 @@ modules:
       - type: reading
         title: "Module 2: firewalld Zones and Services"
         path: sections/section-030/module-02/course.md
+
+      - type: reading
+        title: "Module 2.1: Architecture and the nftables backend"
+        path: sections/section-030/module-02/course-01-architecture-and-backends.md
+
+      - type: reading
+        title: "Module 2.2: Zones"
+        path: sections/section-030/module-02/course-02-zones.md
+
+      - type: reading
+        title: "Module 2.3: Services, ports, and rich rules"
+        path: sections/section-030/module-02/course-03-services-ports-richrules.md
+
+      - type: reading
+        title: "Module 2.4: Runtime, permanent, and operations"
+        path: sections/section-030/module-02/course-04-runtime-permanent-operations.md
 
       - type: reading
         title: Question
