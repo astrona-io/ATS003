@@ -24,13 +24,13 @@ This section is divided into four focused textbook modules, followed by four ded
 *   **[Module 4: Local Hostname Resolution](./module-04/course.md)**
 
 ### Guided Training Labs
-*   **[Hands-on Training Lab 1 (Addressing)](../../labs/lab-011)**
-*   **[Hands-on Training Lab 2 (Hostnames)](../../labs/lab-012)**
-*   **[Hands-on Training Lab 3 (Public IP NAT)](../../labs/lab-013)**
-*   **[Hands-on Training Lab 4 (Resolution)](../../labs/lab-014)**
+*   **[Hands-on Training Lab 1 (Addressing)](../../labs/section-010/module-01/lab-01)**
+*   **[Hands-on Training Lab 2 (Hostnames)](../../labs/section-010/module-02/lab-01)**
+*   **[Hands-on Training Lab 3 (Public IP NAT)](../../labs/section-010/module-03/lab-01)**
+*   **[Hands-on Training Lab 4 (Resolution)](../../labs/section-010/module-04/lab-01)**
 
 ### Unguided Challenge Lab
-*   **[Hands-on Challenge Lab (Capstone)](../../labs/lab-010)**
+*   **[Hands-on Challenge Lab (Capstone)](../../labs/section-010/capstone/lab-01)**
 
 ## Ready for Assessment?
 *   **[Take the Section 010 Knowledge Check Quiz](./quiz.md)**

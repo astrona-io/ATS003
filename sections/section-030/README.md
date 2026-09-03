@@ -20,11 +20,11 @@ By completing this section, you will acquire three core capabilities:
 *   **[Module 2: firewalld Zones and Services](./module-02/course.md)**
 
 ### 2. Guided Training Labs
-*   **Hands-on Training Lab 1 (nftables):** **[lab-031](../../labs/lab-031)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/lab-031")
-*   **Hands-on Training Lab 2 (firewalld):** **[lab-032](../../labs/lab-032)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/lab-032")
+*   **Hands-on Training Lab 1 (nftables):** **[section-030/module-01](../../labs/section-030/module-01/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-030/module-01/lab-01")
+*   **Hands-on Training Lab 2 (firewalld):** **[section-030/module-02](../../labs/section-030/module-02/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-030/module-02/lab-01")
 
 ### 3. Unguided Challenge Lab
-*   **Hands-on Challenge Lab (Capstone):** **[lab-030](../../labs/lab-030)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/lab-030")
+*   **Hands-on Challenge Lab (Capstone):** **[section-030/capstone](../../labs/section-030/capstone/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-030/capstone/lab-01")
 
 ---
 

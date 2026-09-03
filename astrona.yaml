@@ -1,0 +1,487 @@
+training:
+  id: ATS003
+  title: "LFCS: Networking"
+  description: >
+    Training material covering the Linux Foundation Certified System
+    Administrator (LFCS) Networking domain, with hands-on labs for each
+    competency.
+
+  certification:
+    name: Linux Foundation Certified System Administrator
+    code: LFCS
+    provider: Linux Foundation
+    domain: Networking
+    weight: 25
+
+modules:
+  - id: module-010
+    title: "Section 010: Core Host Configuration (Addressing & Hostnames)"
+    description: >
+      Make every host uniquely identifiable at Layer 3: assign static and secondary IPv4/IPv6 addresses, manage the systemd hostname, and resolve names locally with /etc/hosts.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-010/README.md
+
+      - type: reading
+        title: "Module 1: Network Interfaces and IPv4 & IPv6 Addressing"
+        path: sections/section-010/module-01/course.md
+
+      - type: reading
+        title: Question
+        path: labs/section-010/module-01/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-010/module-01/lab-01/solution.md
+
+      - type: lab
+        title: "IPv4 & IPv6 Interface Configuration Lab"
+        path: labs/section-010/module-01/lab-01
+
+      - type: reading
+        title: "Module 2: Managing Linux Hostnames"
+        path: sections/section-010/module-02/course.md
+
+      - type: reading
+        title: Question
+        path: labs/section-010/module-02/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-010/module-02/lab-01/solution.md
+
+      - type: lab
+        title: "Static Hostname Management Lab"
+        path: labs/section-010/module-02/lab-01
+
+      - type: reading
+        title: "Module 3: Discovering Your Public IP Address"
+        path: sections/section-010/module-03/course.md
+
+      - type: reading
+        title: Question
+        path: labs/section-010/module-03/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-010/module-03/lab-01/solution.md
+
+      - type: lab
+        title: "Public IP Discovery Behind NAT Lab"
+        path: labs/section-010/module-03/lab-01
+
+      - type: reading
+        title: "Module 4: Local Hostname Resolution"
+        path: sections/section-010/module-04/course.md
+
+      - type: reading
+        title: Question
+        path: labs/section-010/module-04/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-010/module-04/lab-01/solution.md
+
+      - type: lab
+        title: "Local Hostname Name Resolution Lab"
+        path: labs/section-010/module-04/lab-01
+
+      - type: reading
+        title: "Section 010 Knowledge Check: Core Host Configuration"
+        path: sections/section-010/quiz.md
+
+      - type: reading
+        title: Question
+        path: labs/section-010/capstone/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-010/capstone/lab-01/solution.md
+
+      - type: lab
+        title: "Core Host Configurations Capstone Lab"
+        path: labs/section-010/capstone/lab-01
+
+  - id: module-020
+    title: "Section 020: Link Aggregation & Routing (Bridges, Bonds & Routes)"
+    description: >
+      Build redundant and interconnected links: bond interfaces for uplink aggregation, switch traffic locally with software bridges, and forward packets with multi-interface static routing.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-020/README.md
+
+      - type: reading
+        title: "Module 1: Link Aggregation with Linux Bonding"
+        path: sections/section-020/module-01/course.md
+
+      - type: reading
+        title: Question
+        path: labs/section-020/module-01/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-020/module-01/lab-01/solution.md
+
+      - type: lab
+        title: "Link Aggregation (Bonding) Lab"
+        path: labs/section-020/module-01/lab-01
+
+      - type: reading
+        title: "Module 2: Software Bridging"
+        path: sections/section-020/module-02/course.md
+
+      - type: reading
+        title: Question
+        path: labs/section-020/module-02/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-020/module-02/lab-01/solution.md
+
+      - type: lab
+        title: "Software Bridging Lab"
+        path: labs/section-020/module-02/lab-01
+
+      - type: reading
+        title: "Module 3: Multi-Interface Static Routing"
+        path: sections/section-020/module-03/course.md
+
+      - type: reading
+        title: Question
+        path: labs/section-020/module-03/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-020/module-03/lab-01/solution.md
+
+      - type: lab
+        title: "Multi-Interface Static Routing Lab"
+        path: labs/section-020/module-03/lab-01
+
+      - type: reading
+        title: "Section 020 Knowledge Check: Link Aggregation & Routing"
+        path: sections/section-020/quiz.md
+
+      - type: reading
+        title: Question
+        path: labs/section-020/capstone/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-020/capstone/lab-01/solution.md
+
+      - type: lab
+        title: "Aggregation and Routing Capstone Lab"
+        path: labs/section-020/capstone/lab-01
+
+  - id: module-030
+    title: "Section 030: Network Security & Packet Filtering (Firewalls)"
+    description: >
+      Secure the host at the packet layer: build nftables tables and rulesets from first principles, then manage the same protections through firewalld zones and service abstractions.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-030/README.md
+
+      - type: reading
+        title: "Module 1: Packet Filtering with nftables"
+        path: sections/section-030/module-01/course.md
+
+      - type: reading
+        title: Question
+        path: labs/section-030/module-01/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-030/module-01/lab-01/solution.md
+
+      - type: lab
+        title: "Packet Filtering with nftables Lab"
+        path: labs/section-030/module-01/lab-01
+
+      - type: reading
+        title: "Module 2: firewalld Zones and Services"
+        path: sections/section-030/module-02/course.md
+
+      - type: reading
+        title: Question
+        path: labs/section-030/module-02/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-030/module-02/lab-01/solution.md
+
+      - type: lab
+        title: "firewalld Zones and Services Lab"
+        path: labs/section-030/module-02/lab-01
+
+      - type: reading
+        title: "Section 030 Knowledge Check: Network Security & Packet Filtering"
+        path: sections/section-030/quiz.md
+
+      - type: reading
+        title: Question
+        path: labs/section-030/capstone/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-030/capstone/lab-01/solution.md
+
+      - type: lab
+        title: "Host Security and Filtering Capstone Lab"
+        path: labs/section-030/capstone/lab-01
+
+  - id: module-040
+    title: "Section 040: Time & Domain Name Services (NTP & DNS)"
+    description: >
+      Keep infrastructure timing and naming correct: configure chrony as an NTP client, run it in server mode across stratums, and verify DNS records and resolvers with dig.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-040/README.md
+
+      - type: reading
+        title: "Module 1: NTP Client Time Synchronization"
+        path: sections/section-040/module-01/course.md
+
+      - type: reading
+        title: Question
+        path: labs/section-040/module-01/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-040/module-01/lab-01/solution.md
+
+      - type: lab
+        title: "NTP Client Time Synchronization Lab"
+        path: labs/section-040/module-01/lab-01
+
+      - type: reading
+        title: "Module 2: NTP Server Mode and Stratums"
+        path: sections/section-040/module-02/course.md
+
+      - type: reading
+        title: Question
+        path: labs/section-040/module-02/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-040/module-02/lab-01/solution.md
+
+      - type: lab
+        title: "NTP Server Mode and Stratums Lab"
+        path: labs/section-040/module-02/lab-01
+
+      - type: reading
+        title: "Module 3: DNS Verification with dig"
+        path: sections/section-040/module-03/course.md
+
+      - type: reading
+        title: Question
+        path: labs/section-040/module-03/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-040/module-03/lab-01/solution.md
+
+      - type: lab
+        title: "DNS Verification with dig Lab"
+        path: labs/section-040/module-03/lab-01
+
+      - type: reading
+        title: "Section 040 Knowledge Check: Time & Domain Name Services"
+        path: sections/section-040/quiz.md
+
+      - type: reading
+        title: Question
+        path: labs/section-040/capstone/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-040/capstone/lab-01/solution.md
+
+      - type: lab
+        title: "Time and Name Services Capstone Lab"
+        path: labs/section-040/capstone/lab-01
+
+  - id: module-050
+    title: "Section 050: Application Reverse Proxies (Nginx & SSH)"
+    description: >
+      Front application runtimes safely: proxy requests with Nginx, spread load across upstream backend pools, and lock down remote access with OpenSSH server hardening.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-050/README.md
+
+      - type: reading
+        title: "Module 1: Nginx Reverse Proxy"
+        path: sections/section-050/module-01/course.md
+
+      - type: reading
+        title: Question
+        path: labs/section-050/module-01/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-050/module-01/lab-01/solution.md
+
+      - type: lab
+        title: "Nginx Reverse Proxy Lab"
+        path: labs/section-050/module-01/lab-01
+
+      - type: reading
+        title: "Module 2: Nginx Load Balancers"
+        path: sections/section-050/module-02/course.md
+
+      - type: reading
+        title: Question
+        path: labs/section-050/module-02/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-050/module-02/lab-01/solution.md
+
+      - type: lab
+        title: "Nginx Upstream Load Balancers Lab"
+        path: labs/section-050/module-02/lab-01
+
+      - type: reading
+        title: "Module 3: OpenSSH Server Hardening"
+        path: sections/section-050/module-03/course.md
+
+      - type: reading
+        title: Question
+        path: labs/section-050/module-03/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-050/module-03/lab-01/solution.md
+
+      - type: lab
+        title: "OpenSSH Server Hardening Lab"
+        path: labs/section-050/module-03/lab-01
+
+      - type: reading
+        title: "Section 050 Knowledge Check: Application Reverse Proxies"
+        path: sections/section-050/quiz.md
+
+      - type: reading
+        title: Question
+        path: labs/section-050/capstone/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-050/capstone/lab-01/solution.md
+
+      - type: lab
+        title: "Application Proxy and SSH Capstone Lab"
+        path: labs/section-050/capstone/lab-01
+
+  - id: module-060
+    title: "Section 060: Persistent Configurations & Diagnostics"
+    description: >
+      Make network changes survive a reboot and diagnose them when they break: persist config with NetworkManager and Netplan, then inspect live sockets with ss and capture traffic with tcpdump.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-060/README.md
+
+      - type: reading
+        title: "Module 1: Persistent Network Managers"
+        path: sections/section-060/module-01/course.md
+
+      - type: reading
+        title: Question
+        path: labs/section-060/module-01/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-060/module-01/lab-01/solution.md
+
+      - type: lab
+        title: "NetworkManager nmcli Setup Lab"
+        path: labs/section-060/module-01/lab-01
+
+      - type: reading
+        title: "Module 2: Netplan YAML Configurations"
+        path: sections/section-060/module-02/course.md
+
+      - type: reading
+        title: Question
+        path: labs/section-060/module-02/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-060/module-02/lab-01/solution.md
+
+      - type: lab
+        title: "Netplan YAML Configurations Lab"
+        path: labs/section-060/module-02/lab-01
+
+      - type: reading
+        title: "Module 3: Active Socket Diagnostics (ss)"
+        path: sections/section-060/module-03/course.md
+
+      - type: reading
+        title: Question
+        path: labs/section-060/module-03/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-060/module-03/lab-01/solution.md
+
+      - type: lab
+        title: "Active Socket Diagnostics (ss) Lab"
+        path: labs/section-060/module-03/lab-01
+
+      - type: reading
+        title: "Module 4: Raw Packet Capturing (tcpdump)"
+        path: sections/section-060/module-04/course.md
+
+      - type: reading
+        title: Question
+        path: labs/section-060/module-04/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-060/module-04/lab-01/solution.md
+
+      - type: lab
+        title: "Raw Packet Capturing (tcpdump) Lab"
+        path: labs/section-060/module-04/lab-01
+
+      - type: reading
+        title: "Section 060 Knowledge Check: Persistent Configurations & Diagnostics"
+        path: sections/section-060/quiz.md
+
+      - type: reading
+        title: Question
+        path: labs/section-060/capstone/lab-01/question.md
+
+      - type: reading
+        title: Solution Walkthrough
+        path: labs/section-060/capstone/lab-01/solution.md
+
+      - type: lab
+        title: "Connection Recovery and Audit Capstone Lab"
+        path: labs/section-060/capstone/lab-01
+
+  - id: module-090
+    title: "LFCS Networking Domain Certification Quiz"
+    description: >
+      A comprehensive, scenario-based final assessment covering all
+      modules across the six networking sections, simulating actual Linux
+      Foundation exam pressure.
+
+    content:
+      - type: reading
+        title: "Final Domain Certification Quiz"
+        path: sections/final-domain-quiz.md

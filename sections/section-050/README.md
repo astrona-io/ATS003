@@ -21,12 +21,12 @@ By completing this section, you will acquire three core capabilities:
 *   **[Module 3: OpenSSH Server Hardening](./module-03/course.md)**
 
 ### 2. Guided Training Labs
-*   **Hands-on Training Lab 1 (Nginx Proxy):** **[lab-051](../../labs/lab-051)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/lab-051")
-*   **Hands-on Training Lab 2 (Nginx LB):** **[lab-052](../../labs/lab-052)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/lab-052")
-*   **Hands-on Training Lab 3 (SSH Hardening):** **[lab-053](../../labs/lab-053)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/lab-053")
+*   **Hands-on Training Lab 1 (Nginx Proxy):** **[section-050/module-01](../../labs/section-050/module-01/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-050/module-01/lab-01")
+*   **Hands-on Training Lab 2 (Nginx LB):** **[section-050/module-02](../../labs/section-050/module-02/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-050/module-02/lab-01")
+*   **Hands-on Training Lab 3 (SSH Hardening):** **[section-050/module-03](../../labs/section-050/module-03/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-050/module-03/lab-01")
 
 ### 3. Unguided Challenge Lab
-*   **Hands-on Challenge Lab (Capstone):** **[lab-050](../../labs/lab-050)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/lab-050")
+*   **Hands-on Challenge Lab (Capstone):** **[section-050/capstone](../../labs/section-050/capstone/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-050/capstone/lab-01")
 
 ---
 

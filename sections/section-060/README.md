@@ -22,13 +22,13 @@ By completing this section, you will acquire three core capabilities:
 *   **[Module 4: Raw Packet Capturing (tcpdump)](./module-04/course.md)**
 
 ### 2. Guided Training Labs
-*   **Hands-on Training Lab 1 (nmcli):** **[lab-061](../../labs/lab-061)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/lab-061")
-*   **Hands-on Training Lab 2 (Netplan):** **[lab-062](../../labs/lab-062)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/lab-062")
-*   **Hands-on Training Lab 3 (ss sockets):** **[lab-063](../../labs/lab-063)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/lab-063")
-*   **Hands-on Training Lab 4 (tcpdump Sniffing):** **[lab-064](../../labs/lab-064)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/lab-064")
+*   **Hands-on Training Lab 1 (nmcli):** **[section-060/module-01](../../labs/section-060/module-01/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-060/module-01/lab-01")
+*   **Hands-on Training Lab 2 (Netplan):** **[section-060/module-02](../../labs/section-060/module-02/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-060/module-02/lab-01")
+*   **Hands-on Training Lab 3 (ss sockets):** **[section-060/module-03](../../labs/section-060/module-03/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-060/module-03/lab-01")
+*   **Hands-on Training Lab 4 (tcpdump Sniffing):** **[section-060/module-04](../../labs/section-060/module-04/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-060/module-04/lab-01")
 
 ### 3. Unguided Challenge Lab
-*   **Hands-on Challenge Lab (Capstone):** **[lab-060](../../labs/lab-060)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/lab-060")
+*   **Hands-on Challenge Lab (Capstone):** **[section-060/capstone](../../labs/section-060/capstone/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-060/capstone/lab-01")
 
 ---
 
