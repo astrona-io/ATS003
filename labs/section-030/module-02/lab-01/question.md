@@ -1,13 +1,20 @@
-# Training Lab 032: Guided Practice
+# Question
 
-In this training lab, you will perform a guided configuration of your server.
+Solve this question on: `terminal`
 
-## Practice Objectives:
-Please start this VM sandbox and perform the step-by-step commands detailed in:
-**[Section 032, Module 02](../../sections/section-030/module-02/course.md)**
+## Scenario
 
-## Verification:
-When done, you can verify your final system state using the automated validation test scripts:
-```bash
-/usr/local/bin/validate-*.sh
-```
+`firewalld` is installed, running, enabled at boot, and the primary
+interface is already bound to the `public` zone (which is also the default
+zone). Your job is to open two things in that zone — and to make the change
+both **live now** and **saved for after a reload/reboot**.
+
+## Tasks
+
+In the `public` zone:
+
+1. **Allow the `https` service** — it must appear in both the runtime
+   service list and the permanent service list.
+
+2. **Allow port `8443/tcp`** — it must appear in both the runtime port list
+   and the permanent port list.

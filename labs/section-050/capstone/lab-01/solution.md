@@ -1,156 +1,154 @@
-# Solution
+# Solution Walkthrough
 
-## Step 0: Confirm existing apps are untouched and locate Nginx's include path
+You will add one new nginx file with two `server` blocks — a fixed-target
+proxy on `8001` and a load balancer on `8000` — then reload nginx.
+Everything runs on the VM's `terminal`. You never touch the existing app
+configs.
+
+| Goal | nginx piece |
+| --- | --- |
+| Send a port to one backend | `location / { proxy_pass http://IP:PORT; }` |
+| Force every request onto one path | `rewrite ^.*$ /special break;` before `proxy_pass` |
+| Spread across backends | `upstream NAME { server …; server …; }` + `proxy_pass http://NAME;` |
+| Apply changes | `sudo nginx -t` then `sudo systemctl reload nginx` |
+
+## The feedback loop
+
+Grading runs from the **host terminal** — the shell where you typed
+`astrona run`:
 
 ```bash
-curl -s -o /dev/null -w '%{http_code}\n' http://192.168.10.60:1111/
-curl -s -o /dev/null -w '%{http_code}\n' http://192.168.10.60:2222/
-sudo nginx -T | grep -m1 'include'
-ls /etc/nginx/conf.d/ /etc/nginx/sites-enabled/ 2>/dev/null
+astrona test -c labs/section-050/capstone/lab-01
 ```
 
-Verify both existing app ports respond before you start, so any breakage later is clearly attributable to your new config, not something already broken. `nginx -T` prints the fully-merged config with all includes resolved — look for the `include conf.d/*.conf;` (or `sites-enabled/*`) line in `nginx.conf`, since that's the directory your new file needs to land in to actually get loaded.
+Four checks:
 
-## Step 1: Create a new, isolated config file
+```text
+PASS  existing-apps-untouched
+FAIL  nginx-syntax
+FAIL  proxy-8001
+FAIL  loadbalancer-8000
+```
+
+(`existing-apps-untouched` passes as long as you never edit their files.)
+Run the check after each step.
+
+---
+
+## Step 1: See what the backends serve
+
+On the VM:
 
 ```bash
-sudo touch /etc/nginx/conf.d/lb-8000-8001.conf
+curl http://127.0.0.1:1111/
+curl http://127.0.0.1:2222/
+curl http://127.0.0.1:2222/special
+ls /etc/nginx/conf.d/ /etc/nginx/sites-enabled/
 ```
 
-A descriptive filename tells the next admin exactly what this file is for at a glance. Using `conf.d/` avoids the extra symlink step `sites-available`/`sites-enabled` requires on Debian-family systems — either works as long as it's picked up by an `include`, but a single new file is the minimal, least-invasive footprint, satisfying "don't touch the existing app configs."
+You should get `app-1111-root`, `app-2222-root`, `app-2222-special`. The
+existing app configs live in those directories — leave them alone.
 
-## Step 2: Build the fixed-target proxy on port 8001
+---
 
-```nginx
-# /etc/nginx/conf.d/lb-8000-8001.conf
+## Step 2: Write the new config file
 
-server {
-    listen 8001;
-    server_name _;
+Create a fresh file (nginx automatically includes everything in
+`conf.d/*.conf`):
 
-    location / {
-        proxy_pass http://192.168.10.60:2222/special;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-}
+```bash
+sudo nano /etc/nginx/conf.d/lab.conf
 ```
 
-Since Nginx has no offline man page for directive syntax, lean on `nginx -t`'s error messages as you iterate — write the block, test it, and let the parser tell you immediately if `proxy_pass` or a header directive is malformed, rather than trying to recall exact syntax from memory.
-
-`listen 8001` opens a brand-new socket that has nothing to do with the app on 2222's own `server{}` block — Nginx dispatches purely by the port/host the request arrived on, so this coexists safely with the untouched app config. `proxy_pass http://192.168.10.60:2222/special;` forwards every request under `/` to that fixed backend URL, path included — this is the reverse-proxy behavior that satisfies "redirects all traffic to 192.168.10.60:2222/special" without ever exposing a 301 to the client or requiring changes to the app on 2222. The three `proxy_set_header` lines aren't strictly required by the task, but they're standard reverse-proxy hygiene: they preserve the original `Host` and client IP information for the backend app's logs, which a real API server would otherwise lose (it would just see 127.0.0.1 as the source).
-
-## Step 3: Build the load-balanced upstream on port 8000
+Put this in it:
 
 ```nginx
-# same file, appended
-
-upstream app_pool {
-    # No explicit algorithm = round robin (Nginx's default).
-    # Swap the line above for `random;` to load-balance randomly instead.
-    server 192.168.10.60:1111;
-    server 192.168.10.60:2222;
+upstream lab_backends {
+    server 127.0.0.1:1111;
+    server 127.0.0.1:2222;
 }
 
 server {
     listen 8000;
-    server_name _;
-
     location / {
-        proxy_pass http://app_pool;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass http://lab_backends;
+    }
+}
+
+server {
+    listen 8001;
+    location / {
+        rewrite ^.*$ /special break;
+        proxy_pass http://127.0.0.1:2222;
     }
 }
 ```
 
-Check `man -k nginx` and any locally installed doc package for the `upstream` module first if you're unsure of the `random;`/`least_conn;` keyword spelling — with no internet available, `nginx -t` is again the fastest way to confirm a directive name is spelled correctly, since an unrecognized directive fails syntax validation immediately with the bad token named.
+How the `8001` block works: `rewrite ^.*$ /special break` changes the
+request path to `/special` for *any* incoming path, and `break` stops
+further rewrite processing so `proxy_pass` sends exactly `/special` to the
+backend. Because `proxy_pass` has no URI part of its own, it forwards the
+rewritten path as-is. No `3xx` is ever sent to the client.
 
-`upstream app_pool { ... }` defines a named pool of backends; Nginx load-balances requests across the `server` entries inside it. With no algorithm directive, Nginx uses round-robin — each successive request goes to the next server in the list, cycling back to the top. If the task's "Random" option is preferred instead, add a `random;` line as the first statement inside the `upstream` block:
+The `8000` block names both backends in an `upstream` and proxies to it;
+nginx round-robins between them by default.
 
-```nginx
-upstream app_pool {
-    random;
-    server 192.168.10.60:1111;
-    server 192.168.10.60:2222;
-}
-```
+Save and exit (`nano`: `Ctrl+O`, `Enter`, `Ctrl+X`).
 
-Either satisfies the task since it explicitly allows "Random or Round Robin" — round-robin (the default, shown above) requires the least code and is the safer choice under time pressure since there's nothing extra to get wrong.
+---
 
-## Step 4: Test syntax before touching the running service
+## Step 3: Test and reload
 
 ```bash
 sudo nginx -t
 ```
 
-Expected:
-
-```text
-nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
-nginx: configuration file /etc/nginx/nginx.conf test is successful
-```
-
-`nginx -t` parses and validates the *entire merged* configuration, including your new file, without affecting the running worker processes at all. Never skip this before a reload — a typo here (a missing semicolon, an unmatched brace) is the single most common way to accidentally break the untouched app configs too, since Nginx reloads its configuration as one atomic unit.
-
-## Step 5: Reload Nginx
+If it says `syntax is ok` / `test is successful`, reload:
 
 ```bash
 sudo systemctl reload nginx
 ```
 
-`reload` (not `restart`) sends Nginx's master process a signal to gracefully spawn new workers with the updated config while finishing in-flight requests on the old workers — zero dropped connections for the two existing apps, which matters since you're not allowed to disrupt them.
+**Run the check** — `nginx-syntax` now passes.
 
-## Verification
+---
 
-```bash
-# Fixed-target proxy: every request on 8001 should land on the /special
-# path of the 2222 app, regardless of what path the client requested.
-curl -s http://192.168.10.60:8001/
-curl -s http://192.168.10.60:8001/anything-else
-
-# Load-balanced pool: repeated requests on 8000 should alternate (or
-# randomize) between the 1111 and 2222 backends.
-for i in $(seq 1 6); do curl -s http://192.168.10.60:8000/ | head -c 80; echo; done
-```
-
-Expected pattern for the round-robin case — alternating backend identity in the response body (assuming each app's response distinguishes itself, e.g. by port or hostname):
-
-```text
-response-from-app-on-1111
-response-from-app-on-2222
-response-from-app-on-1111
-response-from-app-on-2222
-response-from-app-on-1111
-response-from-app-on-2222
-```
-
-Confirm the untouched apps still work directly:
+## Step 4: Verify the two ports
 
 ```bash
-curl -s -o /dev/null -w '%{http_code}\n' http://192.168.10.60:1111/
-curl -s -o /dev/null -w '%{http_code}\n' http://192.168.10.60:2222/
+curl http://127.0.0.1:8001/
+curl http://127.0.0.1:8001/anything-else
+for i in $(seq 1 6); do curl -s http://127.0.0.1:8000/; echo; done
 ```
 
-Both should return the same status codes as in Step 0, proving the existing configs were never touched.
+`:8001` should return `app-2222-special` for both paths. `:8000` should
+alternate between `app-1111-root` and `app-2222-root`.
 
-## Command Summary
+**Run the check** — `proxy-8001` and `loadbalancer-8000` now pass. All four
+green.
+
+---
+
+## Step 5: Submit
 
 ```bash
-curl -s -o /dev/null -w '%{http_code}\n' http://192.168.10.60:1111/
-curl -s -o /dev/null -w '%{http_code}\n' http://192.168.10.60:2222/
-sudo nginx -T | grep -m1 'include'
-
-sudo touch /etc/nginx/conf.d/lb-8000-8001.conf
-sudo $EDITOR /etc/nginx/conf.d/lb-8000-8001.conf
-# (add server{} on 8001 with proxy_pass to :2222/special,
-#  upstream{} + server{} on 8000 balancing :1111 and :2222)
-
-sudo nginx -t
-sudo systemctl reload nginx
-
-curl -s http://192.168.10.60:8001/
-for i in $(seq 1 6); do curl -s http://192.168.10.60:8000/; echo; done
+astrona submit -c labs/section-050/capstone/lab-01
 ```
+
+---
+
+## If a check stays red
+
+- **`proxy-8001` fails — `/anything-else` did not return `app-2222-special`.**
+  You used `proxy_pass http://127.0.0.1:2222/special;` (with a URI), which
+  appends the leftover path. Use the `rewrite ^.*$ /special break;` +
+  `proxy_pass http://127.0.0.1:2222;` form shown above.
+- **`proxy-8001` fails — "returned HTTP 301".** You used `return 301` or
+  `rewrite … redirect`/`permanent`. Use `break`, not a redirect.
+- **`loadbalancer-8000` fails — only one backend seen.** Both `server`
+  lines must be inside one `upstream` block, and `proxy_pass` must point at
+  that upstream name.
+- **`nginx-syntax` fails.** A missing `;` or unbalanced `{ }`. `sudo nginx
+  -t` prints the file and line.
+- **`existing-apps-untouched` fails.** You edited a `1111` / `2222` config.
+  Revert it; all your rules belong in the new `lab.conf` only.

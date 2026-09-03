@@ -1,5 +1,35 @@
 # Question
 
-Solve this question on: `web-srv1`
+Solve this question on: `terminal`
 
-Server `web-srv1` is hosting two applications, one accessible on port `1111` and one on `2222`. These are served using Nginx and it's not allowed to change their config. The IP of `web-srv1` is `192.168.10.60`. Create a new HTTP LoadBalancer on that server which: Listens on port `8001` and redirects all traffic to `192.168.10.60:2222/special`. Listens on port `8000` and balances traffic between `192.168.10.60:1111` and `192.168.10.60:2222` in a Random or Round Robin fashion. Nginx is already preinstalled and is recommended to be used for the implementation.
+## Scenario
+
+This is the Section 050 capstone — one integrated reverse-proxy and
+load-balancer task, no step-by-step guidance.
+
+`nginx` is installed and running. Two applications are already deployed and
+**must not be changed**:
+
+- port `1111` serves `app-1111-root` at `/`
+- port `2222` serves `app-2222-root` at `/`, and `app-2222-special` at
+  `/special`
+
+Add a new nginx configuration (in its own file — do not edit the existing
+app configs) that puts two new front-end ports in place.
+
+## Tasks
+
+1. **Fixed-target proxy on port `8001`.** Every request to `8001`, on any
+   path, must be reverse-proxied to the `2222` app's `/special` and return
+   its body (`app-2222-special…`) with HTTP `200` — a transparent proxy,
+   not a `3xx` redirect. Both `curl :8001/` and `curl :8001/anything-else`
+   must come back with `app-2222-special`.
+
+2. **Load balancer on port `8000`.** Requests to `8000` must be spread
+   across **both** backends — `127.0.0.1:1111` and `127.0.0.1:2222` — so
+   that over several requests you see both `app-1111-root` and
+   `app-2222-root`.
+
+3. **Config stays valid.** `sudo nginx -t` must pass for the whole merged
+   configuration, and the existing apps on `1111` / `2222` (including
+   `/special`) must still serve their original content.

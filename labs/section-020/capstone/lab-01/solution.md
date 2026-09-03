@@ -1,151 +1,163 @@
-# Solution
+# Solution Walkthrough
 
-## Step 0: Inspect the current interfaces and routing table
+You will add one static route on `target`, prove it works end to end, then
+write it into a config file so it survives a reboot.
+
+All commands run on the **`target`** VM (`astrona ssh target` if you are not
+already on it). You never need to touch `gateway` — its side is already set
+up.
+
+One route, two places:
+
+| Goal | Command / file |
+| --- | --- |
+| Route **now** (temporary) | `sudo ip route add 10.10.30.0/24 via 10.10.20.1` |
+| Route **after reboot** (permanent) | add a `routes:` block to a `/etc/netplan/` file, then `sudo netplan apply` |
+
+## The feedback loop
+
+Grading runs from the **host terminal** — the shell where you typed
+`astrona run`, not inside a VM:
 
 ```bash
-ip -br addr show
-ip route show
+astrona test -c labs/section-020/capstone/lab-01
 ```
 
-Confirm `eth0` really has 192.168.10.0/24 and the second interface really has 10.10.20.0/24 before adding anything — interface names and subnet assignments should never be assumed on an exam target, always confirmed. The interface name itself may not literally be `eth1` on every distro/image (predictable naming can give it something like `enp0s6`) — `ip -br addr show` tells you the real name to use below.
+Checks (the `gateway-ready` one runs on the other VM and already passes):
 
-## Step 1: Add the route live (ephemeral) first
+```text
+PASS  gateway-ready
+FAIL  route-live
+FAIL  route-get
+FAIL  route-reachability
+FAIL  route-persistent
+```
+
+Run it now, then again after each step.
+
+---
+
+## Step 1: Look at what `target` has
+
+On `target`:
+
+```bash
+ip -brief addr show
+ip route
+```
+
+Find the interface that carries `10.10.20.5` — that is the `backend-net`
+NIC. In the examples it is `enp0s2` (yours may differ; use your own name
+below). In `ip route` there is **no** line for `10.10.30.0/24` yet, and
+`10.10.20.1` is reachable because it is on your directly connected
+`10.10.20.0/24` network.
+
+---
+
+## Step 2: Add the route for right now
 
 ```bash
 sudo ip route add 10.10.30.0/24 via 10.10.20.1
 ```
 
-Check `man ip-route` — the general form is `ip route add DESTINATION via GATEWAY [dev INTERFACE]`. `10.10.30.0/24` is the destination network being reached, `via 10.10.20.1` names the next-hop router that knows how to get there. `dev` is optional when only one interface could plausibly reach that gateway, which the kernel can usually work out on its own — pin it explicitly (`dev eth1`, or whatever `ip -br addr show` reported) if you want to remove any ambiguity on a host with more routes to choose from.
-
-If a route to this destination already exists and you need to change it rather than error out on a duplicate, use `ip route replace` instead of `add` — check `man ip-route` for the distinction; `add` fails loudly if a matching route already exists, while `replace` overwrites it unconditionally.
-
-## Step 2: Verify with `ip route get` before assuming anything
+Read this as: "to reach the `10.10.30.0/24` network, hand packets to
+`10.10.20.1`." Check it landed:
 
 ```bash
+ip route show 10.10.30.0/24
 ip route get 10.10.30.1
 ```
 
-Check `man ip-route`, search `/get` — this subcommand asks the kernel which route it would actually select for a destination, without sending any packet. Expected output:
+The first prints `10.10.30.0/24 via 10.10.20.1 dev enp0s2`. The second, a
+table lookup for one address, also shows `via 10.10.20.1`.
 
-```text
-10.10.30.1 via 10.10.20.1 dev eth1 src 10.10.20.5 uid 1000
-    cache
-```
-
-The `via` shown here must match `10.10.20.1` exactly — if it instead shows a different gateway, something is wrong (a more specific conflicting route, or a typo in the destination CIDR).
-
-## Step 3: Understand the default-route interaction
+Now prove it end to end — the gateway forwards, so its far-side address
+answers:
 
 ```bash
-ip route show default
+ping -c 3 10.10.30.1
+traceroute 10.10.30.1
 ```
 
-If `data-001` has a default route (e.g. `default via 192.168.10.1 dev eth0`), that route only ever matches destinations *not* covered by any more specific route. Because `10.10.30.0/24` is a `/24` (more specific than the default's `/0`), the kernel's longest-prefix-match logic always prefers your new route for anything inside `10.10.30.0/24`, regardless of the default route's existence — the two coexist without conflict.
+`ping` should get replies; `traceroute` should show `10.10.20.1` as the
+first hop.
 
-## Step 4: Persist the route — Netplan path
+**Run the check** on the host terminal — `route-live`, `route-get`, and
+`route-reachability` now pass.
+
+---
+
+## Step 3: Make the route persistent
+
+Add the route to a Netplan file for the `backend-net` interface. Do not edit
+the cloud-init file — add your own. On `target`:
+
+```bash
+sudo nano /etc/netplan/99-lab-route.yaml
+```
+
+Type this in, replacing `enp0s2` with your `backend-net` interface name:
 
 ```yaml
-# /etc/netplan/60-data-001-eth1.yaml
 network:
   version: 2
   ethernets:
-    eth1:
-      addresses:
-        - 10.10.20.5/24
+    enp0s2:
       routes:
         - to: 10.10.30.0/24
           via: 10.10.20.1
 ```
 
-Check `man 5 netplan` and search for `routes:` — it's a list under the interface, with `to`/`via` (and optionally `metric`) keys, distinct from the `addresses:` key used for the interface's own IPs. `netplan apply` re-renders and applies the change:
+- `routes:` is a list of static routes for that interface.
+- `to:` is the destination network, `via:` is the next-hop gateway — the
+  same two values you used with `ip route add`.
+
+Save and exit (`nano`: `Ctrl+O`, `Enter`, `Ctrl+X`), then:
 
 ```bash
-sudo netplan generate
+sudo chmod 600 /etc/netplan/99-lab-route.yaml
 sudo netplan apply
 ```
 
-## Step 5: Persist the route — NetworkManager path
-
-```bash
-sudo nmcli con mod "eth1" +ipv4.routes "10.10.30.0/24 10.10.20.1"
-sudo nmcli con up "eth1"
-```
-
-Check `man nmcli` and search `/ipv4.routes` — the property value format is `destination/prefix next-hop [metric]`, space-separated, as a string. As with addresses, the `+` prefix appends to any existing routes on that connection rather than replacing the whole list — omitting it would wipe out any other static routes already configured on `eth1`.
-
-## Step 6: Persist the route — legacy RHEL-family scripts (if not NetworkManager/Netplan)
-
-```bash
-# /etc/sysconfig/network-scripts/route-eth1
-10.10.30.0/24 via 10.10.20.1 dev eth1
-```
-
-This older-style file format (still supported on some RHEL-family systems for backward compatibility) is read by the legacy network service at interface-up time. It's declining in relevance as NetworkManager becomes the default everywhere, but it's worth recognizing on a system that still uses it.
-
-## Verification
+Confirm the route is still there:
 
 ```bash
 ip route show 10.10.30.0/24
 ```
 
-Expected:
+**Run the check** — `route-persistent` now passes. All green.
+
+---
+
+## Step 4: Submit
+
+When `astrona test` shows every line `PASS`:
 
 ```text
-10.10.30.0/24 via 10.10.20.1 dev eth1
+PASS  gateway-ready
+PASS  route-live
+PASS  route-get
+PASS  route-reachability
+PASS  route-persistent
 ```
+
+Submit from the host terminal:
 
 ```bash
-ip route get 10.10.30.1
+astrona submit -c labs/section-020/capstone/lab-01
 ```
 
-Expected:
+---
 
-```text
-10.10.30.1 via 10.10.20.1 dev eth1 src 10.10.20.5
-```
+## If a check stays red
 
-Real end-to-end proof — this only works if the gateway is actually forwarding, not just present in the routing table:
-
-```bash
-ping -c2 10.10.30.1
-traceroute 10.10.30.1
-```
-
-`10.10.30.1` is the gateway's own address inside the partner subnet it fronts — a reply proves the packet actually left this host, reached the gateway, and got a real response back, not just that an entry exists in `ip route show`. `traceroute`'s first hop should be `10.10.20.1`.
-
-Reboot-survival check (if the environment allows a reboot):
-
-```bash
-sudo reboot
-# after reboot:
-ip route show 10.10.30.0/24
-```
-
-The route should reappear automatically without re-running `ip route add`.
-
-## Command Summary
-
-```bash
-ip -br addr show
-ip route show
-
-sudo ip route add 10.10.30.0/24 via 10.10.20.1
-ip route get 10.10.30.1
-ip route show default
-
-# Netplan path:
-sudo $EDITOR /etc/netplan/60-data-001-eth1.yaml
-sudo netplan generate
-sudo netplan apply
-
-# NetworkManager path:
-sudo nmcli con mod "eth1" +ipv4.routes "10.10.30.0/24 10.10.20.1"
-sudo nmcli con up "eth1"
-
-# Legacy RHEL-family path:
-echo "10.10.30.0/24 via 10.10.20.1 dev eth1" | sudo tee /etc/sysconfig/network-scripts/route-eth1
-
-ip route show 10.10.30.0/24
-ping -c2 10.10.30.1
-traceroute 10.10.30.1
-```
+- **`ip route add` fails, "Nexthop has invalid gateway".** `10.10.20.1` is
+  not on a directly connected network from where you ran the command. Make
+  sure you are on **`target`** (not `gateway`) and that its `backend-net`
+  NIC is up with `10.10.20.5`.
+- **`route-live` / `route-get` pass but `route-reachability` fails.** The
+  route points somewhere wrong, or at the wrong gateway. Re-check it reads
+  `via 10.10.20.1`, and that `ping 10.10.20.1` (the next hop itself) works.
+- **`route-persistent` fails.** The check needs both `10.10.30.0` and
+  `10.10.20.1` in the same persistent file. Confirm your Netplan file is
+  named `*.yaml`, the `to:`/`via:` values are exact, and you saved it.

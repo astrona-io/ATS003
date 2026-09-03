@@ -1,5 +1,27 @@
 # Question
 
-Solve this question on: `web-srv1`
+Solve this question on: `terminal`
 
-A client reports that web-srv1's application on port 8080 is unreachable. You don't yet know whether the process isn't running, isn't listening on the right address, is being blocked by a local firewall rule, or whether packets aren't even arriving. Diagnose the problem methodically — using `ss`, `nft`, and `tcpdump` in that order — identify the root cause, and fix it. (In this scenario, the underlying cause turns out to be an `nftables` rule dropping traffic to port 8080.)
+## Scenario
+
+This is the Section 060 capstone — one integrated connection-recovery
+task, no step-by-step guidance.
+
+A web application (`myapp`, a systemd service) is supposed to be reachable
+on TCP port `8080`, but clients time out. The service is running and bound
+correctly — the problem is a firewall rule silently dropping the traffic.
+Diagnose it and restore reachability.
+
+## Tasks
+
+1. **Confirm the listener.** `myapp` must be listening on port `8080` on a
+   remotely reachable address (not `127.0.0.1` only), as shown by
+   `sudo ss -tulpn`. (This is already the case — verify it, don't break
+   it.)
+
+2. **Remove the block.** Find and delete the `nftables` rule that drops
+   traffic to `tcp dport 8080`. `sudo nft list ruleset` must no longer
+   contain a `tcp dport 8080 drop` rule.
+
+3. **Prove it works.** `curl http://127.0.0.1:8080/` must return a real HTTP
+   status (2xx/3xx) end to end.

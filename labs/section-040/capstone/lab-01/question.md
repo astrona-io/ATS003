@@ -1,5 +1,32 @@
 # Question
 
-The data team reports that an internal service name isn't resolving correctly when tools on `terminal` try to reach it, but they can't tell whether the DNS record is wrong, whether `terminal`'s resolver is caching something stale, or whether it's a local `/etc/hosts` issue overriding DNS entirely. Using `dig`, methodically isolate which layer is actually at fault: check what the system resolver currently returns for the name, compare that against querying a known-good DNS server directly, check the domain's MX and NS records while you're in there, do a reverse lookup on the IP the record is supposed to point to, and if the record appears to be missing entirely, trace the full delegation path to find out where it breaks down.
+Solve this question on: `client`
 
-**Lab environment note:** this lab is two VMs — the client (`terminal`'s role) and the internal DNS server, reachable as `astrona-ats-003-lab-040-dns`. The client's system resolver is already pointed at it; use `getent hosts astrona-ats-003-lab-040-dns` to get its address for the direct `@server` query.
+## Scenario
+
+This is the Section 040 capstone — one integrated DNS-verification task,
+no step-by-step guidance.
+
+Two machines. `dns` runs an internal authoritative BIND server for the zone
+`internal.example.com` (and its reverse zone). You work on `client`. Its
+job is to use that server for name resolution and confirm the zone's
+records are correct with `dig`.
+
+## Tasks
+
+On `client`:
+
+1. **Point the system resolver at `dns`.** Set `/etc/resolv.conf` so that a
+   plain `dig name` (no `@server`) queries the `dns` VM. After this,
+   `dig +short data-001.internal.example.com` returns `192.168.10.80`.
+
+2. **Verify every record below resolves as shown** (these are the exact
+   lookups the checks run):
+
+   | Query | Expected answer |
+   | --- | --- |
+   | `dig +short data-001.internal.example.com A` (system resolver) | `192.168.10.80` |
+   | `dig @<dns-ip> +short data-001.internal.example.com A` (direct) | `192.168.10.80` |
+   | `dig +short internal.example.com NS` | `ns1.internal.example.com.` |
+   | `dig +short internal.example.com MX` | `10 mail.internal.example.com.` |
+   | `dig -x 192.168.10.80 +short` | `data-001.internal.example.com.` |

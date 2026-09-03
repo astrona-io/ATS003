@@ -1,99 +1,130 @@
-# Solution
+# Solution Walkthrough
 
-## Step 1: Query the name using the system's default resolver
+The DNS server is already built on the `dns` VM. Your work is on `client`:
+point its resolver at that server, then run five `dig` lookups to confirm
+the zone. Open a shell with `astrona ssh client`.
+
+| `dig` form | What it uses |
+| --- | --- |
+| `dig name` | the resolver in `/etc/resolv.conf` |
+| `dig @1.2.3.4 name` | that server directly, ignoring `/etc/resolv.conf` |
+| `dig -x 1.2.3.4` | a reverse (PTR) lookup |
+| `+short` | print just the answer |
+
+## The feedback loop
+
+Grading runs from the **host terminal** — the shell where you typed
+`astrona run`:
 
 ```bash
-dig data-001.internal.example.com
+astrona test -c labs/section-040/capstone/lab-01
 ```
 
-Check `man dig` and read the output top to bottom once without `+short` — the full, un-abbreviated response is worth reading in full at least once so the section layout is familiar before relying on `+short` for everything else. The key sections:
+Six checks (`dns-server-ready` runs on the other VM and already passes):
 
-- **QUESTION** — echoes back exactly what was asked (name, class `IN`, type `A` by default)
-- **ANSWER** — the actual resource record(s) returned, each with its own TTL (seconds remaining before a resolver should re-query), class, type, and value
-- **AUTHORITY** — nameservers considered authoritative for the zone, populated especially on referrals or when there's no direct answer
-- **ADDITIONAL** — supplementary records, often the resolved IPs for anything named in AUTHORITY, saving an extra round trip
-
-The `;; SERVER:` line near the bottom of the output shows exactly which resolver actually answered this query — worth checking any time the result looks unexpected, since it confirms whether the system default resolver (from `/etc/resolv.conf`) was used.
-
-## Step 2: Get a bare, scriptable answer
-
-```bash
-dig +short data-001.internal.example.com
+```text
+PASS  dns-server-ready
+FAIL  system-resolver-a-record
+FAIL  direct-server-a-record
+FAIL  ns-record
+FAIL  mx-record
+FAIL  ptr-record
 ```
 
-Check `man dig` for `+short` — it strips all the protocol framing and prints only the answer value(s), one per line, nothing else. This is the right form for piping into a script or a quick sanity check, but the full form from Step 1 is what you want when actually diagnosing a discrepancy, since `+short` throws away the TTL, the answering server, and the section structure that tells you *why* an answer looks the way it does.
+Run it after each step.
 
-## Step 3: Query a specific, known-good server directly — bypassing the system resolver entirely
+---
+
+## Step 1: Find the `dns` server's address
+
+On `client`:
 
 ```bash
-dig @8.8.8.8 data-001.internal.example.com
+cat /etc/resolv.conf
 ```
 
-Check `man dig` — the `@server` syntax (documented right in the SYNOPSIS) sends the query directly to that IP/hostname, completely ignoring whatever is configured in `/etc/resolv.conf`. This is the single most useful move for isolating a DNS problem: if this returns something different from Step 1's system-resolver query, the problem is local to `terminal`'s resolver configuration or cache, not the record itself. For an internal-only name like this scenario's, querying the organization's actual authoritative/internal DNS server directly (rather than a public resolver like `8.8.8.8`, which won't know an internal-only zone at all) is the realistic move — the public-resolver example above is shown for a public-name variant of the same technique.
+If it already has a `nameserver` line with a real address (not
+`127.0.0.53`), note that address — that is the `dns` VM. If not, get it from
+the **host terminal**:
 
 ```bash
-DNS="$(getent hosts astrona-ats-003-lab-040-dns | awk '{print $1}')"
-dig @"$DNS" data-001.internal.example.com
+astrona list
 ```
 
-Comparing this against Step 1's result is the actual diagnostic step the scenario calls for — a match means the record and both resolvers agree (problem is elsewhere, e.g. the application, not DNS at all); a mismatch means `terminal`'s own resolver is the layer at fault. In this lab that's a genuinely independent check: Step 1 went through `terminal`'s configured resolver (`/etc/resolv.conf`), while this step talks directly to the authoritative server on a separate VM, bypassing local resolver config entirely.
+and read the IP of the `dns` VM. Call it `<dns-ip>` below.
 
-## Step 4: Check MX and NS records for the domain
+---
+
+## Step 2: Point the resolver at `dns`
+
+On `client`, replace `/etc/resolv.conf` with a static file pointing at the
+server (`systemd-resolved` may own the old one, so remove it first):
 
 ```bash
-dig internal.example.com MX
-dig internal.example.com NS
+sudo rm -f /etc/resolv.conf
+sudo nano /etc/resolv.conf
 ```
 
-The record type is simply appended after the name (`dig NAME TYPE`) — `dig` defaults to `A` when no type is given, as seen in every prior step. `MX` answers "which mail server(s) handle email for this domain, and in what priority order" (a lower preference number means higher priority); `NS` answers "which nameservers are authoritative for this zone" — two different, non-interchangeable questions that happen to share the same query syntax.
+Put exactly this in it, with the real address:
 
-## Step 5: Reverse-lookup the IP the record is supposed to point to
-
-```bash
-dig -x 192.168.10.80
+```text
+nameserver <dns-ip>
+search internal.example.com
 ```
 
-Check `man dig` for `-x` — it's a convenience flag that automatically builds the correct `in-addr.arpa` (or `ip6.arpa` for IPv6) PTR query for the given address and swaps the octet order for you, so there's no need to hand-construct `80.10.168.192.in-addr.arpa` manually. A working forward record with no matching reverse (PTR) record is a common, legitimate asymmetry — not every environment maintains reverse zones — but confirming it either way is often part of a full DNS health check, especially for mail-related troubleshooting where missing PTR records commonly cause deliverability problems.
-
-## Step 6: Trace the full delegation path if the record appears to be missing entirely
+Save and exit. Test:
 
 ```bash
-dig +trace data-001.internal.example.com
+dig +short data-001.internal.example.com A
 ```
 
-Check `man dig` for `+trace` — instead of asking one resolver for a final answer, this makes `dig` start at a root server and walk the delegation chain itself: root → TLD (or, for an internal zone, wherever the trace bottoms out) → the zone's own authoritative servers, printing the referral at each hop. This is the tool for the specific case where a plain query just returns NXDOMAIN or times out with no further explanation — `+trace` shows exactly which hop in the chain stopped producing a useful referral, which is far more actionable than a bare "not found." For a genuinely internal-only zone not delegated from the public root at all, `+trace` will visibly demonstrate that the chain never reaches an authoritative answer through the public hierarchy — itself useful confirmation that the name only resolves via an internal resolver/zone, not a diagnosis dead-end.
+It should print `192.168.10.80`.
 
-## Verification
+**Run the check** — `system-resolver-a-record` now passes.
+
+---
+
+## Step 3: Verify the rest of the records
+
+Run each lookup and confirm the answer:
 
 ```bash
-dig +short data-001.internal.example.com
-# 192.168.10.80
+dig @<dns-ip> +short data-001.internal.example.com A
+# -> 192.168.10.80   (direct query, bypassing resolv.conf)
 
-dig @"$DNS" +short data-001.internal.example.com
-# 192.168.10.80
-# (matches system resolver's answer -> record + both resolvers agree)
+dig +short internal.example.com NS
+# -> ns1.internal.example.com.
+
+dig +short internal.example.com MX
+# -> 10 mail.internal.example.com.
 
 dig -x 192.168.10.80 +short
-# data-001.internal.example.com.
-
-dig internal.example.com NS +short
-# ns1.internal.example.com.
-
-dig internal.example.com MX +short
-# 10 mail.internal.example.com.
+# -> data-001.internal.example.com.
 ```
 
-Matching output between the system-resolver query and the direct-server query confirms the record itself is correct and consistent — any remaining "it doesn't resolve" complaint at that point points at the application or a client-side cache, not DNS.
+Every answer must match exactly, trailing dot included.
 
-## Command Summary
+**Run the check** — `direct-server-a-record`, `ns-record`, `mx-record`, and
+`ptr-record` now pass. All six green.
+
+---
+
+## Step 4: Submit
 
 ```bash
-dig data-001.internal.example.com
-dig +short data-001.internal.example.com
-DNS="$(getent hosts astrona-ats-003-lab-040-dns | awk '{print $1}')"
-dig @"$DNS" data-001.internal.example.com
-dig internal.example.com MX
-dig internal.example.com NS
-dig -x 192.168.10.80
-dig +trace data-001.internal.example.com
+astrona submit -c labs/section-040/capstone/lab-01
 ```
+
+---
+
+## If a check stays red
+
+- **`system-resolver-a-record` fails, answer empty.** `/etc/resolv.conf` is
+  not pointing at the `dns` VM, or `systemd-resolved` overwrote it again.
+  Re-remove the file, recreate it static, and if it keeps reverting run
+  `sudo systemctl stop systemd-resolved` first.
+- **`direct-server-a-record` fails but the system one passes.** Wrong
+  `<dns-ip>`, or the `dns` VM is unreachable — check `ping <dns-ip>`.
+- **`ns-record` / `mx-record` / `ptr-record` mismatch.** Compare
+  character-for-character, including the trailing `.`. Query the server
+  directly with `@<dns-ip>` to rule out a stale cache.
