@@ -19,7 +19,7 @@ Grading runs from the **host terminal** — the shell where you typed
 `astrona run`:
 
 ```bash
-astrona test -c labs/section-040/module-02/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-040/module-02/lab-01
 ```
 
 Six checks (four on `server`, two on `client`):
@@ -119,7 +119,7 @@ nudge it: `sudo chronyc burst 4/4` then `chronyc sources` again.
 ## Step 4: Submit
 
 ```bash
-astrona submit -c labs/section-040/module-02/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-040/module-02/lab-01
 ```
 
 ---

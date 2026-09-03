@@ -18,7 +18,7 @@ Grading runs from the **host terminal** — the shell where you typed
 `astrona run`, not inside the VM:
 
 ```bash
-astrona test -c labs/section-030/module-01/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-030/module-01/lab-01
 ```
 
 Four checks:
@@ -139,7 +139,7 @@ sudo nft list chain ip nat prerouting
 
 ## Step 7: Submit
 
-When `astrona test` shows all four `PASS`:
+When `astrona submit` shows all four `PASS`:
 
 ```text
 PASS  port-5000-drop
@@ -151,7 +151,7 @@ PASS  egress-block
 Submit from the host terminal:
 
 ```bash
-astrona submit -c labs/section-030/module-01/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-030/module-01/lab-01
 ```
 
 > **Optional — make it stick.** These rules live only in the running

@@ -22,7 +22,7 @@ Grading runs from the **host terminal** — the shell where you typed
 `astrona run`, not the shell inside the VM. The command is:
 
 ```bash
-astrona test -c labs/section-010/module-01/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-010/module-01/lab-01
 ```
 
 It runs all six checks against the live VM and prints one line each:
@@ -104,7 +104,7 @@ You should see the original address, plus `192.168.10.71/24`, plus
 **Run the check** on the host terminal:
 
 ```bash
-astrona test -c labs/section-010/module-01/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-010/module-01/lab-01
 ```
 
 `secondary-ipv4` now passes. `ipv6-address` and `ipv6-reachable` may pass
@@ -262,7 +262,7 @@ includes `app-srv1`.
 
 ## Step 6: Submit
 
-When `astrona test` shows all six `PASS`:
+When `astrona submit` shows all six `PASS`:
 
 ```text
 PASS  secondary-ipv4
@@ -276,7 +276,7 @@ PASS  persistence
 Submit from the host terminal:
 
 ```bash
-astrona submit -c labs/section-010/module-01/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-010/module-01/lab-01
 ```
 
 ---
@@ -289,7 +289,7 @@ astrona submit -c labs/section-010/module-01/lab-01
   its own.
 - **`ipv6-address` fails.** Re-check `ip -6 addr show enp0s1`. If the
   `fd00:10::70/64` line still says `tentative`, wait and look again before
-  the next `astrona test`.
+  the next `astrona submit`.
 - **`persistence` fails but the addresses show in `ip addr`.** They are only
   the temporary ones from Step 2. Do Step 4 — put them in the Netplan file
   and apply it.

@@ -18,7 +18,7 @@ Grading runs from the **host terminal** — the shell where you typed
 `astrona run`:
 
 ```bash
-astrona test -c labs/section-060/module-03/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-060/module-03/lab-01
 ```
 
 Three checks:
@@ -120,7 +120,7 @@ sudo nft list ruleset | sudo tee /etc/nftables.conf
 Then submit from the host terminal:
 
 ```bash
-astrona submit -c labs/section-060/module-03/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-060/module-03/lab-01
 ```
 
 ---

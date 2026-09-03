@@ -20,7 +20,7 @@ Grading runs from the **host terminal** — the shell where you typed
 `astrona run`, not inside a VM:
 
 ```bash
-astrona test -c labs/section-020/capstone/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-020/capstone/lab-01
 ```
 
 Checks (the `gateway-ready` one runs on the other VM and already passes):
@@ -131,7 +131,7 @@ ip route show 10.10.30.0/24
 
 ## Step 4: Submit
 
-When `astrona test` shows every line `PASS`:
+When `astrona submit` shows every line `PASS`:
 
 ```text
 PASS  gateway-ready
@@ -144,7 +144,7 @@ PASS  route-persistent
 Submit from the host terminal:
 
 ```bash
-astrona submit -c labs/section-020/capstone/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-020/capstone/lab-01
 ```
 
 ---

@@ -20,7 +20,7 @@ Grading runs from the **host terminal** — the shell where you typed
 `astrona run`, not inside the VM:
 
 ```bash
-astrona test -c labs/section-030/module-02/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-030/module-02/lab-01
 ```
 
 Seven checks. Three already pass from the setup script:
@@ -97,10 +97,10 @@ All seven green.
 
 ## Step 4: Submit
 
-When `astrona test` shows all seven `PASS`, submit from the host terminal:
+When `astrona submit` shows all seven `PASS`, submit from the host terminal:
 
 ```bash
-astrona submit -c labs/section-030/module-02/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-030/module-02/lab-01
 ```
 
 ---

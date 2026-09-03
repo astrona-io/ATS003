@@ -20,7 +20,7 @@ Grading runs from the **host terminal** — the shell where you typed
 `astrona run`, not the shell inside the VM:
 
 ```bash
-astrona test -c labs/section-010/module-02/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-010/module-02/lab-01
 ```
 
 It runs four checks and prints one line each:
@@ -130,7 +130,7 @@ grep 127.0.1.1 /etc/hosts
 
 ## Step 5: Submit
 
-When `astrona test` shows all four `PASS`:
+When `astrona submit` shows all four `PASS`:
 
 ```text
 PASS  static-hostname
@@ -142,7 +142,7 @@ PASS  hosts-entry
 Submit from the host terminal:
 
 ```bash
-astrona submit -c labs/section-010/module-02/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-010/module-02/lab-01
 ```
 
 ---

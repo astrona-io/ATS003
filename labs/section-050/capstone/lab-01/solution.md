@@ -18,7 +18,7 @@ Grading runs from the **host terminal** — the shell where you typed
 `astrona run`:
 
 ```bash
-astrona test -c labs/section-050/capstone/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-050/capstone/lab-01
 ```
 
 Four checks:
@@ -132,7 +132,7 @@ green.
 ## Step 5: Submit
 
 ```bash
-astrona submit -c labs/section-050/capstone/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-050/capstone/lab-01
 ```
 
 ---

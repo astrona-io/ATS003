@@ -19,7 +19,7 @@ Grading runs from the **host terminal** — the shell where you typed
 `astrona run`, not inside the VM:
 
 ```bash
-astrona test -c labs/section-020/module-01/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-020/module-01/lab-01
 ```
 
 Five checks:
@@ -170,7 +170,7 @@ declarations are what the check reads.
 
 ## Step 5: Submit
 
-When `astrona test` shows all five `PASS`:
+When `astrona submit` shows all five `PASS`:
 
 ```text
 PASS  bridge-master
@@ -183,7 +183,7 @@ PASS  persistence
 Submit from the host terminal:
 
 ```bash
-astrona submit -c labs/section-020/module-01/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-020/module-01/lab-01
 ```
 
 ---

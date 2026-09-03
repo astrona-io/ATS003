@@ -17,7 +17,7 @@ Grading runs from the **host terminal** — the shell where you typed
 `astrona run`:
 
 ```bash
-astrona test -c labs/section-040/capstone/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-040/capstone/lab-01
 ```
 
 Six checks (`dns-server-ready` runs on the other VM and already passes):
@@ -112,7 +112,7 @@ Every answer must match exactly, trailing dot included.
 ## Step 4: Submit
 
 ```bash
-astrona submit -c labs/section-040/capstone/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-040/capstone/lab-01
 ```
 
 ---
