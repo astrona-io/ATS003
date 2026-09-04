@@ -1,20 +1,15 @@
 #!/usr/bin/env bash
 # OS prep for PLAYGROUND — Persistent Network Managers (NetworkManager / nmcli)
-# Runs once at startup. Environment preparation ONLY. The safety design: install
-# NetworkManager and restrict it to the ONE spare NIC on the isolated
-# 192.168.120.0/24 segment. The management interface that carries your SSH
-# session stays `unmanaged`, so no nmcli command can drop the session. The spare
-# NIC is left with NO connection profile — building persistent profiles is the
-# point of the playground.
+# Runs once at startup, as a regular user with passwordless sudo (the LFCS
+# base image, like the graded labs). network-manager and iproute2 both ship
+# in the base image already. The safety design: restrict NetworkManager to
+# the ONE spare NIC on the isolated 192.168.120.0/24 segment. The management
+# interface that carries your SSH session stays `unmanaged`, so no nmcli
+# command can drop the session. The spare NIC is left with NO connection
+# profile — building persistent profiles is the point of the playground.
 set -euo pipefail
 
 echo "[playground] networkmanager-nmcli-playground: preparing..."
-
-export DEBIAN_FRONTEND=noninteractive
-if command -v apt-get >/dev/null 2>&1; then
-  apt-get update -y
-  apt-get install -y --no-install-recommends network-manager iproute2 || true
-fi
 
 # --- find the spare NIC: up, not loopback, not the default-route interface ---
 MGMT_DEV="$(ip route show default 2>/dev/null | awk '/default/ {print $5; exit}')"
@@ -31,16 +26,16 @@ echo "[playground] management interface : ${MGMT_DEV:-unknown}  (left unmanaged)
 echo "[playground] spare interface       : ${SPARE_DEV:-NOT FOUND}  (NetworkManager will own this)"
 
 # --- restrict NetworkManager to the spare NIC only --------------------------
-install -d /etc/NetworkManager/conf.d
+sudo install -d /etc/NetworkManager/conf.d
 if [ -n "$SPARE_DEV" ]; then
-  cat > /etc/NetworkManager/conf.d/10-managed.conf <<EOF
+  sudo tee /etc/NetworkManager/conf.d/10-managed.conf > /dev/null <<EOF
 # Playground: NetworkManager manages ONLY the spare NIC. Everything else —
 # including the interface carrying the SSH session — is unmanaged.
 [keyfile]
 unmanaged-devices=*,except:interface-name:${SPARE_DEV}
 EOF
 else
-  cat > /etc/NetworkManager/conf.d/10-managed.conf <<'EOF'
+  sudo tee /etc/NetworkManager/conf.d/10-managed.conf > /dev/null <<'EOF'
 # Playground: spare NIC not detected at boot; NetworkManager manages nothing by
 # default. Find the spare interface with `ip -br link` and adjust this file's
 # `unmanaged-devices=*,except:interface-name:<dev>` line, then
@@ -50,8 +45,8 @@ unmanaged-devices=*
 EOF
 fi
 
-systemctl enable NetworkManager 2>/dev/null || true
-systemctl restart NetworkManager 2>/dev/null || systemctl start NetworkManager 2>/dev/null || true
+sudo systemctl enable NetworkManager 2>/dev/null || true
+sudo systemctl restart NetworkManager 2>/dev/null || sudo systemctl start NetworkManager 2>/dev/null || true
 sleep 2
 
 echo

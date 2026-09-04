@@ -1,30 +1,23 @@
 #!/usr/bin/env bash
 # OS prep for PLAYGROUND — Local Hostname Resolution
-# Runs once when the environment comes up. Environment preparation ONLY: set the
-# static hostname the module's examples use, make sure the lookup tools are
-# present, and seed a couple of /etc/hosts entries to inspect. There is no task
-# and no grading.
+# Runs once when the environment comes up, as a regular user with passwordless
+# sudo (the LFCS base image, like the graded labs). Environment preparation
+# ONLY: set the static hostname the module's examples use and seed a couple of
+# /etc/hosts entries to inspect. iputils-ping and getent (libc-bin) both ship
+# in the base image already. There is no task and no grading.
 set -euo pipefail
 
 echo "[playground] hostname-resolution-playground: preparing clean host..."
-
-export DEBIAN_FRONTEND=noninteractive
-if command -v apt-get >/dev/null 2>&1; then
-  apt-get update -y
-  # `getent` ships in libc-bin (already present). Add ping for the reachability
-  # comparison the module makes. A missing package is non-fatal for a sandbox.
-  apt-get install -y --no-install-recommends iputils-ping || true
-fi
 
 NEWHOST="prod-app-01"
 
 # Set the static hostname the module's examples use. hostnamectl needs a running
 # systemd; fall back to the classic path when it is not there.
 if [ -d /run/systemd/system ] && command -v hostnamectl >/dev/null 2>&1; then
-  hostnamectl set-hostname "$NEWHOST" || true
+  sudo hostnamectl set-hostname "$NEWHOST" || true
 else
-  echo "$NEWHOST" > /etc/hostname || true
-  hostname "$NEWHOST" 2>/dev/null || true
+  echo "$NEWHOST" | sudo tee /etc/hostname >/dev/null || true
+  sudo hostname "$NEWHOST" 2>/dev/null || true
 fi
 
 # Make sure the standard localhost entries exist, then add a Debian-style
@@ -32,7 +25,7 @@ fi
 # non-loopback address. Each line is added only if missing, so re-running
 # prepare.sh is safe.
 ensure_line() {
-  grep -qxF "$1" /etc/hosts || printf '%s\n' "$1" >> /etc/hosts
+  grep -qxF "$1" /etc/hosts || printf '%s\n' "$1" | sudo tee -a /etc/hosts >/dev/null
 }
 ensure_line "127.0.0.1 localhost"
 ensure_line "::1 localhost ip6-localhost ip6-loopback"

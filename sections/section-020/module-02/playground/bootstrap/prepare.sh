@@ -1,21 +1,14 @@
 #!/usr/bin/env bash
 # OS prep for PLAYGROUND — Software Bridging (playground)
-# Runs once when the environment comes up. Environment preparation ONLY:
-# install the tools the module explores with. It deliberately does NOT create
-# br0, does NOT enslave any interface, and does NOT assign an IP — building and
-# inspecting the bridge is the whole point of the playground.
+# Runs once when the environment comes up, as a regular user with passwordless
+# sudo (the LFCS base image, like the graded labs). Environment preparation
+# ONLY: iproute2, bridge-utils, and ethtool all ship in the base image. It
+# deliberately does NOT create br0, does NOT enslave any interface, and does
+# NOT assign an IP — building and inspecting the bridge is the whole point of
+# the playground.
 set -euo pipefail
 
 echo "[playground] linux-bridging-playground: preparing clean host..."
-
-export DEBIAN_FRONTEND=noninteractive
-if command -v apt-get >/dev/null 2>&1; then
-  apt-get update -y
-  # iproute2 carries `ip` and `bridge`. bridge-utils adds the legacy `brctl`.
-  # ethtool is handy for per-port link detail. Missing packages are non-fatal
-  # for a sandbox.
-  apt-get install -y --no-install-recommends iproute2 bridge-utils ethtool || true
-fi
 
 # The bridge driver is built in or auto-loaded when the first bridge is
 # created, so nothing to modprobe here.
@@ -27,7 +20,7 @@ for dev in $(ip -o link show | awk -F': ' '{print $2}' | grep -v '^lo$'); do
   if ip -o -4 addr show dev "$dev" 2>/dev/null | grep -q 'inet '; then
     continue
   fi
-  ip link set "$dev" down 2>/dev/null || true
+  sudo ip link set "$dev" down 2>/dev/null || true
 done
 
 echo

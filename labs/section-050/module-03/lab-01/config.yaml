@@ -19,7 +19,7 @@ runtime:
 bootstrap:
   init:
     - name: "install-openssh"
-      description: "Installs and enables openssh-server, and installs sshpass for later live-login validation checks"
+      description: "Enables openssh-server (openssh-server, openssh-client, and sshpass all ship in the base LFCS image)"
       type: "folder"
       source: "bootstrap/"
 

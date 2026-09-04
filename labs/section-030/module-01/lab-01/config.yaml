@@ -19,7 +19,7 @@ runtime:
 bootstrap:
   init:
     - name: "nftables-lab-setup"
-      description: "Installs nftables if missing, resets to an empty ruleset, and starts a local listener on port 6001 so the port 6000->6001 redirect is testable end-to-end"
+      description: "Resets the ruleset to empty (nftables ships in the base LFCS image) and starts a local listener on port 6001 so the port 6000->6001 redirect is testable end-to-end"
       type: "folder"
       source: "bootstrap/"
 

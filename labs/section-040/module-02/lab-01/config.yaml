@@ -30,7 +30,7 @@ runtime:
 bootstrap:
   init:
     - name: "chrony-install"
-      description: "Installs chrony and starts chronyd on both VMs, giving each a default chrony.conf to edit — server mode on the server VM, pointing at the internal server on the client VM"
+      description: "Enables/starts chronyd on both VMs, giving each a default chrony.conf to edit — server mode on the server VM, pointing at the internal server on the client VM (chrony ships in the base LFCS image)"
       type: "folder"
       source: "bootstrap/"
 

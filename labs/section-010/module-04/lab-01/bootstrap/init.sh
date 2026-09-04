@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
-# Bootstrap init: makes sure the network-management tooling the scenario
-# expects (Netplan and, as a fallback, NetworkManager) is present. On the
-# stock Ubuntu 24.04 cloud image this is normally already installed, so
-# these installs are expected to be no-ops most of the time.
+# Bootstrap init: confirms the network-management tooling the scenario
+# expects (netplan.io, iproute2) is present. Both ship in the base LFCS
+# image, so there is nothing to install here.
 #
 # This script intentionally does NOT touch live addressing, /etc/hosts,
 # or any netplan/NetworkManager config for the primary interface — the
@@ -14,15 +13,3 @@ set -eu
 
 IFACE=$(ip -o -4 route show to default | awk '{print $5}')
 echo "Detected primary interface: ${IFACE}"
-
-export DEBIAN_FRONTEND=noninteractive
-
-if ! dpkg -s netplan.io >/dev/null 2>&1; then
-  sudo apt-get update -qq
-  sudo apt-get install -y --no-install-recommends netplan.io
-fi
-
-if ! command -v ip >/dev/null 2>&1; then
-  sudo apt-get update -qq
-  sudo apt-get install -y --no-install-recommends iproute2
-fi

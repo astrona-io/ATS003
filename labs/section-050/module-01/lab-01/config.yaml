@@ -19,7 +19,7 @@ runtime:
 bootstrap:
   init:
     - name: "install-nginx"
-      description: "Installs nginx via apt-get and enables/starts the service"
+      description: "Enables/starts nginx (ships in the base LFCS image)"
       type: "folder"
       source: "bootstrap/10-install-nginx/"
 

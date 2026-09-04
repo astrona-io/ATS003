@@ -19,7 +19,7 @@ runtime:
 bootstrap:
   init:
     - name: "network-tools-lab-setup"
-      description: "Installs curl and dnsutils (dig), and creates /opt/course for recording the private and public addresses"
+      description: "Creates /opt/course for recording the private and public addresses (curl and dnsutils ship in the base LFCS image)"
       type: "folder"
       source: "bootstrap/"
 

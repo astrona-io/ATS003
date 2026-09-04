@@ -9,18 +9,8 @@ set -eu
 
 echo "[playground] network-interfaces-playground: preparing clean host..."
 
-# iproute2 carries `ip`; iputils-ping and ethtool help poke at link state. On
-# the base image these are usually already there, so only touch apt if one is
-# missing. Failures are non-fatal for a sandbox.
-need_pkg=0
-command -v ip     >/dev/null 2>&1 || need_pkg=1
-command -v ping   >/dev/null 2>&1 || need_pkg=1
-command -v ethtool >/dev/null 2>&1 || need_pkg=1
-if [ "$need_pkg" -eq 1 ] && command -v apt-get >/dev/null 2>&1; then
-  export DEBIAN_FRONTEND=noninteractive
-  sudo apt-get update -y || true
-  sudo apt-get install -y --no-install-recommends iproute2 iputils-ping ethtool || true
-fi
+# iproute2, iputils-ping, and ethtool all ship in the base LFCS image, so
+# there is nothing to install here.
 
 # The two extra NICs are dummy devices created here — astrona's qemu backend
 # only does point-to-point segments (2 VMs each), so this one-VM sandbox cannot

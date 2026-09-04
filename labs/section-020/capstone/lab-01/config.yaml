@@ -28,12 +28,8 @@ runtime:
         - name: "backend-net"
           ipv4: "10.10.20.5"
 
-      bootstrap:
-        init:
-          - name: "install-traceroute"
-            description: "Installs traceroute so the solution's verification commands run without a 'command not found' error"
-            type: "file"
-            source: "bootstrap/install-traceroute.sh"
+      # traceroute ships in the base LFCS image now, so there is no install
+      # step for it anymore.
 
       validation:
         scripts:

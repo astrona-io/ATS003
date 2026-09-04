@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Bootstrap: installs firewalld and disables the conflicting ufw firewall.
+# Bootstrap: firewalld ships in the base LFCS image; this disables the
+# conflicting ufw firewall before it is ever started.
 #
 # The base image is Ubuntu, which normally ships ufw (itself a wrapper
 # around nftables) rather than firewalld. Having both manage the same
@@ -8,11 +9,6 @@
 # started.
 
 set -eu
-
-export DEBIAN_FRONTEND=noninteractive
-
-sudo apt-get update -y
-sudo apt-get install -y firewalld
 
 if command -v ufw >/dev/null 2>&1; then
   if sudo ufw status | grep -qi "^Status: active"; then

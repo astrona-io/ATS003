@@ -1,19 +1,13 @@
 #!/usr/bin/env bash
 # OS prep for PLAYGROUND — Active Socket Diagnostics (ss)
-# Runs once at startup. Environment preparation ONLY: start a spread of sockets
+# Runs once at startup, as a regular user with passwordless sudo (the LFCS
+# base image, like the graded labs). socat, iproute2 (which has ss), and
+# python3 all ship in the base image already. This starts a spread of sockets
 # so every `ss` view has something to show. There is nothing to build or solve
 # — reading `ss` on a machine that already has interesting sockets is the point.
 set -euo pipefail
 
 echo "[playground] ss-socket-diagnostics-playground: starting sample sockets..."
-
-export DEBIAN_FRONTEND=noninteractive
-if command -v apt-get >/dev/null 2>&1; then
-  apt-get update -y
-  # socat for the UDP + Unix listeners and the held connection; iproute2 has ss;
-  # python3 for the HTTP listeners.
-  apt-get install -y --no-install-recommends socat iproute2 python3 || true
-fi
 
 mk_unit() {
   local name="$1" desc="$2" after="$3" exec="$4" pre="${5:-}"
@@ -23,7 +17,7 @@ mk_unit() {
     printf '\n[Service]\n'
     [ -n "$pre" ] && printf 'ExecStartPre=%s\n' "$pre"
     printf 'ExecStart=%s\nRestart=always\nDynamicUser=yes\n\n[Install]\nWantedBy=multi-user.target\n' "$exec"
-  } > "/etc/systemd/system/${name}.service"
+  } | sudo tee "/etc/systemd/system/${name}.service" > /dev/null
 }
 
 # TCP listeners: all-addresses, localhost-only, and IPv6.
@@ -49,15 +43,15 @@ mk_unit lab-estab "ss playground: holds an established TCP connection to 127.0.0
   "lab-http-local.service" \
   "/bin/sh -c 'exec 3<>/dev/tcp/127.0.0.1/9000; exec sleep infinity'"
 
-systemctl daemon-reload
-systemctl enable --now \
+sudo systemctl daemon-reload
+sudo systemctl enable --now \
   lab-http-any.service lab-http-local.service lab-http-v6.service \
   lab-udp.service lab-unix.service lab-estab.service 2>/dev/null || true
 
 sleep 1
 echo
 echo "[playground] listening TCP:"
-ss -tlnp 2>/dev/null || true
+sudo ss -tlnp 2>/dev/null || true
 echo
 echo "[playground] ready. Sockets in place for ss to show:"
 echo "[playground]   TCP  0.0.0.0:8080     (lab-http-any)   - all v4 addresses"

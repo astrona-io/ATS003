@@ -1,20 +1,13 @@
 #!/usr/bin/env bash
 # OS prep for PLAYGROUND — Discovering Your Public IP Address
-# Runs once when the environment comes up. Environment preparation ONLY: install
-# the discovery tools the module uses and put a second private address on the
-# host so `ip addr` shows more than one RFC 1918 range. There is no task and no
-# grading.
+# Runs once when the environment comes up, as a regular user with passwordless
+# sudo (the LFCS base image, like the graded labs). Environment preparation
+# ONLY: curl, dnsutils (dig), and ca-certificates all ship in the base image,
+# so this just puts a second private address on the host so `ip addr` shows
+# more than one RFC 1918 range. There is no task and no grading.
 set -euo pipefail
 
 echo "[playground] public-ip-playground: preparing clean host..."
-
-export DEBIAN_FRONTEND=noninteractive
-if command -v apt-get >/dev/null 2>&1; then
-  apt-get update -y
-  # curl for the HTTP discovery services, dnsutils for `dig` (the DNS method),
-  # ca-certificates so HTTPS validates. Non-fatal if a package is missing.
-  apt-get install -y --no-install-recommends curl dnsutils ca-certificates || true
-fi
 
 # Address the spare NIC from RFC 1918's 172.16.0.0/12 block. The management
 # interface already sits in 10.0.0.0/8, so the host then shows two different
@@ -28,8 +21,8 @@ for dev in $(ip -o link show | awk -F': ' '{print $2}' | grep -v '^lo$'); do
   break
 done
 if [ -n "$LAB_NIC" ]; then
-  ip addr add 172.16.20.50/24 dev "$LAB_NIC" 2>/dev/null || true
-  ip link set "$LAB_NIC" up || true
+  sudo ip addr add 172.16.20.50/24 dev "$LAB_NIC" 2>/dev/null || true
+  sudo ip link set "$LAB_NIC" up || true
 fi
 
 echo

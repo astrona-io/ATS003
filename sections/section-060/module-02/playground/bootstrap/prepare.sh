@@ -1,20 +1,14 @@
 #!/usr/bin/env bash
 # OS prep for PLAYGROUND — Netplan YAML Configurations
-# Runs once at startup. Environment preparation ONLY. No netplan file is written
-# for the spare NIC — writing it is the point. This script just makes sure
-# netplan is installed, works out which interface is the spare (so the docs can
-# name it), and tightens permissions on the existing netplan files so their
-# "world-readable" warning does not clutter every command.
+# Runs once at startup, as a regular user with passwordless sudo (the LFCS
+# base image, like the graded labs). netplan.io and iproute2 both ship in the
+# base image already. No netplan file is written for the spare NIC — writing
+# it is the point. This script just works out which interface is the spare
+# (so the docs can name it) and tightens permissions on the existing netplan
+# files so their "world-readable" warning does not clutter every command.
 set -euo pipefail
 
 echo "[playground] netplan-yaml-playground: preparing..."
-
-export DEBIAN_FRONTEND=noninteractive
-if command -v apt-get >/dev/null 2>&1; then
-  apt-get update -y
-  # netplan.io ships on Ubuntu already; this is a no-op safety net. iproute2 for `ip`.
-  apt-get install -y --no-install-recommends netplan.io iproute2 || true
-fi
 
 # --- identify the spare NIC: not loopback, not the default-route interface ---
 MGMT_DEV="$(ip route show default 2>/dev/null | awk '/default/ {print $5; exit}')"
@@ -25,14 +19,14 @@ for dev in $(ip -o link show | awk -F': ' '{print $2}' | cut -d@ -f1 | grep -v '
   SPARE_DEV="$dev"
   break
 done
-printf '%s\n' "${SPARE_DEV:-unknown}" > /root/lab-spare-iface
+printf '%s\n' "${SPARE_DEV:-unknown}" | sudo tee /root/lab-spare-iface > /dev/null
 
 echo "[playground] management interface : ${MGMT_DEV:-unknown}  (its /etc/netplan file is off-limits)"
 echo "[playground] spare interface       : ${SPARE_DEV:-NOT FOUND}  (write a netplan file for this one)"
 
 # --- tidy up permissions on any existing netplan files ---------------------
 if compgen -G "/etc/netplan/*.yaml" >/dev/null; then
-  chmod 600 /etc/netplan/*.yaml || true
+  sudo chmod 600 /etc/netplan/*.yaml || true
 fi
 
 echo
@@ -40,7 +34,7 @@ echo "[playground] existing netplan files:"
 ls -l /etc/netplan/ 2>/dev/null || true
 echo
 echo "[playground] netplan status:"
-netplan status 2>/dev/null || netplan get 2>/dev/null || true
+sudo netplan status 2>/dev/null || sudo netplan get 2>/dev/null || true
 
 echo
 echo "[playground] ready. Netplan is native here (renderer: systemd-networkd)."

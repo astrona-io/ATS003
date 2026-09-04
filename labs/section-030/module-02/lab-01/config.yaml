@@ -19,7 +19,7 @@ runtime:
 bootstrap:
   init:
     - name: "firewalld-lab-setup"
-      description: "Installs firewalld via apt-get, disables ufw so it can't conflict with firewalld's nftables/iptables backend, and enables+starts firewalld with the primary interface bound to a sane public zone"
+      description: "Disables ufw so it can't conflict with firewalld's nftables/iptables backend (firewalld ships in the base LFCS image), and enables+starts firewalld with the primary interface bound to a sane public zone"
       type: "folder"
       source: "bootstrap/"
 

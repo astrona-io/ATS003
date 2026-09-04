@@ -11,7 +11,7 @@ echo "[playground] ntp-server: writing local-stratum chrony server config..."
 CONF=/etc/chrony/chrony.conf
 [ -f "$CONF" ] || CONF=/etc/chrony.conf
 
-cat > "$CONF" <<'EOF'
+sudo tee "$CONF" > /dev/null <<'EOF'
 # Playground NTP server — serves local time to the isolated lab segment.
 # No upstream source is reachable here, so `local stratum 8` lets this host
 # act as a source anyway. Do not copy `local stratum` onto a real server that
@@ -23,7 +23,7 @@ local stratum 8
 allow 192.168.100.0/24
 EOF
 
-systemctl restart chrony 2>/dev/null || systemctl restart chronyd 2>/dev/null || true
+sudo systemctl restart chrony 2>/dev/null || sudo systemctl restart chronyd 2>/dev/null || true
 
 echo "[playground] ntp-server: chrony restarted. Serving on 192.168.100.10:123."
-chronyc tracking 2>/dev/null || true
+sudo chronyc tracking 2>/dev/null || true

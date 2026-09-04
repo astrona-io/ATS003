@@ -1,21 +1,17 @@
 #!/usr/bin/env bash
 # OS prep for PLAYGROUND — Raw Packet Capturing (tcpdump)
-# Runs once at startup. Environment preparation ONLY: install tcpdump, start a
-# local HTTP server and a loop that produces steady loopback traffic, and save a
+# Runs once at startup, as a regular user with passwordless sudo (the LFCS
+# base image, like the graded labs). tcpdump, curl, python3, socat, and
+# iproute2 all ship in the base image already. This starts a local HTTP
+# server and a loop that produces steady loopback traffic, and saves a
 # sample capture. Nothing to build — the point is running tcpdump against a
 # machine that always has packets moving on `lo`.
 set -euo pipefail
 
 echo "[playground] tcpdump-capture-playground: starting traffic + capture tools..."
 
-export DEBIAN_FRONTEND=noninteractive
-if command -v apt-get >/dev/null 2>&1; then
-  apt-get update -y
-  apt-get install -y --no-install-recommends tcpdump curl python3 socat iproute2 iputils-ping || true
-fi
-
 # --- a local HTTP server to capture conversations with ----------------------
-cat > /etc/systemd/system/lab-http.service <<'EOF'
+sudo tee /etc/systemd/system/lab-http.service > /dev/null <<'EOF'
 [Unit]
 Description=tcpdump playground: HTTP server on 127.0.0.1:8080
 After=network.target
@@ -27,7 +23,7 @@ DynamicUser=yes
 EOF
 
 # --- a loop that keeps loopback traffic flowing ---------------------------
-cat > /usr/local/bin/lab-traffic.sh <<'EOF'
+sudo tee /usr/local/bin/lab-traffic.sh > /dev/null <<'EOF'
 #!/bin/sh
 # Every ~2s: one HTTP GET, one ICMP echo, one UDP datagram to a closed port
 # (which draws an ICMP port-unreachable back). All on 127.0.0.1.
@@ -38,9 +34,9 @@ while :; do
   sleep 2
 done
 EOF
-chmod +x /usr/local/bin/lab-traffic.sh
+sudo chmod +x /usr/local/bin/lab-traffic.sh
 
-cat > /etc/systemd/system/lab-traffic.service <<'EOF'
+sudo tee /etc/systemd/system/lab-traffic.service > /dev/null <<'EOF'
 [Unit]
 Description=tcpdump playground: steady loopback traffic generator
 After=lab-http.service
@@ -51,13 +47,13 @@ Restart=always
 DynamicUser=yes
 EOF
 
-systemctl daemon-reload
-systemctl enable --now lab-http.service lab-traffic.service 2>/dev/null || true
+sudo systemctl daemon-reload
+sudo systemctl enable --now lab-http.service lab-traffic.service 2>/dev/null || true
 
 # --- a sample .pcap so `tcpdump -r` works from the first minute ------------
 sleep 3
-timeout 15 tcpdump -i lo -n -c 40 -w /usr/local/share/lab-sample.pcap 2>/dev/null || true
-chmod 644 /usr/local/share/lab-sample.pcap 2>/dev/null || true
+sudo timeout 15 tcpdump -i lo -n -c 40 -w /usr/local/share/lab-sample.pcap 2>/dev/null || true
+sudo chmod 644 /usr/local/share/lab-sample.pcap 2>/dev/null || true
 
 echo
 echo "[playground] tcpdump version:"

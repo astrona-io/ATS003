@@ -1,22 +1,18 @@
 #!/usr/bin/env bash
 # OS prep for PLAYGROUND — Nginx Reverse Proxy
-# Runs once at startup. Environment preparation ONLY: install nginx and two tiny
+# Runs once at startup, as a regular user with passwordless sudo (the LFCS
+# base image, like the graded labs). Environment preparation ONLY: nginx,
+# curl, and python3 all ship in the base image already. This starts two tiny
 # backend apps that echo the request they received, so you can write proxy
 # blocks and see exactly what nginx forwards. Nginx is left serving its stock
 # default page — the `location` / `proxy_pass` config is yours to write.
 set -euo pipefail
 
-echo "[playground] nginx-proxy-playground: installing nginx + backends..."
-
-export DEBIAN_FRONTEND=noninteractive
-if command -v apt-get >/dev/null 2>&1; then
-  apt-get update -y
-  apt-get install -y --no-install-recommends nginx curl python3 || true
-fi
+echo "[playground] nginx-proxy-playground: preparing backends..."
 
 # --- the request-echo backend -------------------------------------------------
-install -d /opt/echo
-cat > /opt/echo/echo_server.py <<'PY'
+sudo install -d /opt/echo
+sudo tee /opt/echo/echo_server.py > /dev/null <<'PY'
 #!/usr/bin/env python3
 """Tiny HTTP server that echoes the request line and selected headers as text.
 Usage: echo_server.py <port> <label>
@@ -58,13 +54,13 @@ class Echo(BaseHTTPRequestHandler):
 
 HTTPServer(("127.0.0.1", PORT), Echo).serve_forever()
 PY
-chmod +x /opt/echo/echo_server.py
+sudo chmod +x /opt/echo/echo_server.py
 
 # --- one systemd unit per backend ------------------------------------------
 for spec in "a 9001" "b 9002"; do
   set -- $spec
   name="$1"; port="$2"
-  cat > "/etc/systemd/system/backend-${name}.service" <<EOF
+  sudo tee "/etc/systemd/system/backend-${name}.service" > /dev/null <<EOF
 [Unit]
 Description=Playground echo backend ${name} (127.0.0.1:${port})
 After=network.target
@@ -79,13 +75,13 @@ WantedBy=multi-user.target
 EOF
 done
 
-systemctl daemon-reload
-systemctl enable --now backend-a.service backend-b.service 2>/dev/null || true
+sudo systemctl daemon-reload
+sudo systemctl enable --now backend-a.service backend-b.service 2>/dev/null || true
 
 # --- nginx: stock default site, just make sure it is up ---------------------
-systemctl enable --now nginx 2>/dev/null || true
-nginx -t 2>&1 || true
-systemctl reload nginx 2>/dev/null || true
+sudo systemctl enable --now nginx 2>/dev/null || true
+sudo nginx -t 2>&1 || true
+sudo systemctl reload nginx 2>/dev/null || true
 
 echo
 echo "[playground] backend check:"

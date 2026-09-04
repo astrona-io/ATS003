@@ -1,27 +1,15 @@
 #!/usr/bin/env bash
 # OS prep for PLAYGROUND — firewalld Zones and Services (playground)
-# Runs once when the environment comes up. Environment preparation ONLY:
-# install firewalld, start it at its STOCK defaults, address the extra NIC, and
-# install a couple of tools for probing ports. It deliberately adds NO custom
-# service, opens NO extra port, and moves NO interface between zones — doing
-# that with `firewall-cmd` is the whole point of the playground.
+# Runs once when the environment comes up, as a regular user with passwordless
+# sudo (the LFCS base image, like the graded labs). Environment preparation
+# ONLY: firewalld, iproute2, curl, and python3 all ship in the base image
+# already. This starts firewalld at its STOCK defaults and addresses the extra
+# NIC. It deliberately adds NO custom service, opens NO extra port, and moves
+# NO interface between zones — doing that with `firewall-cmd` is the whole
+# point of the playground.
 set -euo pipefail
 
 echo "[playground] firewalld-zones-playground: preparing host..."
-
-# Runs as a regular user with passwordless sudo (the LFCS base image, like the
-# graded labs) — every command that touches packages, the daemon, or links
-# needs an explicit `sudo`.
-export DEBIAN_FRONTEND=noninteractive
-if command -v apt-get >/dev/null 2>&1; then
-  sudo apt-get update -y
-  # firewalld     = `firewall-cmd` and the daemon.
-  # iproute2      = `ip` (addr / link), used to find and address NICs.
-  # curl, python3 = generate and serve test traffic against your own rules.
-  # Missing packages are non-fatal for a sandbox.
-  sudo apt-get install -y --no-install-recommends \
-    firewalld iproute2 curl python3 || true
-fi
 
 # Start firewalld at its defaults. On Ubuntu the `public` zone is the default
 # and already permits the `ssh` service, so enabling the daemon does not cut the

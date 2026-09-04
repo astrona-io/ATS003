@@ -2,14 +2,9 @@
 # Bootstrap: starts a trivial local listener on port 6001 so the
 # port 6000 -> 6001 nftables redirect the task asks for is testable
 # end-to-end on this single VM (there is no separate downstream host
-# to redirect to here).
+# to redirect to here). python3 ships in the base LFCS image.
 
 set -eu
-
-if ! command -v python3 >/dev/null 2>&1; then
-  sudo apt-get update -y
-  sudo apt-get install -y python3
-fi
 
 sudo tee /etc/systemd/system/lab-port-6001.service > /dev/null <<'EOF'
 [Unit]

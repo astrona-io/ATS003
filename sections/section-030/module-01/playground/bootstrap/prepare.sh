@@ -1,30 +1,15 @@
 #!/usr/bin/env bash
 # OS prep for PLAYGROUND — Packet Filtering with nftables (playground)
-# Runs once when the environment comes up. Environment preparation ONLY:
-# install `nft` and a handful of tools for generating and observing traffic,
-# bring up the extra NIC so a second local source address exists, and flush the
-# nftables ruleset so it starts empty. It deliberately creates NO table, NO
-# chain, and NO rule — building that structure is the whole point of the
-# playground.
+# Runs once when the environment comes up, as a regular user with passwordless
+# sudo (the LFCS base image, like the graded labs). Environment preparation
+# ONLY: nftables, iproute2, iputils-ping, ncat, curl, and python3 all ship in
+# the base image already. This brings up the extra NIC so a second local
+# source address exists, and flushes the nftables ruleset so it starts empty.
+# It deliberately creates NO table, NO chain, and NO rule — building that
+# structure is the whole point of the playground.
 set -euo pipefail
 
 echo "[playground] nftables-filtering-playground: preparing host..."
-
-# Runs as a regular user with passwordless sudo (the LFCS base image, like the
-# graded labs) — every command that touches packages, the ruleset, services, or
-# links needs an explicit `sudo`.
-export DEBIAN_FRONTEND=noninteractive
-if command -v apt-get >/dev/null 2>&1; then
-  sudo apt-get update -y
-  # nftables      = the `nft` command.
-  # iproute2      = `ip` (addr / link / route), used to find and address NICs.
-  # iputils-ping  = quick reachability checks.
-  # ncat, curl    = generate test traffic against your own rules.
-  # python3       = `python3 -m http.server <port>` as a throwaway listener.
-  # Missing packages are non-fatal for a sandbox.
-  sudo apt-get install -y --no-install-recommends \
-    nftables iproute2 iputils-ping ncat curl python3 || true
-fi
 
 # Start from a blank ruleset. On some images nftables.service loads a stock
 # file; flushing here means `nft list ruleset` shows nothing until you add

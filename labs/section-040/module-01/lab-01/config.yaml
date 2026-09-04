@@ -19,7 +19,7 @@ runtime:
 bootstrap:
   init:
     - name: "chrony-install"
-      description: "Installs chrony and starts chronyd, giving the task a default chrony.conf to edit"
+      description: "Enables/starts chronyd, giving the task a default chrony.conf to edit (chrony ships in the base LFCS image)"
       type: "folder"
       source: "bootstrap/"
 

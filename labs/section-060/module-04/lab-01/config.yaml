@@ -19,7 +19,7 @@ runtime:
 bootstrap:
   init:
     - name: "network-troubleshooting-lab-setup"
-      description: "Installs tcpdump/iproute2/nftables if missing, deploys a systemd-managed web app ('myapp') listening on 0.0.0.0:8080, then deliberately adds an nftables 'tcp dport 8080 drop' rule so the lab's unreachable-port scenario is reproducible"
+      description: "Deploys a systemd-managed web app ('myapp') listening on 0.0.0.0:8080, then deliberately adds an nftables 'tcp dport 8080 drop' rule so the lab's unreachable-port scenario is reproducible (tcpdump/iproute2/nftables ship in the base LFCS image)"
       type: "folder"
       source: "bootstrap/"
 

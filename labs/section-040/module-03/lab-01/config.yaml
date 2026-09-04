@@ -29,18 +29,8 @@ runtime:
 
 bootstrap:
   init:
-    - name: "install-dnsutils"
-      description: "Installs dnsutils (dig, host, nslookup) on the client VM so the DNS querying tools this lab's task relies on are present"
-      type: "file"
-      source: "bootstrap/install-dnsutils.sh"
-      vm: "client"
-
-    - name: "install-bind"
-      description: "Installs bind9 on the dns VM to act as this lab's internal authoritative DNS server"
-      type: "file"
-      source: "bootstrap/install-bind.sh"
-      vm: "dns"
-
+    # dnsutils (client) and bind9/bind9utils (dns) ship in the base LFCS
+    # image now, so there is no install step for either anymore.
     - name: "configure-zones"
       description: "Serves the internal.example.com forward zone plus its reverse zone from the dns VM, listening on all interfaces"
       type: "file"

@@ -1,27 +1,21 @@
 #!/usr/bin/env bash
 # OS prep for PLAYGROUND — DNS Verification with dig
-# Runs once at startup. Environment preparation ONLY: install `dig` and a local
-# authoritative BIND server, load a made-up zone `lab.example` (+ its reverse
-# zone) so every dig query type resolves offline, and point the machine's own
-# resolver at 127.0.0.1. There is nothing to solve — the zone is deliberately
-# fully populated so you can query it, not build it.
+# Runs once at startup, as a regular user with passwordless sudo (the LFCS
+# base image, like the graded labs). Environment preparation ONLY: bind9,
+# bind9-dnsutils (dig/nslookup/host), and bind9utils (named-checkconf/
+# named-checkzone) all ship in the base image already. This loads a made-up
+# zone `lab.example` (+ its reverse zone) so every dig query type resolves
+# offline, and points the machine's own resolver at 127.0.0.1. There is
+# nothing to solve — the zone is deliberately fully populated so you can
+# query it, not build it.
 set -euo pipefail
 
-echo "[playground] dns-dig-playground: installing dig + BIND..."
-
-export DEBIAN_FRONTEND=noninteractive
-if command -v apt-get >/dev/null 2>&1; then
-  apt-get update -y
-  # bind9            = the `named` authoritative server.
-  # bind9-dnsutils   = `dig`, `nslookup`, `host`.
-  # bind9-utils      = `named-checkconf`, `named-checkzone`.
-  apt-get install -y --no-install-recommends bind9 bind9-dnsutils bind9utils || true
-fi
+echo "[playground] dns-dig-playground: configuring local BIND server..."
 
 # --- the zone data --------------------------------------------------------------
 # Documentation IP ranges only: 203.0.113.0/24 (TEST-NET-3), 2001:db8::/32.
 
-cat > /etc/bind/db.lab.example <<'EOF'
+sudo tee /etc/bind/db.lab.example > /dev/null <<'EOF'
 $TTL 3600
 @       IN  SOA ns1.lab.example. admin.lab.example. (
                 2024010101 ; serial
@@ -45,7 +39,7 @@ _dmarc  IN  TXT  "v=DMARC1; p=none"
 short   30  IN  A    203.0.113.99
 EOF
 
-cat > /etc/bind/db.203.0.113 <<'EOF'
+sudo tee /etc/bind/db.203.0.113 > /dev/null <<'EOF'
 $TTL 3600
 @       IN  SOA ns1.lab.example. admin.lab.example. (
                 2024010101 3600 900 604800 300 )
@@ -56,7 +50,7 @@ $TTL 3600
 32      IN  PTR  app2.lab.example.
 EOF
 
-cat > /etc/bind/named.conf.local <<'EOF'
+sudo tee /etc/bind/named.conf.local > /dev/null <<'EOF'
 // Forward zone — transfer allowed from localhost so `dig AXFR` works from here.
 zone "lab.example" {
     type master;
@@ -73,7 +67,7 @@ zone "113.0.203.in-addr.arpa" {
 EOF
 
 # Authoritative only — no recursion, no upstream. IPv4 listen on all addresses.
-cat > /etc/bind/named.conf.options <<'EOF'
+sudo tee /etc/bind/named.conf.options > /dev/null <<'EOF'
 options {
     directory "/var/cache/bind";
     recursion no;
@@ -84,20 +78,20 @@ options {
 };
 EOF
 
-named-checkconf && echo "[playground] named.conf OK" || echo "[playground] named.conf WARNING" >&2
-named-checkzone lab.example /etc/bind/db.lab.example || true
-named-checkzone 113.0.203.in-addr.arpa /etc/bind/db.203.0.113 || true
+sudo named-checkconf && echo "[playground] named.conf OK" || echo "[playground] named.conf WARNING" >&2
+sudo named-checkzone lab.example /etc/bind/db.lab.example || true
+sudo named-checkzone 113.0.203.in-addr.arpa /etc/bind/db.203.0.113 || true
 
-systemctl enable named 2>/dev/null || true
-systemctl restart named 2>/dev/null || systemctl restart bind9 2>/dev/null || true
+sudo systemctl enable named 2>/dev/null || true
+sudo systemctl restart named 2>/dev/null || sudo systemctl restart bind9 2>/dev/null || true
 
 # --- point this machine's own resolver at the local server --------------------
 # Best effort: the plain `dig lab.example` form (no @server) then works too.
 if systemctl is-active --quiet systemd-resolved 2>/dev/null; then
-  systemctl disable --now systemd-resolved 2>/dev/null || true
+  sudo systemctl disable --now systemd-resolved 2>/dev/null || true
 fi
-rm -f /etc/resolv.conf
-cat > /etc/resolv.conf <<'EOF'
+sudo rm -f /etc/resolv.conf
+sudo tee /etc/resolv.conf > /dev/null <<'EOF'
 nameserver 127.0.0.1
 search lab.example
 options edns0

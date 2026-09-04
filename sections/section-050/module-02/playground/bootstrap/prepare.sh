@@ -1,22 +1,18 @@
 #!/usr/bin/env bash
 # OS prep for PLAYGROUND — Nginx Load Balancers
-# Runs once at startup. Environment preparation ONLY: install nginx, three
-# labelled echo backends, and a plain round-robin load balancer on :8080. The
+# Runs once at startup, as a regular user with passwordless sudo (the LFCS
+# base image, like the graded labs). Environment preparation ONLY: nginx,
+# curl, and python3 all ship in the base image already. This starts three
+# labelled echo backends and a plain round-robin load balancer on :8080. The
 # base config balances evenly across all three — changing the balancing method
 # and the health-check settings in /etc/nginx/conf.d/lb.conf is the point.
 set -euo pipefail
 
-echo "[playground] nginx-lb-playground: installing nginx + backends..."
-
-export DEBIAN_FRONTEND=noninteractive
-if command -v apt-get >/dev/null 2>&1; then
-  apt-get update -y
-  apt-get install -y --no-install-recommends nginx curl python3 || true
-fi
+echo "[playground] nginx-lb-playground: preparing backends..."
 
 # --- the request-echo backend (prints which backend answered) ----------------
-install -d /opt/echo
-cat > /opt/echo/echo_server.py <<'PY'
+sudo install -d /opt/echo
+sudo tee /opt/echo/echo_server.py > /dev/null <<'PY'
 #!/usr/bin/env python3
 """Tiny HTTP server that names itself and echoes the request. Slow mode with ?ms=."""
 import sys, time
@@ -57,12 +53,12 @@ class Echo(BaseHTTPRequestHandler):
 
 HTTPServer(("127.0.0.1", PORT), Echo).serve_forever()
 PY
-chmod +x /opt/echo/echo_server.py
+sudo chmod +x /opt/echo/echo_server.py
 
 for spec in "1 9001" "2 9002" "3 9003"; do
   set -- $spec
   name="$1"; port="$2"
-  cat > "/etc/systemd/system/backend-${name}.service" <<EOF
+  sudo tee "/etc/systemd/system/backend-${name}.service" > /dev/null <<EOF
 [Unit]
 Description=Playground echo backend ${name} (127.0.0.1:${port})
 After=network.target
@@ -77,11 +73,11 @@ WantedBy=multi-user.target
 EOF
 done
 
-systemctl daemon-reload
-systemctl enable --now backend-1.service backend-2.service backend-3.service 2>/dev/null || true
+sudo systemctl daemon-reload
+sudo systemctl enable --now backend-1.service backend-2.service backend-3.service 2>/dev/null || true
 
 # --- a plain round-robin load balancer on :8080 -----------------------------
-cat > /etc/nginx/conf.d/lb.conf <<'EOF'
+sudo tee /etc/nginx/conf.d/lb.conf > /dev/null <<'EOF'
 # Load balancer for the playground. Edit the `upstream` block to change the
 # balancing method (add `least_conn;`, `ip_hash;`, `hash $request_uri;`) or the
 # per-server options (`weight=`, `max_fails=`, `fail_timeout=`, `backup`, `down`),
@@ -104,9 +100,9 @@ server {
 }
 EOF
 
-systemctl enable --now nginx 2>/dev/null || true
-nginx -t 2>&1 || true
-systemctl reload nginx 2>/dev/null || true
+sudo systemctl enable --now nginx 2>/dev/null || true
+sudo nginx -t 2>&1 || true
+sudo systemctl reload nginx 2>/dev/null || true
 
 echo
 echo "[playground] round-robin check (:8080):"
