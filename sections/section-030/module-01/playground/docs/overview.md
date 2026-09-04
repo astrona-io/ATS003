@@ -17,8 +17,8 @@ and no pass/fail. Explore, break things, `astrona destroy`, start over.
 - Two local IPv4 addresses:
   - the **management interface** — carries your SSH session. Do not add a rule
     that drops traffic to it or you lock yourself out;
-  - **`192.168.80.10/24`** on an isolated segment, so you have a second source
-    address for `ip saddr` rules. Find the kernel names with
+  - **`192.168.80.10/24`** on a local dummy interface, so you have a second
+    source address for `ip saddr` rules. Find the kernel names with
     `ip -brief -4 addr show`.
 - `sudo` works without a password.
 

@@ -15,7 +15,7 @@ if command -v apt-get >/dev/null 2>&1; then
   # bind9            = the `named` authoritative server.
   # bind9-dnsutils   = `dig`, `nslookup`, `host`.
   # bind9-utils      = `named-checkconf`, `named-checkzone`.
-  apt-get install -y --no-install-recommends bind9 bind9-dnsutils bind9-utils || true
+  apt-get install -y --no-install-recommends bind9 bind9-dnsutils bind9utils || true
 fi
 
 # --- the zone data --------------------------------------------------------------

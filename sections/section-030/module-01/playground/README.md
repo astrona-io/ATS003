@@ -8,7 +8,7 @@
 Clean Ubuntu host with an empty nftables ruleset for building tables, chains,
 hooks, and rules from scratch and watching them filter live traffic. Includes
 `ncat` / `curl` / `python3` for generating test traffic and a second local
-address on an isolated segment for `ip saddr` rules.
+address on a dummy interface for `ip saddr` rules.
 
 A single sandbox environment that spins up, runs OS prep, and stays running so
 you can explore the module's topic on a clean machine. Nothing to submit.

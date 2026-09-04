@@ -16,7 +16,7 @@ and no pass/fail. Explore, break things, `astrona destroy`, start over.
 - `firewall-cmd`, plus `curl` and `python3` for generating and serving test
   traffic.
 - Two local IPv4 addresses: the **management interface** that carries your SSH
-  session, and **`192.168.90.10/24`** on an isolated segment, used for
+  session, and **`192.168.90.10/24`** on a local dummy interface, used for
   interface-to-zone experiments. Find the kernel names with
   `ip -brief -4 addr show`.
 - Password-less `sudo`. (firewalld's backend on Ubuntu 24.04 is nftables — see

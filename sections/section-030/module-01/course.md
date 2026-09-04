@@ -63,7 +63,7 @@ Open a shell on the playground VM with `astrona ssh astro-nftables-filtering-pla
 
 - An **empty nftables ruleset**. `sudo nft list ruleset` prints nothing until you add a table — no stock firewall in the way.
 - `nft`, plus `conntrack`, `curl`, `ncat`, and `python3` for generating and observing traffic.
-- Two local IPv4 addresses: the **management interface** that carries your SSH session, and **`192.168.80.10/24`** on an isolated segment, used later for source-address rules. Find their kernel names with `ip -brief -4 addr show`.
+- Two local IPv4 addresses: the **management interface** that carries your SSH session, and **`192.168.80.10/24`** on a local dummy interface, used later for source-address rules. Find their kernel names with `ip -brief -4 addr show`.
 - Password-less `sudo`.
 
 Several checkpoints need a listener to filter; you start one yourself with `python3 -m http.server 5000` and restart it as needed. Run it in one SSH session and the `nft` / `curl` commands in a second, or append `&` to background it.

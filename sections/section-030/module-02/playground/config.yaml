@@ -5,10 +5,12 @@
 #
 # Runtime: a single qemu VM — a plain Ubuntu 24.04 server, no Kubernetes.
 # OS prep installs firewalld, starts it at its stock defaults (default zone
-# `public`, ssh allowed, nothing custom added), and brings up one extra NIC so
-# interface-to-zone assignment is something you can actually see. Everything
-# else — adding services, opening ports, moving interfaces between zones — is
-# left for you to do with `firewall-cmd`.
+# `public`, ssh allowed, nothing custom added), and brings up a second local
+# interface (a dummy netdev — see bootstrap/prepare.sh; astrona's qemu backend
+# only supports networks joined by exactly 2 VMs, so a solo VM cannot get one
+# via runtime.networks) so interface-to-zone assignment is something you can
+# actually see. Everything else — adding services, opening ports, moving
+# interfaces between zones — is left for you to do with `firewall-cmd`.
 
 metadata:
   name: "firewalld-zones-playground"
@@ -28,22 +30,12 @@ teardown:
 
 runtime:
   type: "qemu"
-  networks:
-    # One isolated L2 segment. Nothing else is on it — it exists only so the VM
-    # has a second interface to assign between zones (`firewall-cmd
-    # --change-interface`), with a reachable-looking address on it.
-    - name: fwd-net
-      cidr: 192.168.90.0/24
   qemu:
     - name: "host"
       image:
         type: "oci"
-        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
-      arch: "arm64"
+        source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
       cpus: 2
       memoryMB: 2048
       diskSizeGB: 20
-      networks:
-        # One extra interface on top of the default management interface.
-        - { name: fwd-net, ipv4: 192.168.90.10 }
       sshPasswordAuth: false

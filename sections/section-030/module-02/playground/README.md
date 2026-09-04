@@ -7,8 +7,8 @@
 
 Clean Ubuntu host running firewalld at its defaults, for exploring zones,
 interface assignment, services, and ports with `firewall-cmd`. Includes `curl` /
-`python3` for test traffic and a second interface on an isolated segment for
-zone-assignment experiments.
+`python3` for test traffic and a second dummy interface for zone-assignment
+experiments.
 
 A single sandbox environment that spins up, runs OS prep, and stays running so
 you can explore the module's topic on a clean machine. Nothing to submit.

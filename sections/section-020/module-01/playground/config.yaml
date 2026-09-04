@@ -36,8 +36,7 @@ runtime:
     - name: "host"
       image:
         type: "oci"
-        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
-      arch: "arm64"
+        source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
       cpus: 2
       memoryMB: 2048
       diskSizeGB: 20

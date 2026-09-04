@@ -48,7 +48,7 @@ Open a shell on the playground VM with `astrona ssh astro-firewalld-zones-playgr
 
 - **firewalld running at its stock defaults**: default zone `public`, the `ssh` service allowed, nothing custom added.
 - `firewall-cmd`, plus `curl` and `python3` for test traffic.
-- Two local IPv4 addresses: the **management interface** carrying your SSH session — leave its zone alone — and **`192.168.90.10/24`** on an isolated segment, used for the interface-to-zone and source-binding checkpoints. Find their kernel names with `ip -brief -4 addr show`.
+- Two local IPv4 addresses: the **management interface** carrying your SSH session — leave its zone alone — and **`192.168.90.10/24`** on a local dummy interface, used for the interface-to-zone and source-binding checkpoints. Find their kernel names with `ip -brief -4 addr show`.
 - Password-less `sudo`.
 
 Several checkpoints need a listener; start one with `python3 -m http.server 8080` in a second SSH session (or background it with `&`).

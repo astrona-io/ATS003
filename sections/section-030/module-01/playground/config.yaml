@@ -6,8 +6,10 @@
 # Runtime: a single qemu VM — a plain Ubuntu 24.04 server, no Kubernetes. The
 # nftables ruleset is left EMPTY on purpose: building the table -> chain -> rule
 # structure yourself, and watching it filter live traffic, is the whole point.
-# OS prep installs `nft` and a few test tools, brings up one extra NIC so you
-# have a second local source address for `ip saddr` rules, and flushes the
+# OS prep installs `nft` and a few test tools, brings up a second local source
+# address for `ip saddr` rules (a dummy interface — see bootstrap/prepare.sh;
+# astrona's qemu backend only supports networks joined by exactly 2 VMs, so a
+# solo VM cannot get a second address via runtime.networks), and flushes the
 # ruleset so `nft list ruleset` starts blank.
 
 metadata:
@@ -28,22 +30,12 @@ teardown:
 
 runtime:
   type: "qemu"
-  networks:
-    # One isolated L2 segment. Nothing else is on it — it exists only so the VM
-    # has a second local IPv4 address (192.168.80.10) to aim `ip saddr` rules
-    # at, tested with `curl --interface`.
-    - name: nft-net
-      cidr: 192.168.80.0/24
   qemu:
     - name: "host"
       image:
         type: "oci"
-        source: "ghcr.io/astrona-io/ubuntu-24.04-server-docker:arm64"
-      arch: "arm64"
+        source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
       cpus: 2
       memoryMB: 2048
       diskSizeGB: 20
-      networks:
-        # One extra interface on top of the default management interface.
-        - { name: nft-net, ipv4: 192.168.80.10 }
       sshPasswordAuth: false
