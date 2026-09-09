@@ -33,11 +33,11 @@ Each module has a short landing page and a set of ordered deep-dive parts. Read 
     4.  [Runtime, permanent, and operations](./module-02/course-04-runtime-permanent-operations.md)
 
 ### 2. Guided Training Labs
-*   **Hands-on Training Lab 1 (nftables):** **[section-030/module-01](../../labs/section-030/module-01/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-030/module-01/lab-01")
-*   **Hands-on Training Lab 2 (firewalld):** **[section-030/module-02](../../labs/section-030/module-02/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-030/module-02/lab-01")
+*   **Hands-on Training Lab 1 (nftables):** **[section-030/module-01](module-01/labs/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-030/module-01/labs/lab-01")
+*   **Hands-on Training Lab 2 (firewalld):** **[section-030/module-02](module-02/labs/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-030/module-02/labs/lab-01")
 
 ### 3. Unguided Challenge Lab
-*   **Hands-on Challenge Lab (Capstone):** **[section-030/capstone](../../labs/section-030/capstone/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-030/capstone/lab-01")
+*   **Hands-on Challenge Lab (Capstone):** **[section-030/capstone](capstone/labs/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-030/capstone/labs/lab-01")
 
 ---
 

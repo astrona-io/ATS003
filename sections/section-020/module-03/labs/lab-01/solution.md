@@ -20,7 +20,7 @@ Grading runs from the **host terminal** — the shell where you typed
 `astrona run`, not inside a VM:
 
 ```bash
-astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-020/module-03/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c sections/section-020/module-03/labs/lab-01
 ```
 
 Checks (the `gateway-ready` one runs on the other VM and already passes):
@@ -144,7 +144,7 @@ PASS  route-persistent
 Submit from the host terminal:
 
 ```bash
-astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-020/module-03/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c sections/section-020/module-03/labs/lab-01
 ```
 
 ---

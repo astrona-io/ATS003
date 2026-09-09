@@ -21,12 +21,12 @@ By completing this section, you will acquire three core capabilities:
 *   **[Module 3: DNS Verification with dig](./module-03/course.md)**
 
 ### 2. Guided Training Labs
-*   **Hands-on Training Lab 1 (NTP Client):** **[section-040/module-01](../../labs/section-040/module-01/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-040/module-01/lab-01")
-*   **Hands-on Training Lab 2 (NTP Server):** **[section-040/module-02](../../labs/section-040/module-02/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-040/module-02/lab-01")
-*   **Hands-on Training Lab 3 (DNS & dig):** **[section-040/module-03](../../labs/section-040/module-03/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-040/module-03/lab-01")
+*   **Hands-on Training Lab 1 (NTP Client):** **[section-040/module-01](module-01/labs/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-040/module-01/labs/lab-01")
+*   **Hands-on Training Lab 2 (NTP Server):** **[section-040/module-02](module-02/labs/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-040/module-02/labs/lab-01")
+*   **Hands-on Training Lab 3 (DNS & dig):** **[section-040/module-03](module-03/labs/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-040/module-03/labs/lab-01")
 
 ### 3. Unguided Challenge Lab
-*   **Hands-on Challenge Lab (Capstone):** **[section-040/capstone](../../labs/section-040/capstone/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-040/capstone/lab-01")
+*   **Hands-on Challenge Lab (Capstone):** **[section-040/capstone](capstone/labs/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-040/capstone/labs/lab-01")
 
 ---
 

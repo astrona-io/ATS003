@@ -5,7 +5,7 @@ This is the **unguid challenge lab** that serves as the section capstone assessm
 ## Start the Sandbox VM
 To spin up this certification challenge sandbox in your host terminal, run:
 ```bash
-astrona run --git git@github.com:astrona-io/ATS003.git -c labs/section-040/capstone/lab-01
+astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-040/capstone/labs/lab-01
 ```
 
 ## Learning Path & Objectives

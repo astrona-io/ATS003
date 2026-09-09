@@ -21,12 +21,12 @@ By completing this section, you will acquire three core capabilities:
 *   **[Module 3: Multi-Interface Static Routing](./module-03/course.md)**
 
 ### 2. Guided Training Labs
-*   **[Hands-on Training Lab 1 (Bonding)](../../labs/section-020/module-01/lab-01)**
-*   **[Hands-on Training Lab 2 (Bridging)](../../labs/section-020/module-02/lab-01)**
-*   **[Hands-on Training Lab 3 (Routing)](../../labs/section-020/module-03/lab-01)**
+*   **[Hands-on Training Lab 1 (Bonding)](module-01/labs/lab-01)**
+*   **[Hands-on Training Lab 2 (Bridging)](module-02/labs/lab-01)**
+*   **[Hands-on Training Lab 3 (Routing)](module-03/labs/lab-01)**
 
 ### 3. Unguided Challenge Lab
-*   **[Hands-on Challenge Lab (Capstone)](../../labs/section-020/capstone/lab-01)**
+*   **[Hands-on Challenge Lab (Capstone)](capstone/labs/lab-01)**
 
 ## Ready for Assessment?
 *   **[Take the Section 020 Knowledge Check Quiz](./quiz.md)**

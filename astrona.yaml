@@ -30,15 +30,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-010/module-01/lab-01/question.md
+        path: sections/section-010/module-01/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-010/module-01/lab-01/solution.md
+        path: sections/section-010/module-01/labs/lab-01/solution.md
 
       - type: lab
         title: "IPv4 & IPv6 Interface Configuration Lab"
-        path: labs/section-010/module-01/lab-01
+        path: sections/section-010/module-01/labs/lab-01
 
       - type: reading
         title: "Module 2: Managing Linux Hostnames"
@@ -46,15 +46,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-010/module-02/lab-01/question.md
+        path: sections/section-010/module-02/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-010/module-02/lab-01/solution.md
+        path: sections/section-010/module-02/labs/lab-01/solution.md
 
       - type: lab
         title: "Static Hostname Management Lab"
-        path: labs/section-010/module-02/lab-01
+        path: sections/section-010/module-02/labs/lab-01
 
       - type: reading
         title: "Module 3: Discovering Your Public IP Address"
@@ -62,15 +62,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-010/module-03/lab-01/question.md
+        path: sections/section-010/module-03/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-010/module-03/lab-01/solution.md
+        path: sections/section-010/module-03/labs/lab-01/solution.md
 
       - type: lab
         title: "Public IP Discovery Behind NAT Lab"
-        path: labs/section-010/module-03/lab-01
+        path: sections/section-010/module-03/labs/lab-01
 
       - type: reading
         title: "Module 4: Local Hostname Resolution"
@@ -78,15 +78,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-010/module-04/lab-01/question.md
+        path: sections/section-010/module-04/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-010/module-04/lab-01/solution.md
+        path: sections/section-010/module-04/labs/lab-01/solution.md
 
       - type: lab
         title: "Local Hostname Name Resolution Lab"
-        path: labs/section-010/module-04/lab-01
+        path: sections/section-010/module-04/labs/lab-01
 
       - type: reading
         title: "Section 010 Knowledge Check: Core Host Configuration"
@@ -94,15 +94,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-010/capstone/lab-01/question.md
+        path: sections/section-010/capstone/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-010/capstone/lab-01/solution.md
+        path: sections/section-010/capstone/labs/lab-01/solution.md
 
       - type: lab
         title: "Core Host Configurations Capstone Lab"
-        path: labs/section-010/capstone/lab-01
+        path: sections/section-010/capstone/labs/lab-01
 
   - id: module-020
     title: "Section 020: Link Aggregation & Routing (Bridges, Bonds & Routes)"
@@ -120,15 +120,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-020/module-01/lab-01/question.md
+        path: sections/section-020/module-01/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-020/module-01/lab-01/solution.md
+        path: sections/section-020/module-01/labs/lab-01/solution.md
 
       - type: lab
         title: "Link Aggregation (Bonding) Lab"
-        path: labs/section-020/module-01/lab-01
+        path: sections/section-020/module-01/labs/lab-01
 
       - type: reading
         title: "Module 2: Software Bridging"
@@ -136,15 +136,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-020/module-02/lab-01/question.md
+        path: sections/section-020/module-02/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-020/module-02/lab-01/solution.md
+        path: sections/section-020/module-02/labs/lab-01/solution.md
 
       - type: lab
         title: "Software Bridging Lab"
-        path: labs/section-020/module-02/lab-01
+        path: sections/section-020/module-02/labs/lab-01
 
       - type: reading
         title: "Module 3: Multi-Interface Static Routing"
@@ -152,15 +152,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-020/module-03/lab-01/question.md
+        path: sections/section-020/module-03/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-020/module-03/lab-01/solution.md
+        path: sections/section-020/module-03/labs/lab-01/solution.md
 
       - type: lab
         title: "Multi-Interface Static Routing Lab"
-        path: labs/section-020/module-03/lab-01
+        path: sections/section-020/module-03/labs/lab-01
 
       - type: reading
         title: "Section 020 Knowledge Check: Link Aggregation & Routing"
@@ -168,15 +168,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-020/capstone/lab-01/question.md
+        path: sections/section-020/capstone/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-020/capstone/lab-01/solution.md
+        path: sections/section-020/capstone/labs/lab-01/solution.md
 
       - type: lab
         title: "Aggregation and Routing Capstone Lab"
-        path: labs/section-020/capstone/lab-01
+        path: sections/section-020/capstone/labs/lab-01
 
   - id: module-030
     title: "Section 030: Network Security & Packet Filtering (Firewalls)"
@@ -218,15 +218,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-030/module-01/lab-01/question.md
+        path: sections/section-030/module-01/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-030/module-01/lab-01/solution.md
+        path: sections/section-030/module-01/labs/lab-01/solution.md
 
       - type: lab
         title: "Packet Filtering with nftables Lab"
-        path: labs/section-030/module-01/lab-01
+        path: sections/section-030/module-01/labs/lab-01
 
       - type: reading
         title: "Module 2: firewalld Zones and Services"
@@ -250,15 +250,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-030/module-02/lab-01/question.md
+        path: sections/section-030/module-02/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-030/module-02/lab-01/solution.md
+        path: sections/section-030/module-02/labs/lab-01/solution.md
 
       - type: lab
         title: "firewalld Zones and Services Lab"
-        path: labs/section-030/module-02/lab-01
+        path: sections/section-030/module-02/labs/lab-01
 
       - type: reading
         title: "Section 030 Knowledge Check: Network Security & Packet Filtering"
@@ -266,15 +266,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-030/capstone/lab-01/question.md
+        path: sections/section-030/capstone/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-030/capstone/lab-01/solution.md
+        path: sections/section-030/capstone/labs/lab-01/solution.md
 
       - type: lab
         title: "Host Security and Filtering Capstone Lab"
-        path: labs/section-030/capstone/lab-01
+        path: sections/section-030/capstone/labs/lab-01
 
   - id: module-040
     title: "Section 040: Time & Domain Name Services (NTP & DNS)"
@@ -292,15 +292,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-040/module-01/lab-01/question.md
+        path: sections/section-040/module-01/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-040/module-01/lab-01/solution.md
+        path: sections/section-040/module-01/labs/lab-01/solution.md
 
       - type: lab
         title: "NTP Client Time Synchronization Lab"
-        path: labs/section-040/module-01/lab-01
+        path: sections/section-040/module-01/labs/lab-01
 
       - type: reading
         title: "Module 2: NTP Server Mode and Stratums"
@@ -308,15 +308,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-040/module-02/lab-01/question.md
+        path: sections/section-040/module-02/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-040/module-02/lab-01/solution.md
+        path: sections/section-040/module-02/labs/lab-01/solution.md
 
       - type: lab
         title: "NTP Server Mode and Stratums Lab"
-        path: labs/section-040/module-02/lab-01
+        path: sections/section-040/module-02/labs/lab-01
 
       - type: reading
         title: "Module 3: DNS Verification with dig"
@@ -324,15 +324,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-040/module-03/lab-01/question.md
+        path: sections/section-040/module-03/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-040/module-03/lab-01/solution.md
+        path: sections/section-040/module-03/labs/lab-01/solution.md
 
       - type: lab
         title: "DNS Verification with dig Lab"
-        path: labs/section-040/module-03/lab-01
+        path: sections/section-040/module-03/labs/lab-01
 
       - type: reading
         title: "Section 040 Knowledge Check: Time & Domain Name Services"
@@ -340,15 +340,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-040/capstone/lab-01/question.md
+        path: sections/section-040/capstone/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-040/capstone/lab-01/solution.md
+        path: sections/section-040/capstone/labs/lab-01/solution.md
 
       - type: lab
         title: "Time and Name Services Capstone Lab"
-        path: labs/section-040/capstone/lab-01
+        path: sections/section-040/capstone/labs/lab-01
 
   - id: module-050
     title: "Section 050: Application Reverse Proxies (Nginx & SSH)"
@@ -366,15 +366,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-050/module-01/lab-01/question.md
+        path: sections/section-050/module-01/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-050/module-01/lab-01/solution.md
+        path: sections/section-050/module-01/labs/lab-01/solution.md
 
       - type: lab
         title: "Nginx Reverse Proxy Lab"
-        path: labs/section-050/module-01/lab-01
+        path: sections/section-050/module-01/labs/lab-01
 
       - type: reading
         title: "Module 2: Nginx Load Balancers"
@@ -382,15 +382,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-050/module-02/lab-01/question.md
+        path: sections/section-050/module-02/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-050/module-02/lab-01/solution.md
+        path: sections/section-050/module-02/labs/lab-01/solution.md
 
       - type: lab
         title: "Nginx Upstream Load Balancers Lab"
-        path: labs/section-050/module-02/lab-01
+        path: sections/section-050/module-02/labs/lab-01
 
       - type: reading
         title: "Module 3: OpenSSH Server Hardening"
@@ -398,15 +398,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-050/module-03/lab-01/question.md
+        path: sections/section-050/module-03/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-050/module-03/lab-01/solution.md
+        path: sections/section-050/module-03/labs/lab-01/solution.md
 
       - type: lab
         title: "OpenSSH Server Hardening Lab"
-        path: labs/section-050/module-03/lab-01
+        path: sections/section-050/module-03/labs/lab-01
 
       - type: reading
         title: "Section 050 Knowledge Check: Application Reverse Proxies"
@@ -414,15 +414,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-050/capstone/lab-01/question.md
+        path: sections/section-050/capstone/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-050/capstone/lab-01/solution.md
+        path: sections/section-050/capstone/labs/lab-01/solution.md
 
       - type: lab
         title: "Application Proxy and SSH Capstone Lab"
-        path: labs/section-050/capstone/lab-01
+        path: sections/section-050/capstone/labs/lab-01
 
   - id: module-060
     title: "Section 060: Persistent Configurations & Diagnostics"
@@ -440,15 +440,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-060/module-01/lab-01/question.md
+        path: sections/section-060/module-01/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-060/module-01/lab-01/solution.md
+        path: sections/section-060/module-01/labs/lab-01/solution.md
 
       - type: lab
         title: "NetworkManager nmcli Setup Lab"
-        path: labs/section-060/module-01/lab-01
+        path: sections/section-060/module-01/labs/lab-01
 
       - type: reading
         title: "Module 2: Netplan YAML Configurations"
@@ -456,15 +456,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-060/module-02/lab-01/question.md
+        path: sections/section-060/module-02/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-060/module-02/lab-01/solution.md
+        path: sections/section-060/module-02/labs/lab-01/solution.md
 
       - type: lab
         title: "Netplan YAML Configurations Lab"
-        path: labs/section-060/module-02/lab-01
+        path: sections/section-060/module-02/labs/lab-01
 
       - type: reading
         title: "Module 3: Active Socket Diagnostics (ss)"
@@ -472,15 +472,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-060/module-03/lab-01/question.md
+        path: sections/section-060/module-03/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-060/module-03/lab-01/solution.md
+        path: sections/section-060/module-03/labs/lab-01/solution.md
 
       - type: lab
         title: "Active Socket Diagnostics (ss) Lab"
-        path: labs/section-060/module-03/lab-01
+        path: sections/section-060/module-03/labs/lab-01
 
       - type: reading
         title: "Module 4: Raw Packet Capturing (tcpdump)"
@@ -488,15 +488,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-060/module-04/lab-01/question.md
+        path: sections/section-060/module-04/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-060/module-04/lab-01/solution.md
+        path: sections/section-060/module-04/labs/lab-01/solution.md
 
       - type: lab
         title: "Raw Packet Capturing (tcpdump) Lab"
-        path: labs/section-060/module-04/lab-01
+        path: sections/section-060/module-04/labs/lab-01
 
       - type: reading
         title: "Section 060 Knowledge Check: Persistent Configurations & Diagnostics"
@@ -504,15 +504,15 @@ modules:
 
       - type: reading
         title: Question
-        path: labs/section-060/capstone/lab-01/question.md
+        path: sections/section-060/capstone/labs/lab-01/question.md
 
       - type: reading
         title: Solution Walkthrough
-        path: labs/section-060/capstone/lab-01/solution.md
+        path: sections/section-060/capstone/labs/lab-01/solution.md
 
       - type: lab
         title: "Connection Recovery and Audit Capstone Lab"
-        path: labs/section-060/capstone/lab-01
+        path: sections/section-060/capstone/labs/lab-01
 
   - id: module-090
     title: "LFCS Networking Domain Certification Quiz"

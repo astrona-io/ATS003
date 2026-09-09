@@ -19,7 +19,7 @@ Grading runs from the **host terminal** — the shell where you typed
 `astrona run`, not inside the VM:
 
 ```bash
-astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-010/module-03/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c sections/section-010/module-03/labs/lab-01
 ```
 
 Two checks:
@@ -115,7 +115,7 @@ PASS  public-ip
 Submit from the host terminal:
 
 ```bash
-astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-010/module-03/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c sections/section-010/module-03/labs/lab-01
 ```
 
 ---

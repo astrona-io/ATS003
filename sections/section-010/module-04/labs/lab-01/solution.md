@@ -22,7 +22,7 @@ Grading runs from the **host terminal** — the shell where you typed
 `astrona run`, not the shell inside the VM. The command is:
 
 ```bash
-astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-010/module-04/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c sections/section-010/module-04/labs/lab-01
 ```
 
 It runs all six checks against the live VM and prints one line each:
@@ -104,7 +104,7 @@ You should see the original address, plus `192.168.10.71/24`, plus
 **Run the check** on the host terminal:
 
 ```bash
-astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-010/module-04/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c sections/section-010/module-04/labs/lab-01
 ```
 
 `secondary-ipv4` now passes. `ipv6-address` and `ipv6-reachable` may pass
@@ -276,7 +276,7 @@ PASS  persistence
 Submit from the host terminal:
 
 ```bash
-astrona submit --git git@github.com:astrona-io/ATS003.git -c labs/section-010/module-04/lab-01
+astrona submit --git git@github.com:astrona-io/ATS003.git -c sections/section-010/module-04/labs/lab-01
 ```
 
 ---
