@@ -1,27 +1,20 @@
 # Question
 
-Solve this question on: `client`
+Solve this question on: `terminal`
 
 ## Scenario
 
-This is the Section 040 capstone — one integrated DNS-verification task,
-no step-by-step guidance.
+This is the section 040 capstone: one combined task about checking names in the Domain Name System (DNS), with no step-by-step guidance.
 
-Two machines. `dns` runs an internal authoritative BIND server for the zone
-`internal.example.com` (and its reverse zone). You work on `client`. Its
-job is to use that server for name resolution and confirm the zone's
-records are correct with `dig`.
+Astronaut, this mission has two training ships. `dns` runs an internal authoritative BIND server (the DNS server program) for the zone `internal.example.com` and its reverse zone. DNS is the directory that turns names into addresses. You work on `client`. Its job is to use that server for name resolution, and to confirm with `dig` that the zone's records are correct.
 
 ## Tasks
 
 On `client`:
 
-1. **Point the system resolver at `dns`.** Set `/etc/resolv.conf` so that a
-   plain `dig name` (no `@server`) queries the `dns` VM. After this,
-   `dig +short data-001.internal.example.com` returns `192.168.10.80`.
+1. **Point the system resolver at `dns`.** Set `/etc/resolv.conf` so that a plain `dig name` (no `@server`) queries the `dns` machine. After this, `dig +short data-001.internal.example.com` returns `192.168.10.80`.
 
-2. **Verify every record below resolves as shown** (these are the exact
-   lookups the checks run):
+2. **Verify every record below resolves as shown.** These are the exact lookups the checks run:
 
    | Query | Expected answer |
    | --- | --- |
@@ -30,3 +23,5 @@ On `client`:
    | `dig +short internal.example.com NS` | `ns1.internal.example.com.` |
    | `dig +short internal.example.com MX` | `10 mail.internal.example.com.` |
    | `dig -x 192.168.10.80 +short` | `data-001.internal.example.com.` |
+
+   `<dns-ip>` is the address of the `dns` machine on the lab network. The check finds it by looking up the name `astrona-ats-003-lab-040-dns`.

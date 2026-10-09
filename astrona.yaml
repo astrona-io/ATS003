@@ -391,6 +391,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-030/module-01/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-030/module-01/labs/lab-01/question.md
       - type: lab
         title: "Packet Filtering with nftables Lab"
         path: sections/section-030/module-01/labs/lab-01
@@ -437,6 +440,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-030/module-02/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-030/module-02/labs/lab-01/question.md
       - type: lab
         title: "firewalld Zones and Services Lab"
         path: sections/section-030/module-02/labs/lab-01
@@ -456,6 +462,9 @@ modules:
       - type: reading
         title: "Section 030 Knowledge Check: Packet Filtering"
         path: sections/section-030/quiz.md
+      - type: reading
+        title: "Question"
+        path: sections/section-030/capstone/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-030/capstone/labs/lab-01/question.md
@@ -501,14 +510,14 @@ modules:
         title: "NTP Client Time Synchronization"
         path: sections/section-040/module-01/course.md
       - type: reading
-        title: "Question"
-        path: sections/section-040/module-01/labs/lab-01/question.md
+        title: "Why Clocks Drift"
+        path: sections/section-040/module-01/course-01-why-clocks-drift.md
       - type: reading
-        title: "Question"
-        path: sections/section-040/module-01/labs/lab-01/question.md
+        title: "Add A Time Source"
+        path: sections/section-040/module-01/course-02-add-a-time-source.md
       - type: reading
-        title: "Question"
-        path: sections/section-040/module-01/labs/lab-01/question.md
+        title: "Write The Source Into The Configuration File"
+        path: sections/section-040/module-01/course-03-write-the-source-into-the-configuration-file.md
       - type: reading
         title: "Question"
         path: sections/section-040/module-01/labs/lab-01/question.md
@@ -530,17 +539,20 @@ modules:
           - name: "chronyc(1) documentation"
             url: https://chrony-project.org/doc/4.5/chronyc.html
       - type: reading
+        title: "Slew, Step And The System View"
+        path: sections/section-040/module-01/course-04-slew-step-and-the-system-view.md
+      - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-040/module-01/course-05-wrap-up.md
+      - type: reading
         title: "NTP Server Mode and Stratums"
         path: sections/section-040/module-02/course.md
       - type: reading
-        title: "Question"
-        path: sections/section-040/module-02/labs/lab-01/question.md
+        title: "One Service, Two Jobs"
+        path: sections/section-040/module-02/course-01-one-service-two-jobs.md
       - type: reading
-        title: "Question"
-        path: sections/section-040/module-02/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-040/module-02/labs/lab-01/question.md
+        title: "Open The Server With `allow`"
+        path: sections/section-040/module-02/course-02-open-the-server-with-allow.md
       - type: reading
         title: "Question"
         path: sections/section-040/module-02/labs/lab-01/question.md
@@ -562,17 +574,20 @@ modules:
           - name: "chronyc(1) documentation"
             url: https://chrony-project.org/doc/4.5/chronyc.html
       - type: reading
+        title: "Local Stratum And Firewalls"
+        path: sections/section-040/module-02/course-03-local-stratum-and-firewalls.md
+      - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-040/module-02/course-04-wrap-up.md
+      - type: reading
         title: "DNS Verification with dig"
         path: sections/section-040/module-03/course.md
       - type: reading
-        title: "Question"
-        path: sections/section-040/module-03/labs/lab-01/question.md
+        title: "Read A dig Answer"
+        path: sections/section-040/module-03/course-01-read-a-dig-answer.md
       - type: reading
-        title: "Question"
-        path: sections/section-040/module-03/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-040/module-03/labs/lab-01/question.md
+        title: "Ask The Right Server The Right Question"
+        path: sections/section-040/module-03/course-02-ask-the-right-server-the-right-question.md
       - type: reading
         title: "Question"
         path: sections/section-040/module-03/labs/lab-01/question.md
@@ -593,17 +608,14 @@ modules:
           - name: "resolv.conf(5) manual page"
             url: https://man7.org/linux/man-pages/man5/resolv.conf.5.html
       - type: reading
+        title: "Aliases And Zone Transfers"
+        path: sections/section-040/module-03/course-03-aliases-and-zone-transfers.md
+      - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-040/module-03/course-04-wrap-up.md
+      - type: reading
         title: "Section 040 Knowledge Check: Time & Name Services"
         path: sections/section-040/quiz.md
-      - type: reading
-        title: "Question"
-        path: sections/section-040/capstone/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-040/capstone/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-040/capstone/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-040/capstone/labs/lab-01/question.md
@@ -794,6 +806,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-060/module-01/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-060/module-01/labs/lab-01/question.md
       - type: lab
         title: "Private And Public Address Audit Lab"
         path: sections/section-060/module-01/labs/lab-01
@@ -815,6 +830,9 @@ modules:
       - type: reading
         title: "Netplan YAML Configurations"
         path: sections/section-060/module-02/course.md
+      - type: reading
+        title: "Question"
+        path: sections/section-060/module-02/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-060/module-02/labs/lab-01/question.md
@@ -860,6 +878,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-060/module-03/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-060/module-03/labs/lab-01/question.md
       - type: lab
         title: "Active Socket Diagnostics (ss) Lab"
         path: sections/section-060/module-03/labs/lab-01
@@ -880,6 +901,9 @@ modules:
       - type: reading
         title: "Raw Packet Capturing (tcpdump)"
         path: sections/section-060/module-04/course.md
+      - type: reading
+        title: "Question"
+        path: sections/section-060/module-04/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-060/module-04/labs/lab-01/question.md
@@ -914,6 +938,9 @@ modules:
       - type: reading
         title: "Section 060 Knowledge Check: Persistence & Diagnostics"
         path: sections/section-060/quiz.md
+      - type: reading
+        title: "Question"
+        path: sections/section-060/capstone/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-060/capstone/labs/lab-01/question.md

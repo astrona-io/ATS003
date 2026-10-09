@@ -4,10 +4,7 @@ Solve this question on: `terminal`
 
 ## Scenario
 
-This host's time sync needs a defined set of sources with tuned poll
-intervals. `chrony` is installed and running with its default
-`/etc/chrony/chrony.conf`. Rewrite the source list to the four servers
-below, then reload the daemon and confirm it is disciplining the clock.
+Astronaut, this ship's clockmaster needs a fixed list of time beacons with tuned poll limits. `chrony` is installed and running with its default `/etc/chrony/chrony.conf`. Rewrite the source list to the four servers below, restart chrony so it reads the new file, and confirm it is correcting the clock.
 
 ## Tasks
 
@@ -19,13 +16,8 @@ Edit `/etc/chrony/chrony.conf` so that:
    - `ntp.ubuntu.com`
    - `0.debian.pool.ntp.org`
 
-   Any pre-existing `pool` / `server` lines that are not in this list must
-   be removed or commented out (the check reads the *first* line for a
-   given host).
+   Remove or comment out any existing `pool` or `server` lines that are not in this list, so chrony uses only these four.
 
-2. **Every one of those four lines sets `minpoll 4` and `maxpoll 10`** —
-   poll no faster than every 16 s, no slower than every ~1024 s (the
-   closest powers of two to a 20 s retry and a 1000 s ceiling).
+2. **Every one of those four lines sets `minpoll 4` and `maxpoll 10`.** The values are powers of two seconds: poll no more often than every 16 seconds and no less often than every 1024 seconds. They are the closest powers of two to a 20-second retry and a 1000-second ceiling.
 
-3. **`chronyd` has reloaded the new config and is synchronised** —
-   `chronyc tracking` reports `Leap status : Normal`.
+3. **`chronyd` runs with the new file and is synchronised:** `chronyc tracking` reports `Leap status : Normal`.
