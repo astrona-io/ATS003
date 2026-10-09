@@ -1,32 +1,22 @@
 # Question
 
-Solve this question on: `target`
+Solve this question on: `terminal`
 
 ## Scenario
 
-This is the Section 020 capstone — one integrated static-routing task,
-no step-by-step guidance.
+This is the section capstone: one static routing task, with no step-by-step help.
 
-This environment has two machines. You work on **`target`**. It sits on
-`backend-net` (`10.10.20.0/24`) with the address `10.10.20.5`.
+This mission has two training ships flying in formation. You work on **`target`**. It sits on the segment `backend-net` (`10.10.20.0/24`) with the address `10.10.20.5`.
 
-A partner subnet, `10.10.30.0/24`, lives behind the other machine
-(`gateway`), which is reachable at `10.10.20.1` and is already forwarding.
-`target` currently has **no route** to that partner subnet — traffic for
-`10.10.30.0/24` has nowhere to go.
+A partner subnet, `10.10.30.0/24`, lies behind the other machine, **`gateway`**: a relay ship at `10.10.20.1` that already forwards traffic. Right now `target` has **no route** to that partner subnet, so traffic for `10.10.30.0/24` has no lane on its star chart.
 
 ## Tasks
 
-On `target`:
+Do all the work on `target`. You do not need to change anything on `gateway`.
 
-1. **Add the route.** Give `target` a route to `10.10.30.0/24` with next hop
-   `10.10.20.1`. After this:
+1. **Add the route.** Give `target` a route to `10.10.30.0/24` with the next hop `10.10.20.1`. After this:
    - `ip route show 10.10.30.0/24` shows the route `via 10.10.20.1`,
    - `ip route get 10.10.30.1` selects `via 10.10.20.1`, and
-   - `ping 10.10.30.1` gets replies (the gateway forwards them).
+   - `ping 10.10.30.1` gets replies, because the gateway forwards them.
 
-2. **Persistence.** Declare that same route — destination `10.10.30.0/24`,
-   gateway `10.10.20.1` — in on-disk network configuration (a file under
-   `/etc/netplan/`, a systemd-networkd `.network` file, a NetworkManager
-   connection, or a legacy `route-` file) so it is restored on reboot. A
-   route added only with `ip route add` does not count.
+2. **Persistence.** Declare that same route, destination `10.10.30.0/24` with gateway `10.10.20.1`, in on-disk network configuration, so it comes back after a reboot. Any of these counts: a file under `/etc/netplan/`, a `systemd-networkd` `.network` file, a NetworkManager connection, or a legacy `route-` file. A route added only with `ip route add` does not count.

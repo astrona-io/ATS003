@@ -1,32 +1,27 @@
 # Link Aggregation & Routing (Bridges, Bonds & Routes)
 
-Redundant uplinks, Layer 2 local switching, and Layer 3 packet forwarding are the core layers of system interconnects. This portal coordinates the conceptual reading, guided training, and unguided challenge sandboxes for interface bonding aggregates, virtual software bridging switches, and static routing across multiple cards.
+Astronaut, this section is about how your ship joins its antennas together and how it chooses a lane for every signal. You team antennas into a **bond** so one failure does not cut you off, plug antennas into a **bridge** so they share one local lane, and draw **static routes** on the ship's star chart so traffic for each network leaves by the right antenna.
 
----
+## What you will be able to do
 
-## What You Will Master
+By the end of this section you can:
 
-By completing this section, you will acquire three core capabilities:
-*   **Link Aggregation (Bonding)**: Group interfaces in active-backup and load-balancing states with MII monitoring.
-*   **Software Bridging**: Build kernel software switches to link multiple interfaces and virtual guests at Layer 2.
-*   **Static Multi-Interface Routing**: Control route metrics, default routing gateways, and packet forwarding engines.
+- **Bond interfaces:** build an active-backup bond, read its state, and trigger a failover yourself.
+- **Bridge interfaces:** build a software bridge, attach ports, read what it learned, and stop a loop with the Spanning Tree Protocol.
+- **Route between networks:** add, check, replace and remove static routes, predict which route Linux picks, and troubleshoot a destination you cannot reach.
+- **Make it last:** explain why all of this disappears on reboot when it is built with `ip`, and where it must be written to come back.
 
----
+## The modules
 
-## The Learning & Lab Path
+Each module has its own playground and ends with a graded mission.
 
-### 1. Theoretical Concepts & Metaphors
-*   **[Module 1: Link Aggregation (Bonding)](./module-01/course.md)**
-*   **[Module 2: Software Bridging](./module-02/course.md)**
-*   **[Module 3: Multi-Interface Static Routing](./module-03/course.md)**
+1. [Link Aggregation with Linux Bonding](./module-01/course.md): teaming two antennas into one link, bonding modes, and failover.
+2. [Software Bridging](./module-02/course.md): a virtual switch inside the kernel, its forwarding database, and loops.
+3. [Multi-Interface Static Routing](./module-03/course.md): reading and drawing the star chart, metrics, and a troubleshooting order.
 
-### 2. Guided Training Labs
-*   **[Hands-on Training Lab 1 (Bonding)](module-01/labs/lab-01)**
-*   **[Hands-on Training Lab 2 (Bridging)](module-02/labs/lab-01)**
-*   **[Hands-on Training Lab 3 (Routing)](module-03/labs/lab-01)**
+## Check yourself and the capstone
 
-### 3. Unguided Challenge Lab
-*   **[Hands-on Challenge Lab (Capstone)](capstone/labs/lab-01)**
+When you have finished the modules:
 
-## Ready for Assessment?
-*   **[Take the Section 020 Knowledge Check Quiz](./quiz.md)**
+- Take the [Section 020 knowledge check](./quiz.md), five scenario questions on bonding, bridging and routing.
+- Then take on the [section capstone](./capstone/labs/lab-01/README.md): one static routing task between two machines, with no step-by-step help.

@@ -225,8 +225,8 @@ page, using this table.
 
 | Term | Space picture |
 | --- | --- |
-| Network | The comms array and the space lanes between ships |
-| Network interface (NIC) | One antenna on the comms array |
+| Network | The communications array and the space lanes between ships |
+| Network interface (NIC) | One antenna on the communications array |
 | Management interface | The antenna that carries your link to mission control (your SSH session): never touch it |
 | Loopback (`lo`, `127.0.0.1`) | The ship's internal intercom: signals never leave the hull |
 | `dummy` interface | A practice antenna bolted to the hull, wired to nothing |
@@ -241,7 +241,7 @@ page, using this table.
 | DHCP | The harbour master who hands out call signs to arriving ships |
 | Static address | A call sign painted on the hull by the crew |
 | Persistent vs runtime configuration | Written into the flight manual (survives a restart) vs chalked on the console (gone at the next restart) |
-| Netplan / NetworkManager / `systemd-networkd` | The flight manual for the comms array / two different comms officers who read it and set the antennas |
+| Netplan / NetworkManager / `systemd-networkd` | The flight manual for the communications array / two different communications officers who read it and set the antennas |
 
 **Names**
 

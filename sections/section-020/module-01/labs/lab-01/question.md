@@ -4,27 +4,16 @@ Solve this question on: `terminal`
 
 ## Scenario
 
-You are preparing this host for a redundant network layout: one Layer-2
-bridge that other interfaces can be plugged into, and one fault-tolerant
-bond that survives losing a link.
+Astronaut, you are preparing this training ship for a redundant network layout. It needs one bridge, a docking hub that other interfaces can be plugged into, and one bond, two antennas teamed so the link survives losing one of them.
 
-The VM has only one real NIC — the management interface your session runs
-on. Bridging or bonding it would cut you off, so the setup script has
-already created three safe, disposable dummy interfaces: `dummy0`, `dummy1`,
-and `dummy2`, all UP. Build everything on those.
+The virtual machine has only one real network interface: the management interface your session runs on. Bridging or bonding it would cut you off. So the setup script has already created three safe practice interfaces, `dummy0`, `dummy1` and `dummy2`, all `UP`. Build everything on those three.
 
 ## Tasks
 
-1. **Bridge.** Create a bridge named `br0`, bring it administratively UP,
-   and enslave `dummy0` to it. `dummy0` must end up with `master br0` and
-   reach `state forwarding` (as shown by `bridge link show`).
+1. **Bridge.** Create a bridge named `br0` and bring it administratively `UP`. Attach `dummy0` to it as a port. `dummy0` must end up with `master br0` and reach `state forwarding`, as shown by `bridge link show`.
 
-2. **Bond.** Create a bond named `bond0` in **active-backup** mode, and
-   enslave **both** `dummy1` and `dummy2` to it. `/proc/net/bonding/bond0`
-   must report active-backup mode, both slave interfaces, and a current
-   active slave that is not `None`.
+2. **Bond.** Create a bond named `bond0` in **active-backup** mode, and attach **both** `dummy1` and `dummy2` to it. `/proc/net/bonding/bond0` must report active-backup mode, both member interfaces (`Slave Interface: dummy1` and `Slave Interface: dummy2`), and a `Currently Active Slave` that is `dummy1` or `dummy2`, not `None`.
 
-3. **Persistence.** Declare both `br0` and `bond0` in on-disk network
-   configuration — a file under `/etc/netplan/` or a NetworkManager
-   connection — so they come back after a reboot. Live-only kernel state
-   from `ip link add` does not count.
+3. **Persistence.** Declare both `br0` and `bond0` in on-disk network configuration, either in a file under `/etc/netplan/` (ending in `.yaml`) or as NetworkManager connections, so they come back after a reboot. A bridge or bond that exists only in the kernel, made with `ip link add`, does not count.
+
+Leave the management interface alone.

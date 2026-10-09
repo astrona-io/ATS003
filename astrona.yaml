@@ -44,6 +44,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-010/module-01/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-010/module-01/labs/lab-01/question.md
       - type: lab
         title: "IPv4 & IPv6 Interface Configuration Lab"
         path: sections/section-010/module-01/labs/lab-01
@@ -72,6 +75,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-010/module-02/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-010/module-02/labs/lab-01/question.md
       - type: lab
         title: "Static Hostname Management Lab"
         path: sections/section-010/module-02/labs/lab-01
@@ -92,6 +98,9 @@ modules:
       - type: reading
         title: "Discovering Your Public IP Address"
         path: sections/section-010/module-03/course.md
+      - type: reading
+        title: "Question"
+        path: sections/section-010/module-03/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-010/module-03/labs/lab-01/question.md
@@ -126,6 +135,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-010/module-04/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-010/module-04/labs/lab-01/question.md
       - type: lab
         title: "Local Hostname Name Resolution Lab"
         path: sections/section-010/module-04/labs/lab-01
@@ -148,6 +160,9 @@ modules:
       - type: reading
         title: "Section 010 Knowledge Check: Core Host Configuration"
         path: sections/section-010/quiz.md
+      - type: reading
+        title: "Question"
+        path: sections/section-010/capstone/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-010/capstone/labs/lab-01/question.md
@@ -187,8 +202,14 @@ modules:
         title: "Link Aggregation with Linux Bonding"
         path: sections/section-020/module-01/course.md
       - type: reading
-        title: "Question"
-        path: sections/section-020/module-01/labs/lab-01/question.md
+        title: "One Link From Many Antennas"
+        path: sections/section-020/module-01/course-01-one-link-from-many.md
+      - type: reading
+        title: "Bonding Modes And Failover"
+        path: sections/section-020/module-01/course-02-modes-and-failover.md
+      - type: reading
+        title: "Make The Bond Last"
+        path: sections/section-020/module-01/course-03-make-the-bond-last.md
       - type: reading
         title: "Question"
         path: sections/section-020/module-01/labs/lab-01/question.md
@@ -212,11 +233,23 @@ modules:
           - name: "Netplan YAML configuration reference"
             url: https://netplan.readthedocs.io/en/stable/netplan-yaml/
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-020/module-01/course-04-wrap-up.md
+      - type: reading
         title: "Software Bridging"
         path: sections/section-020/module-02/course.md
       - type: reading
-        title: "Question"
-        path: sections/section-020/module-02/labs/lab-01/question.md
+        title: "A Switch Inside The Kernel"
+        path: sections/section-020/module-02/course-01-a-switch-inside-the-kernel.md
+      - type: reading
+        title: "How A Bridge Learns"
+        path: sections/section-020/module-02/course-02-how-a-bridge-learns.md
+      - type: reading
+        title: "Loops And Spanning Tree"
+        path: sections/section-020/module-02/course-03-loops-and-spanning-tree.md
+      - type: reading
+        title: "Make The Bridge Last"
+        path: sections/section-020/module-02/course-04-make-the-bridge-last.md
       - type: reading
         title: "Question"
         path: sections/section-020/module-02/labs/lab-01/question.md
@@ -240,11 +273,26 @@ modules:
           - name: "Netplan YAML configuration reference"
             url: https://netplan.readthedocs.io/en/stable/netplan-yaml/
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-020/module-02/course-05-wrap-up.md
+      - type: reading
         title: "Multi-Interface Static Routing"
         path: sections/section-020/module-03/course.md
       - type: reading
-        title: "Question"
-        path: sections/section-020/module-03/labs/lab-01/question.md
+        title: "Read The Star Chart"
+        path: sections/section-020/module-03/course-01-read-the-star-chart.md
+      - type: reading
+        title: "Draw A Static Route"
+        path: sections/section-020/module-03/course-02-draw-a-static-route.md
+      - type: reading
+        title: "Metrics, Sources And Rules"
+        path: sections/section-020/module-03/course-03-metrics-sources-and-rules.md
+      - type: reading
+        title: "Test The Path"
+        path: sections/section-020/module-03/course-04-test-the-path.md
+      - type: reading
+        title: "Make Routes Last"
+        path: sections/section-020/module-03/course-05-make-routes-last.md
       - type: reading
         title: "Question"
         path: sections/section-020/module-03/labs/lab-01/question.md
@@ -266,11 +314,11 @@ modules:
           - name: "Netplan YAML configuration reference"
             url: https://netplan.readthedocs.io/en/stable/netplan-yaml/
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-020/module-03/course-06-wrap-up.md
+      - type: reading
         title: "Section 020 Knowledge Check: Aggregation & Routing"
         path: sections/section-020/quiz.md
-      - type: reading
-        title: "Question"
-        path: sections/section-020/capstone/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-020/capstone/labs/lab-01/question.md
@@ -328,6 +376,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-030/module-01/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-030/module-01/labs/lab-01/question.md
       - type: lab
         title: "Packet Filtering with nftables Lab"
         path: sections/section-030/module-01/labs/lab-01
@@ -368,6 +419,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-030/module-02/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-030/module-02/labs/lab-01/question.md
       - type: lab
         title: "firewalld Zones and Services Lab"
         path: sections/section-030/module-02/labs/lab-01
@@ -387,6 +441,9 @@ modules:
       - type: reading
         title: "Section 030 Knowledge Check: Packet Filtering"
         path: sections/section-030/quiz.md
+      - type: reading
+        title: "Question"
+        path: sections/section-030/capstone/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-030/capstone/labs/lab-01/question.md
@@ -431,6 +488,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-040/module-01/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-040/module-01/labs/lab-01/question.md
       - type: lab
         title: "NTP Client Time Synchronization Lab"
         path: sections/section-040/module-01/labs/lab-01
@@ -451,6 +511,9 @@ modules:
       - type: reading
         title: "NTP Server Mode and Stratums"
         path: sections/section-040/module-02/course.md
+      - type: reading
+        title: "Question"
+        path: sections/section-040/module-02/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-040/module-02/labs/lab-01/question.md
@@ -483,6 +546,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-040/module-03/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-040/module-03/labs/lab-01/question.md
       - type: lab
         title: "DNS Verification with dig Lab"
         path: sections/section-040/module-03/labs/lab-01
@@ -502,6 +568,9 @@ modules:
       - type: reading
         title: "Section 040 Knowledge Check: Time & Name Services"
         path: sections/section-040/quiz.md
+      - type: reading
+        title: "Question"
+        path: sections/section-040/capstone/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-040/capstone/labs/lab-01/question.md
@@ -689,6 +758,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-060/module-01/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-060/module-01/labs/lab-01/question.md
       - type: lab
         title: "Private And Public Address Audit Lab"
         path: sections/section-060/module-01/labs/lab-01
@@ -710,6 +782,9 @@ modules:
       - type: reading
         title: "Netplan YAML Configurations"
         path: sections/section-060/module-02/course.md
+      - type: reading
+        title: "Question"
+        path: sections/section-060/module-02/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-060/module-02/labs/lab-01/question.md
@@ -743,6 +818,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-060/module-03/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-060/module-03/labs/lab-01/question.md
       - type: lab
         title: "Active Socket Diagnostics (ss) Lab"
         path: sections/section-060/module-03/labs/lab-01
@@ -763,6 +841,9 @@ modules:
       - type: reading
         title: "Raw Packet Capturing (tcpdump)"
         path: sections/section-060/module-04/course.md
+      - type: reading
+        title: "Question"
+        path: sections/section-060/module-04/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-060/module-04/labs/lab-01/question.md
@@ -791,6 +872,9 @@ modules:
       - type: reading
         title: "Section 060 Knowledge Check: Persistence & Diagnostics"
         path: sections/section-060/quiz.md
+      - type: reading
+        title: "Question"
+        path: sections/section-060/capstone/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-060/capstone/labs/lab-01/question.md
