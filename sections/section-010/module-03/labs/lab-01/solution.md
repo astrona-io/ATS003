@@ -1,7 +1,7 @@
 # Solution Walkthrough
 
-You will find two addresses and write each one to a file. Everything runs on
-the VM's `terminal`.
+You will find two addresses and write each one to a file. Everything runs in
+the `terminal` of the lab machine (the virtual machine, or VM).
 
 Two addresses, two ways to find them:
 
@@ -15,8 +15,8 @@ it — no `sudo` needed for the file writes.
 
 ## The feedback loop
 
-Grading runs from the **host terminal** — the shell where you typed
-`astrona run`, not inside the VM:
+Grading runs from your **own terminal**: the shell where you typed
+`astrona run`, not the shell inside the VM:
 
 ```bash
 astrona submit --git git@github.com:astrona-io/ATS003.git -c sections/section-010/module-03/labs/lab-01
@@ -62,15 +62,15 @@ Replace `10.0.2.15` with the address you actually saw. Check what you wrote:
 cat /opt/course/private_ip
 ```
 
-**Run the check** on the host terminal — `private-ip` now passes.
+**Run the check** in your own terminal — `private-ip` now passes.
 
 ---
 
 ## Step 2: Find and record the public address
 
-Your host sits behind NAT, so its own interface does not know the public
-address. You have to ask a server on the outside what address your traffic
-arrives from. Two independent ways — use whichever answers:
+Your machine sits behind NAT (network address translation), so its own
+interface does not know the public address. You have to ask a server on the outside what address your traffic
+arrives from. There are two independent ways; use whichever one answers:
 
 HTTP method:
 
@@ -112,7 +112,7 @@ PASS  private-ip
 PASS  public-ip
 ```
 
-Submit from the host terminal:
+Submit from your own terminal:
 
 ```bash
 astrona submit --git git@github.com:astrona-io/ATS003.git -c sections/section-010/module-03/labs/lab-01

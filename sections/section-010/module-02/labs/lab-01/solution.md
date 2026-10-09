@@ -4,7 +4,8 @@ You will give this machine three kinds of name: the persistent system name,
 the pretty display name, and the `/etc/hosts` entry the machine uses to
 resolve itself.
 
-Everything runs on the VM's `terminal`.
+Everything runs in the `terminal` of the lab machine (the virtual machine,
+or VM).
 
 Three names, three places:
 
@@ -16,7 +17,7 @@ Three names, three places:
 
 ## The feedback loop
 
-Grading runs from the **host terminal** — the shell where you typed
+Grading runs from your **own terminal**: the shell where you typed
 `astrona run`, not the shell inside the VM:
 
 ```bash
@@ -73,7 +74,7 @@ cat /etc/hostname
 
 Both should print `web-srv1`.
 
-**Run the check** on the host terminal — `static-hostname` and
+**Run the check** in your own terminal — `static-hostname` and
 `transient-hostname` now pass.
 
 ---
@@ -93,8 +94,8 @@ Confirm it is exactly right:
 hostnamectl status --pretty
 ```
 
-Output must be exactly `Web Server 1 (Frankfurt)` — same capitalisation,
-same spacing, same parentheses.
+The output must be exactly `Web Server 1 (Frankfurt)`: the same capital
+letters, the same spacing and the same parentheses.
 
 **Run the check** — `pretty-hostname` now passes.
 
@@ -139,7 +140,7 @@ PASS  pretty-hostname
 PASS  hosts-entry
 ```
 
-Submit from the host terminal:
+Submit from your own terminal:
 
 ```bash
 astrona submit --git git@github.com:astrona-io/ATS003.git -c sections/section-010/module-02/labs/lab-01

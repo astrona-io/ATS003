@@ -1,36 +1,31 @@
 # Core Host Configuration (Addressing & Hostnames)
 
-Every system in your infrastructure must be uniquely identifiable. This portal coordinates the conceptual reading, guided training, and unguided challenge sandboxes for Layer 3 interface assignments, systemd hostname management, and local offline DNS resolution.
+Astronaut, before your ship can talk to anyone, it needs a call sign and a name. Every machine in your network must be clearly identifiable: it needs the right addresses on its network interfaces, a hostname that lasts, and a way to turn names into addresses.
 
----
+This section teaches those basics on a live Ubuntu 24.04 machine, from the terminal, the way the exam asks for them.
 
-## What You Will Master
+## What you will be able to do
 
-By completing this section, you will acquire three core capabilities:
-*   **Interface IP Allocation**: Query active links and configure static IPv4 and IPv6 addresses.
-*   **Identity Engineering**: Query, assign, and manage static, transient, and pretty hostnames using systemd-hostnamed.
-*   **Offline Resolution**: Control search priority order and set static loopback maps to eliminate name warnings.
+After this section you can:
 
----
+- **Read and set addresses.** List the interfaces on a machine, read their state, and add IPv4 and IPv6 addresses, both for now and so they survive a reboot.
+- **Manage hostnames.** Read and set the static, transient and pretty hostnames with `hostnamectl`.
+- **Find your public address.** Tell a private address from a public one, and ask an outside service which address the internet sees after NAT (network address translation).
+- **Resolve names locally.** Add entries to `/etc/hosts`, read the lookup order in `/etc/nsswitch.conf`, and test resolution with `getent`.
 
-## The Learning & Lab Path
+## The modules
 
-This section is divided into four focused textbook modules, followed by four dedicated guided sandboxes and one unguided capstone:
+Work through the modules in order. Each module has its own playground, a few short parts and a graded mission.
 
-### Theoretical Concepts & Metaphors
-*   **[Module 1: Understanding network interfaces and IPv4 & IPv6 Addressing](./module-01/course.md)**
-*   **[Module 2: Managing Linux Hostnames](./module-02/course.md)**
-*   **[Module 3: Discovering Your Public IP Address](./module-03/course.md)**
-*   **[Module 4: Local Hostname Resolution](./module-04/course.md)**
+1. [Network Interfaces and IPv4 & IPv6 Addressing](./module-01/course.md): interfaces, link state, IPv4 and IPv6 addresses, prefix lengths, the default gateway, and runtime against persistent configuration.
+2. [Managing Linux Hostnames](./module-02/course.md): the static, transient and pretty hostnames, and which ones survive a reboot.
+3. [Discovering Your Public IP Address](./module-03/course.md): private ranges, NAT, and asking an outside service for your public egress address.
+4. [Local Hostname Resolution](./module-04/course.md): `/etc/hosts`, the Name Service Switch, `getent`, and when to use DNS instead.
 
-### Guided Training Labs
-*   **[Hands-on Training Lab 1 (Addressing)](module-01/labs/lab-01)**
-*   **[Hands-on Training Lab 2 (Hostnames)](module-02/labs/lab-01)**
-*   **[Hands-on Training Lab 3 (Public IP NAT)](module-03/labs/lab-01)**
-*   **[Hands-on Training Lab 4 (Resolution)](module-04/labs/lab-01)**
+## Check your knowledge
 
-### Unguided Challenge Lab
-*   **[Hands-on Challenge Lab (Capstone)](capstone/labs/lab-01)**
+When you have finished the modules, take the [section knowledge check](./quiz.md): a short multiple-choice quiz on the whole section.
 
-## Ready for Assessment?
-*   **[Take the Section 010 Knowledge Check Quiz](./quiz.md)**
+## The capstone
+
+The section ends with one graded capstone mission, with no step-by-step guidance: the [Core Host Configurations Capstone Lab](./capstone/labs/lab-01/README.md). It brings addressing, persistent configuration and local name resolution together in one task.

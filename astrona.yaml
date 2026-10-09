@@ -39,11 +39,14 @@ modules:
         title: "Network Interfaces and IPv4 & IPv6 Addressing"
         path: sections/section-010/module-01/course.md
       - type: reading
-        title: "Question"
-        path: sections/section-010/module-01/labs/lab-01/question.md
+        title: "Antennas And Their State"
+        path: sections/section-010/module-01/course-01-antennas-and-their-state.md
       - type: reading
-        title: "Question"
-        path: sections/section-010/module-01/labs/lab-01/question.md
+        title: "Call Signs, Sectors And The Way Out"
+        path: sections/section-010/module-01/course-02-call-signs-sectors-and-the-way-out.md
+      - type: reading
+        title: "Runtime Changes And Persistent Configuration"
+        path: sections/section-010/module-01/course-03-runtime-and-persistent-configuration.md
       - type: reading
         title: "Question"
         path: sections/section-010/module-01/labs/lab-01/question.md
@@ -67,14 +70,17 @@ modules:
           - name: "hosts(5) manual page"
             url: https://man7.org/linux/man-pages/man5/hosts.5.html
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-010/module-01/course-04-wrap-up.md
+      - type: reading
         title: "Managing Linux Hostnames"
         path: sections/section-010/module-02/course.md
       - type: reading
-        title: "Question"
-        path: sections/section-010/module-02/labs/lab-01/question.md
+        title: "Three Names For One Ship"
+        path: sections/section-010/module-02/course-01-three-names-for-one-ship.md
       - type: reading
-        title: "Question"
-        path: sections/section-010/module-02/labs/lab-01/question.md
+        title: "Pretty Names, Transient Names And Reboots"
+        path: sections/section-010/module-02/course-02-pretty-transient-and-reboots.md
       - type: reading
         title: "Question"
         path: sections/section-010/module-02/labs/lab-01/question.md
@@ -96,14 +102,17 @@ modules:
           - name: "hosts(5) manual page"
             url: https://man7.org/linux/man-pages/man5/hosts.5.html
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-010/module-02/course-03-wrap-up.md
+      - type: reading
         title: "Discovering Your Public IP Address"
         path: sections/section-010/module-03/course.md
       - type: reading
-        title: "Question"
-        path: sections/section-010/module-03/labs/lab-01/question.md
+        title: "Private Call Signs And The Relay Station"
+        path: sections/section-010/module-03/course-01-private-addresses-and-nat.md
       - type: reading
-        title: "Question"
-        path: sections/section-010/module-03/labs/lab-01/question.md
+        title: "Ask The Galaxy What It Sees"
+        path: sections/section-010/module-03/course-02-ask-what-the-internet-sees.md
       - type: reading
         title: "Question"
         path: sections/section-010/module-03/labs/lab-01/question.md
@@ -127,14 +136,17 @@ modules:
           - name: "dig(1) manual page (Ubuntu 24.04)"
             url: https://manpages.ubuntu.com/manpages/noble/man1/dig.1.html
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-010/module-03/course-03-wrap-up.md
+      - type: reading
         title: "Local Hostname Resolution"
         path: sections/section-010/module-04/course.md
       - type: reading
-        title: "Question"
-        path: sections/section-010/module-04/labs/lab-01/question.md
+        title: "The Pocket Address Book"
+        path: sections/section-010/module-04/course-01-the-pocket-address-book.md
       - type: reading
-        title: "Question"
-        path: sections/section-010/module-04/labs/lab-01/question.md
+        title: "Write An Entry And Test It"
+        path: sections/section-010/module-04/course-02-write-an-entry-and-test-it.md
       - type: reading
         title: "Question"
         path: sections/section-010/module-04/labs/lab-01/question.md
@@ -158,14 +170,11 @@ modules:
           - name: "ip-address(8) manual page"
             url: https://man7.org/linux/man-pages/man8/ip-address.8.html
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-010/module-04/course-03-wrap-up.md
+      - type: reading
         title: "Section 010 Knowledge Check: Core Host Configuration"
         path: sections/section-010/quiz.md
-      - type: reading
-        title: "Question"
-        path: sections/section-010/capstone/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-010/capstone/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-010/capstone/labs/lab-01/question.md
@@ -379,6 +388,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-030/module-01/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-030/module-01/labs/lab-01/question.md
       - type: lab
         title: "Packet Filtering with nftables Lab"
         path: sections/section-030/module-01/labs/lab-01
@@ -422,6 +434,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-030/module-02/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-030/module-02/labs/lab-01/question.md
       - type: lab
         title: "firewalld Zones and Services Lab"
         path: sections/section-030/module-02/labs/lab-01
@@ -441,6 +456,9 @@ modules:
       - type: reading
         title: "Section 030 Knowledge Check: Packet Filtering"
         path: sections/section-030/quiz.md
+      - type: reading
+        title: "Question"
+        path: sections/section-030/capstone/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-030/capstone/labs/lab-01/question.md
@@ -491,6 +509,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-040/module-01/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-040/module-01/labs/lab-01/question.md
       - type: lab
         title: "NTP Client Time Synchronization Lab"
         path: sections/section-040/module-01/labs/lab-01
@@ -511,6 +532,9 @@ modules:
       - type: reading
         title: "NTP Server Mode and Stratums"
         path: sections/section-040/module-02/course.md
+      - type: reading
+        title: "Question"
+        path: sections/section-040/module-02/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-040/module-02/labs/lab-01/question.md
@@ -549,6 +573,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-040/module-03/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-040/module-03/labs/lab-01/question.md
       - type: lab
         title: "DNS Verification with dig Lab"
         path: sections/section-040/module-03/labs/lab-01
@@ -568,6 +595,9 @@ modules:
       - type: reading
         title: "Section 040 Knowledge Check: Time & Name Services"
         path: sections/section-040/quiz.md
+      - type: reading
+        title: "Question"
+        path: sections/section-040/capstone/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-040/capstone/labs/lab-01/question.md
@@ -761,6 +791,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-060/module-01/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-060/module-01/labs/lab-01/question.md
       - type: lab
         title: "Private And Public Address Audit Lab"
         path: sections/section-060/module-01/labs/lab-01
@@ -782,6 +815,9 @@ modules:
       - type: reading
         title: "Netplan YAML Configurations"
         path: sections/section-060/module-02/course.md
+      - type: reading
+        title: "Question"
+        path: sections/section-060/module-02/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-060/module-02/labs/lab-01/question.md
@@ -821,6 +857,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-060/module-03/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-060/module-03/labs/lab-01/question.md
       - type: lab
         title: "Active Socket Diagnostics (ss) Lab"
         path: sections/section-060/module-03/labs/lab-01
@@ -841,6 +880,9 @@ modules:
       - type: reading
         title: "Raw Packet Capturing (tcpdump)"
         path: sections/section-060/module-04/course.md
+      - type: reading
+        title: "Question"
+        path: sections/section-060/module-04/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-060/module-04/labs/lab-01/question.md
@@ -872,6 +914,9 @@ modules:
       - type: reading
         title: "Section 060 Knowledge Check: Persistence & Diagnostics"
         path: sections/section-060/quiz.md
+      - type: reading
+        title: "Question"
+        path: sections/section-060/capstone/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-060/capstone/labs/lab-01/question.md
