@@ -1,16 +1,22 @@
-# Part 1 — Netfilter and the packet path
+# Netfilter And The Packet Path
 
-> Prerequisite: the module landing page, [course.md](./course.md). Next: [Part 2 — Tables and address families](./course-02-tables-and-families.md).
+Astronaut, before you program the shields, you need to know where on the hull they stand. A rule that filters "incoming" traffic never sees a packet that is only passing through. A rule at the wrong priority runs after the address has already been rewritten.
 
-Before you can write a filtering rule that behaves the way you expect, you have to know *where* in the kernel it runs. A rule that filters "incoming" traffic never sees a forwarded packet. A rule at the wrong priority runs after the address has already been rewritten. This part is the map: the fixed points a packet passes through, the order it passes them in, and where an nftables chain inserts itself.
+This part is the map. It shows the fixed points a packet passes, the order it passes them in, and where an nftables chain plugs in.
 
 ## Netfilter is older and bigger than nftables
 
-**Netfilter** is a framework built into the Linux kernel network stack. At five fixed points on a packet's journey it stops and calls out to a list of registered **callbacks**, in priority order, and each callback returns a **verdict** — keep going, drop, steal, queue to userspace. That is the whole mechanism.
+nftables is not the shield generator itself. It is one of several tools that program it. This section explains what the generator does on its own, so the rest of the module makes sense.
 
-nftables is *one* user of that framework. So are the old `iptables` binaries (through a compatibility layer), the connection tracker, the NAT engine, and packet loggers. When you add an nftables base chain, you are registering one more callback on one of those five points.
+### The shield generator in the kernel
 
-> **Analogy — a mail sorting line.** Netfilter is the conveyor belt with five inspection stations bolted to it. nftables is one inspector you assign to a station. The belt runs whether or not anyone is standing at a station; an empty station just waves everything through.
+**Netfilter** is a framework built into the Linux kernel's network code. At five fixed points on a packet's journey, it stops and calls a list of registered **callbacks** (small pieces of code), in priority order. Each callback returns a **verdict**: keep going, drop, take the packet away, or queue it for a program outside the kernel. That is the whole mechanism.
+
+nftables is *one* user of that framework. So are the old `iptables` commands (through a compatibility layer), the connection tracker, the address-rewriting engine and packet loggers. When you add an nftables base chain, you register one more callback on one of those five points.
+
+Picture the generator as a ring of five checkpoints around the ship's hull. nftables is one guard you post at a checkpoint. Signals pass the checkpoints whether or not a guard stands there; an empty checkpoint simply waves everything through.
+
+### The five hooks
 
 The five points are called **hooks**. For IPv4 and IPv6 they are:
 
@@ -22,9 +28,15 @@ The five points are called **hooks**. For IPv4 and IPv6 they are:
 | `output` | a local process just sent it, before routing |
 | `postrouting` | it is about to leave on an interface, **after** all routing and address decisions |
 
-## The routing decision is what splits the paths
+## The routing decision splits the paths
 
-The kernel makes its **routing decision** once, right after `prerouting`: it looks at the destination address and answers one question — *is this packet for me, or for somewhere else?* That answer is what sends the packet down the `input` path or the `forward` path. Nothing you do in a `forward` chain can touch a packet bound for a local socket, and nothing in an `input` chain can touch transit traffic. Choosing the hook **is** choosing the traffic class.
+Which hook sees a packet depends on one decision the kernel makes early on. Learn this decision, and choosing the right hook becomes easy.
+
+### One question: for me, or for someone else?
+
+The kernel makes its **routing decision** once, right after `prerouting`. It looks at the destination address and answers one question: *is this packet for me, or for somewhere else?* That answer sends the packet down the `input` path or the `forward` path.
+
+Nothing in a `forward` chain can touch a packet bound for a local program, and nothing in an `input` chain can touch traffic that is only passing through. Choosing the hook **is** choosing the kind of traffic.
 
 ```text
                               +--> INPUT --> (local socket / process)
@@ -34,70 +46,101 @@ The kernel makes its **routing decision** once, right after `prerouting`: it loo
    (local process) --> OUTPUT --> [routing] --> POSTROUTING --> NIC (out)
 ```
 
-Read it as three routes:
+In the drawing, NIC means network interface card, one antenna on the ship's communications array. A socket is the open radio channel a program listens on.
 
-- **Inbound to this host:** `prerouting` → routing → `input` → delivered to a socket.
-- **Transit (this host is a router):** `prerouting` → routing → `forward` → `postrouting` → out. Needs `net.ipv4.ip_forward=1`; otherwise the packet is dropped after routing.
-- **Generated by this host:** socket → `output` → routing → `postrouting` → out. Replies your server sends to a client take this path, which is why locking down `input` without thinking about `output` still lets the box talk out.
+### The three routes
 
-For a plain server that only protects itself, **`input` is the hook that matters**. `forward` matters the moment the box routes for anything else (a container bridge, a VPN, a gateway).
+Read the drawing as three routes:
+
+- **Inbound to this host:** `prerouting`, then routing, then `input`, then delivery to a socket.
+- **Passing through (this host acts as a router):** `prerouting`, then routing, then `forward`, then `postrouting`, then out. This needs `net.ipv4.ip_forward=1`; without it, the kernel drops the packet after routing.
+- **Sent by this host:** socket, then `output`, then routing, then `postrouting`, then out. Replies your server sends to a client take this route. That is why locking down `input` without thinking about `output` still lets the machine talk out.
+
+For a plain server that only protects itself, **`input` is the hook that matters**. `forward` matters as soon as the machine routes traffic for others, for example for a container bridge, a virtual private network (VPN) or a gateway.
 
 ## Hooks run callbacks in priority order
 
-Several subsystems want the same hook. Connection tracking, NAT, your filter rules, and a packet logger might all be registered on `prerouting`. Netfilter runs them **lowest priority number first**. Priority is a **signed integer** — negative numbers run early, positive numbers run late — so a new subsystem can always slot in before or after an existing one.
+Several parts of the kernel want the same hook. Connection tracking, address rewriting, your filter rules and a packet logger might all sit on `prerouting`. This section shows how netfilter decides who goes first.
+
+### Priority is a signed number
+
+Netfilter runs the callbacks on a hook **lowest priority number first**. Priority is a **signed whole number**: negative numbers run early and positive numbers run late. So a new piece of the kernel can always slot in before or after an existing one.
 
 nftables gives the common priority values keyword names. You can write the number or the keyword; `nft` prints the keyword back.
 
-| Keyword | Number | What conventionally lives here |
+| Keyword | Number | What usually lives here |
 |---|---:|---|
-| `raw` | -300 | rules that opt packets **out** of connection tracking (`notrack`) |
-| `mangle` | -150 | early header edits (TTL, TOS, packet marks) |
-| `dstnat` | -100 | destination NAT / port forwarding (`prerouting` only) |
-| `filter` | 0 | ordinary accept/drop filtering — **the default for a filter chain** |
-| `security` | 50 | SELinux/`secmark` labelling |
-| `srcnat` | 100 | source NAT / masquerade (`postrouting` only) |
+| `raw` | -300 | rules that take packets **out** of connection tracking (`notrack`) |
+| `mangle` | -150 | early header edits (time to live, type of service, packet marks) |
+| `dstnat` | -100 | destination address rewriting and port forwarding (`prerouting` only) |
+| `filter` | 0 | ordinary accept and drop filtering, **the default for a filter chain** |
+| `security` | 50 | SELinux and `secmark` labels |
+| `srcnat` | 100 | source address rewriting and masquerade (`postrouting` only) |
 
-Connection tracking itself registers at priority **-200** on `prerouting` and `output` (and again near the end to confirm the connection). That is why it is safe to write `ct state` matches in a `filter` (0) chain: the tracker has already run and stamped the packet by the time your chain sees it.
+### Where connection tracking sits
 
-Two base chains on the *same* hook run in priority order and a terminal verdict in the earlier one wins — the later chain never sees that packet. Two chains at the *same* priority on the same hook is allowed but the order between them is unspecified; don't rely on it.
+Connection tracking, the shield's memory of conversations already in progress, registers at priority **-200** on `prerouting` and `output`, and again near the end to confirm the connection. So it is safe to write `ct state` matches in a `filter` (0) chain: the tracker has already run and stamped the packet by the time your chain sees it.
+
+Two base chains on the *same* hook run in priority order. A final verdict in the earlier chain wins, and the later chain never sees that packet. Two chains with the *same* priority on the same hook are allowed, but the order between them is not defined, so do not rely on it.
+
+## See a chain on a hook
+
+Now watch the routing decision at work on your playground. You put a counting rule on two different hooks and send the same traffic each time.
+
+### Count packets on the input hook
+
+<!-- astrona:playground:renew -->
+
+Create a table, put a chain on the `input` hook, add a rule that only counts, and send three pings to your own ship:
+
+```sh
+sudo nft add table inet demo
+sudo nft 'add chain inet demo watch { type filter hook input priority 0 ; policy accept ; }'
+sudo nft add rule inet demo watch counter
+ping -c 3 127.0.0.1 >/dev/null
+sudo nft list chain inet demo watch
+```
+
+The bare `counter` rule shows a packet count above zero:
+
+```text
+table inet demo {
+	chain watch {
+		type filter hook input priority filter; policy accept;
+		counter packets 6 bytes 504
+	}
+}
+```
+
+Every packet that the routing decision sent to `input` crossed your chain. `policy accept` and a rule with no verdict mean nothing was blocked; the chain only *watched*.
+
+### Count packets on the forward hook
+
+Now put the same counter on the `forward` hook and send the same pings:
+
+```sh
+sudo nft 'add chain inet demo transit { type filter hook forward priority 0 ; policy accept ; }'
+sudo nft add rule inet demo transit counter
+ping -c 3 127.0.0.1 >/dev/null
+sudo nft list chain inet demo transit
+```
+
+The `forward` chain's counter stays at **zero**. Loopback traffic (the ship's internal intercom) is meant for this host, so the kernel's routing decision sent it to `input` and never to `forward`.
+
+Clean up when you are done:
+
+```sh
+sudo nft delete table inet demo
+```
 
 > [!TIP]
-> **Try it — put a chain on a hook and watch traffic cross it**
->
-> ```sh
-> sudo nft add table inet demo
-> sudo nft 'add chain inet demo watch { type filter hook input priority 0 ; policy accept ; }'
-> sudo nft add rule inet demo watch counter
-> ping -c 3 127.0.0.1 >/dev/null
-> sudo nft list chain inet demo watch
-> ```
->
-> Expect the bare `counter` rule to show a non-zero packet count — every packet the routing decision classified as `input` crossed your chain:
->
-> ```text
-> table inet demo {
-> 	chain watch {
-> 		type filter hook input priority filter; policy accept;
-> 		counter packets 6 bytes 504
-> 	}
-> }
-> ```
->
-> `policy accept` and a rule with no verdict mean nothing was blocked — the chain only *observed*. Now change the hook and see the classification matter:
->
-> ```sh
-> sudo nft 'add chain inet demo transit { type filter hook forward priority 0 ; policy accept ; }'
-> sudo nft add rule inet demo transit counter
-> ping -c 3 127.0.0.1 >/dev/null
-> sudo nft list chain inet demo transit
-> ```
->
-> Expect the `forward` chain's counter to stay at **zero** — loopback traffic is destined for this host, so routing sent it to `input`, never `forward`. Clean up with `sudo nft delete table inet demo`.
+> When a rule "does nothing", first ask which hook the packet really passes. A bare `counter` rule on the chain answers that in seconds.
 
-> *A base chain only ever sees the traffic class its hook represents, and it runs at a fixed spot in a priority-ordered line of kernel callbacks. Pick the hook for the traffic, pick the priority for the ordering.*
+## Common pitfalls
 
-## Reference
+> [!WARNING]
+> - **Filtering passing-through traffic in `input`.** A packet for another host never reaches `input`. It goes through `forward`.
+> - **Locking down `input` and forgetting `output`.** Packets your own programs send take the `output` path, so an `input` rule never stops them.
+> - **Relying on two chains with the same priority.** Their order on a hook is not defined. Give them different priorities.
 
-- `man 7 nftables` — the "Address families" and "Chains" sections list every hook available per family and the standard priority names, in one page.
-- **netfilter.org packet-flow diagram** (`https://en.wikipedia.org/wiki/Netfilter#/media/File:Netfilter-packet-flow.svg`) — the canonical full-size picture of every hook, the routing decisions, and where conntrack and NAT sit. Worth pinning up while you learn.
-- `man 8 nft`, section "Chains" — the exact syntax for `type`, `hook`, `priority`, and `policy` when you create a base chain.
+> *A base chain only ever sees the kind of traffic its hook stands for, and it runs at a fixed spot in a priority-ordered line of kernel callbacks. Pick the hook for the traffic, and the priority for the order.*

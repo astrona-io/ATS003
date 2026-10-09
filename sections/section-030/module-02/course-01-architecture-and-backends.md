@@ -1,53 +1,71 @@
-# Part 1 — Architecture and the nftables backend
+# Architecture And The nftables Backend
 
-> Prerequisite: the module landing page, [course.md](./course.md). Next: [Part 2 — Zones](./course-02-zones.md).
+Astronaut, before zones and services make sense, it helps to see the machine they run on. firewalld is a long-running station on your ship, a console that only sends it requests, two configuration directories with different jobs, and, underneath it all, an ordinary nftables ruleset.
 
-Before the zone-and-service model makes sense, it helps to see the machine it runs on: a long-lived daemon, a command-line client that just talks to it, two configuration directories with different jobs, and — underneath all of it — an ordinary nftables ruleset like the one you built by hand in the previous module. This part draws that picture so the rest of the module is "which knob," not "what is this thing."
+This part draws that picture, so the rest of the module is about "which switch", not "what is this thing".
 
 ## The daemon and its clients
 
-**firewalld** is a `systemd` service (`firewalld.service`) that runs continuously. It holds the *current* firewall policy in memory and owns the kernel ruleset. You never edit the kernel ruleset directly — you ask the daemon to, and it recomputes and reloads.
+firewalld is not a command you run once. It is a service that keeps running and holds the firewall policy in memory. This section shows the service and the tools that talk to it.
 
-Clients talk to the daemon over **D-Bus**:
+### A station that is always staffed
+
+**firewalld** is a `systemd` service (`firewalld.service`), a station the ship's duty officer keeps staffed at all times. It holds the *current* firewall policy in memory and owns the kernel ruleset. You never edit the kernel ruleset directly: you ask the daemon to, and it works out the new rules and loads them.
+
+### The clients
+
+Clients talk to the daemon over **D-Bus**, the message bus programs on a Linux machine use to talk to each other:
 
 | Client | Use |
 |---|---|
-| `firewall-cmd` | the everyday command-line client — everything in this module |
-| `firewall-config` | a GTK graphical client |
-| `firewall-offline-cmd` | edits the on-disk config **while the daemon is stopped** (recovery, image building) |
-| `firewall-applet` | a tray indicator |
+| `firewall-cmd` | the everyday command-line client, used for everything in this module |
+| `firewall-config` | a graphical client |
+| `firewall-offline-cmd` | edits the configuration on disk **while the daemon is stopped** (recovery, building images) |
+| `firewall-applet` | a small icon for the desktop tray |
 
-Because the state lives in the daemon, `firewall-cmd` commands are requests, not file edits. That is what makes the runtime-versus-permanent split (Part 4) necessary: a request can change the *running* daemon state, the *on-disk* config, or both.
+Because the state lives in the daemon, `firewall-cmd` commands are requests, not file edits. That is why firewalld has a runtime and a permanent configuration: a request can change the *running* state, the *saved* configuration on disk, or both.
 
 ## Two configuration directories
 
-firewalld reads zone, service, and other definitions from two places, in this order:
+firewalld reads zone, service and other definitions from two places. Knowing which is which tells you where your changes land and which files never to touch.
+
+### Stock files and your files
 
 | Directory | Contains | Do you edit it? |
 |---|---|---|
-| `/usr/lib/firewalld/` | the **stock** definitions shipped by the package — every built-in zone and the ~100 predefined services | **No.** A package update overwrites it. |
-| `/etc/firewalld/` | your **local** additions and overrides | Yes — directly, or (better) via `firewall-cmd --permanent` |
+| `/usr/lib/firewalld/` | the **stock** definitions shipped with the package: every built-in zone and about 100 ready-made services | **No.** A package update overwrites it. |
+| `/etc/firewalld/` | your **local** additions and changes | Yes, directly or (better) with `firewall-cmd --permanent` |
 
-A file in `/etc/firewalld/` with the same name as one in `/usr/lib/firewalld/` **replaces** it. This is how you customise a built-in zone: firewalld copies it to `/etc/firewalld/zones/` the first time you change it permanently, and edits the copy.
+A file in `/etc/firewalld/` with the same name as one in `/usr/lib/firewalld/` **replaces** it. This is how you change a built-in zone: firewalld copies it to `/etc/firewalld/zones/` the first time you change it permanently, and edits the copy.
 
-Each definition is a small XML file. A zone is `/etc/firewalld/zones/<name>.xml`; a service is `/etc/firewalld/services/<name>.xml`. You rarely write these by hand — `firewall-cmd --permanent` does — but knowing where they live makes "did my permanent change actually land" answerable with `ls` and `cat`.
+### What the files look like
 
-## What "dynamic" actually means
+Each definition is a small XML file. XML is a text format of nested tags. A zone is `/etc/firewalld/zones/<name>.xml`; a service is `/etc/firewalld/services/<name>.xml`. You rarely write these by hand, because `firewall-cmd --permanent` does it for you. But knowing where they live lets you answer "did my permanent change really land?" with `ls` and `cat`.
 
-The predecessor pattern (the old `iptables` init script) applied a firewall by **flushing every rule and re-adding the whole set**. During that flush the box was briefly unprotected, and every existing connection's conntrack state that depended on a rule was disrupted.
+## What "dynamic" really means
 
-firewalld is **dynamic**: when you change one zone, it computes the delta and splices only the changed rules into the live ruleset. Nothing is flushed, established connections are undisturbed, and there is no unprotected window. This is why you can safely `--add-service=https` on a production box in the middle of the day.
+The older way to manage a firewall had a weak moment every time it changed. firewalld removes that moment. This section explains how, and the two reload commands.
 
-Two reload levels:
+### Changes without a gap
 
-- `firewall-cmd --reload` — re-read the permanent config and apply it, **keeping** connection-tracking state. The normal reload.
-- `firewall-cmd --complete-reload` — tear down everything including conntrack state. For when the ruleset is wedged; it *will* break active connections.
+The older pattern, the `iptables` start-up script, applied a firewall by **flushing every rule and adding the whole set again**. During that flush the machine was briefly unprotected, and every connection whose tracking depended on a rule was disturbed.
 
-## Underneath: it is just nftables
+firewalld is **dynamic**. When you change one zone, it works out the difference and splices only the changed rules into the live ruleset. Nothing is flushed, connections in progress are not disturbed, and there is no unprotected gap. That is why you can safely run `--add-service=https` on a production machine in the middle of the day.
 
-firewalld does not filter packets itself. It compiles your zones, services, ports, and rich rules into **nftables** rules and loads them into a single table it owns: `table inet firewalld`. On older systems (or when `FirewallBackend=iptables` is set in `/etc/firewalld/firewalld.conf`) it emits `iptables` rules instead, but `nftables` is the default on every current distribution.
+### Two reload levels
 
-The generated table has a predictable chain layout:
+- `firewall-cmd --reload` reads the permanent configuration again and applies it, **keeping** the connection tracking state, the shield's memory of conversations in progress. This is the normal reload.
+- `firewall-cmd --complete-reload` tears everything down, including the connection tracking state. Use it only when the ruleset is stuck: it *will* break connections in progress.
+
+## Underneath, it is just nftables
+
+firewalld does not filter packets itself. It writes your zones, services, ports and rich rules as **nftables** rules, the kernel's own shield program, into one table it owns: `table inet firewalld`.
+
+On older systems, or when `FirewallBackend=iptables` is set in `/etc/firewalld/firewalld.conf`, it writes `iptables` rules instead. `nftables` is the default on every current distribution.
+
+### The table firewalld writes
+
+The table has a predictable layout of chains (checkpoints):
 
 ```text
 table inet firewalld {
@@ -63,48 +81,53 @@ table inet firewalld {
 }
 ```
 
-Note the priority: `filter + 10` (i.e. 10), so firewalld's base chain runs *after* a plain `priority 0` chain. The `filter_INPUT_ZONES` chain is where a packet is matched to its zone (Part 2) and sent to that zone's chain.
+Note the priority: `filter + 10`, that is 10. So firewalld's base chain runs *after* a plain `priority 0` chain. The `filter_INPUT_ZONES` chain is where a packet is matched to its zone and sent on to that zone's chain.
 
-> [!TIP]
-> **Try it — find firewalld's rules in the nftables ruleset**
->
-> ```sh
-> sudo nft list table inet firewalld | head -n 30
-> ```
->
-> Expect a large table with per-zone chains:
->
-> ```text
-> table inet firewalld {
-> 	chain filter_INPUT {
-> 		type filter hook input priority filter + 10; policy accept;
-> 		...
-> 		jump filter_INPUT_ZONES
-> 	}
-> 	chain filter_IN_public {
-> 		...
-> 	}
-> }
-> ```
->
-> Every `firewall-cmd` change you make in the rest of this module shows up as edits inside this table. `firewall-cmd` is a rule *generator*; the kernel firewall is still nftables.
+### Find firewalld's rules in the ruleset
 
-## Other front ends own the same ruleset
+<!-- astrona:playground:renew -->
 
-firewalld is not the only thing that wants to own nftables:
+List the first lines of firewalld's table on your playground:
 
-- `ufw` (Debian/Ubuntu) — a different front end with the same job.
-- **NetworkManager** — can assign a zone per connection, feeding firewalld.
-- **Docker / Podman / Kubernetes** — insert their own NAT and filter rules.
-- A cloud provider's **security groups** — filter *before* the packet reaches your host at all.
+```sh
+sudo nft list table inet firewalld | head -n 30
+```
 
-Because firewalld rewrites `table inet firewalld` on every reload, `nft` rules you add by hand in your own table still exist but can be evaluated in an order you did not intend, and firewalld will not know about them. On a firewalld host, manage the firewall with `firewall-cmd`.
+You see a large table with one chain per zone:
 
-> *firewalld is a daemon that compiles zones and services into an nftables table called `table inet firewalld`; `firewall-cmd` only sends it requests. "Dynamic" means changes splice in without a flush, so live connections survive.*
+```text
+table inet firewalld {
+	chain filter_INPUT {
+		type filter hook input priority filter + 10; policy accept;
+		...
+		jump filter_INPUT_ZONES
+	}
+	chain filter_IN_public {
+		...
+	}
+}
+```
 
-## Reference
+(The listing is shortened: the dots stand for lines left out.)
 
-- `man 1 firewall-cmd` — the client; skim the "OPTIONS" groups once to see the shape of the whole tool.
-- `man 5 firewalld.conf` — `DefaultZone`, `FirewallBackend`, `CleanupOnExit`, and other daemon-wide settings.
-- `man 5 firewalld.zone` and `man 5 firewalld.service` — the XML schema for the files in `/etc/firewalld/`.
-- **firewalld.org documentation** (`https://firewalld.org/documentation/`) — concept pages for the daemon, D-Bus API, and backends.
+Every `firewall-cmd` change you make shows up as edits inside this table. `firewall-cmd` writes rules; the kernel firewall is still nftables.
+
+## Other tools own the same ruleset
+
+firewalld is not the only thing that wants to manage nftables. Knowing the others helps you spot a clash:
+
+- `ufw` (Debian and Ubuntu) is a different front end with the same job.
+- **NetworkManager**, a service that manages the network antennas, can assign a zone per connection and pass it to firewalld.
+- **Docker, Podman and Kubernetes** add their own address translation and filter rules.
+- A cloud provider's **security groups** filter *before* the packet even reaches your host.
+
+Because firewalld rewrites `table inet firewalld` on every reload, `nft` rules you add by hand in your own table still exist, but they can be checked in an order you did not intend, they can be bypassed or overridden, and firewalld does not know about them. **On a firewalld host, change the firewall with `firewall-cmd`, not `nft`.**
+
+## Common pitfalls
+
+> [!WARNING]
+> - **Editing files under `/usr/lib/firewalld/`.** A package update overwrites them. Your changes belong in `/etc/firewalld/`.
+> - **Using `--complete-reload` as a normal reload.** It drops the connection tracking state and breaks connections in progress. Use `--reload`.
+> - **Editing `nft` rules on a firewalld host.** firewalld rewrites its table on every reload and does not know about your rules. Use `firewall-cmd`.
+
+> *firewalld is a daemon that turns zones and services into an nftables table called `table inet firewalld`; `firewall-cmd` only sends it requests. "Dynamic" means changes splice in without a flush, so live connections survive.*

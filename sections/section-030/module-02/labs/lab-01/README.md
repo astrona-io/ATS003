@@ -1,15 +1,27 @@
-# section-030 / module-02: firewalld Zones and Services (Guided Practice)
+# firewalld Zones and Services Lab
 
-This is a **guided training lab** designed to walk you step-by-step through configuration and diagnostic actions.
+A graded mission on one training ship (an Ubuntu 24.04 virtual machine) running firewalld. You open one service and one port in the `public` zone, and make both changes live now and saved for after a reload.
 
-## Start the Sandbox VM
-To spin up this practice sandbox in your host terminal, run:
+## Start the mission
+
+Run this in your own terminal:
+
 ```bash
 astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-030/module-02/labs/lab-01
 ```
 
-## Learning Path & Objectives
-This training sandbox maps directly to the step-by-step guided instructions inside:
-**[Section 030, Module 02](../../course.md)**
+Open a terminal on the lab machine with `astrona ssh ats-003-lab-032`, and read the task in [question.md](./question.md).
 
-Once completed, you can run the validation scripts inside the VM to test your work.
+## Grade and clean up
+
+When you think you are done, send it for grading from your own terminal:
+
+```bash
+astrona submit -c sections/section-030/module-02/labs/lab-01
+```
+
+Then remove the lab. The command takes its name, not its folder path:
+
+```bash
+astrona destroy ats-003-lab-032
+```

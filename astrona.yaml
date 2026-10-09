@@ -362,38 +362,20 @@ modules:
         title: "Packet Filtering with nftables"
         path: sections/section-030/module-01/course.md
       - type: reading
-        title: "Part 1 — Netfilter and the packet path"
+        title: "Netfilter And The Packet Path"
         path: sections/section-030/module-01/course-01-netfilter-and-packet-flow.md
       - type: reading
-        title: "Part 2 — Tables and address families"
+        title: "Tables And Address Families"
         path: sections/section-030/module-01/course-02-tables-and-families.md
       - type: reading
-        title: "Part 3 — Chains, hooks, priority, and policy"
+        title: "Chains, Hooks, Priority And Policy"
         path: sections/section-030/module-01/course-03-chains-hooks-priority.md
       - type: reading
-        title: "Part 4 — Rules: matches and verdicts"
+        title: "Rules: Matches And Verdicts"
         path: sections/section-030/module-01/course-04-rules-matches-verdicts.md
       - type: reading
-        title: "Part 5 — Connection tracking, sets, and maps"
-        path: sections/section-030/module-01/course-05-conntrack-sets-maps.md
-      - type: reading
-        title: "Part 6 — Persistence and operating a ruleset"
-        path: sections/section-030/module-01/course-06-persistence-and-operations.md
-      - type: reading
-        title: "Question"
-        path: sections/section-030/module-01/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-030/module-01/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-030/module-01/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-030/module-01/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-030/module-01/labs/lab-01/question.md
+        title: "Rule Order, Handles And Redirects"
+        path: sections/section-030/module-01/course-05-rule-order-handles-redirects.md
       - type: reading
         title: "Question"
         path: sections/section-030/module-01/labs/lab-01/question.md
@@ -417,35 +399,32 @@ modules:
           - name: "nft(8) manual page (Ubuntu 24.04)"
             url: https://manpages.ubuntu.com/manpages/noble/man8/nft.8.html
       - type: reading
+        title: "Connection Tracking"
+        path: sections/section-030/module-01/course-06-connection-tracking.md
+      - type: reading
+        title: "Sets And Maps"
+        path: sections/section-030/module-01/course-07-sets-and-maps.md
+      - type: reading
+        title: "Persistence And Operating A Ruleset"
+        path: sections/section-030/module-01/course-08-persistence-and-operations.md
+      - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-030/module-01/course-09-wrap-up.md
+      - type: reading
         title: "firewalld Zones and Services"
         path: sections/section-030/module-02/course.md
       - type: reading
-        title: "Part 1 — Architecture and the nftables backend"
+        title: "Architecture And The nftables Backend"
         path: sections/section-030/module-02/course-01-architecture-and-backends.md
       - type: reading
-        title: "Part 2 — Zones"
+        title: "Zones"
         path: sections/section-030/module-02/course-02-zones.md
       - type: reading
-        title: "Part 3 — Services, ports, and rich rules"
+        title: "Services, Ports And Rich Rules"
         path: sections/section-030/module-02/course-03-services-ports-richrules.md
       - type: reading
-        title: "Part 4 — Runtime, permanent, and operations"
+        title: "Runtime, Permanent And Operations"
         path: sections/section-030/module-02/course-04-runtime-permanent-operations.md
-      - type: reading
-        title: "Question"
-        path: sections/section-030/module-02/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-030/module-02/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-030/module-02/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-030/module-02/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-030/module-02/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-030/module-02/labs/lab-01/question.md
@@ -466,23 +445,11 @@ modules:
           - name: "firewalld zones"
             url: https://firewalld.org/documentation/zone/
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-030/module-02/course-05-wrap-up.md
+      - type: reading
         title: "Section 030 Knowledge Check: Packet Filtering"
         path: sections/section-030/quiz.md
-      - type: reading
-        title: "Question"
-        path: sections/section-030/capstone/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-030/capstone/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-030/capstone/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-030/capstone/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-030/capstone/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-030/capstone/labs/lab-01/question.md

@@ -1,46 +1,28 @@
 # Section 030: Network Security & Packet Filtering (Firewalls)
 
-Host-level packet security is a critical administration responsibility. This portal coordinates the conceptual reading, guided training, and unguided challenge sandboxes for nftables hierarchy, ruleset filters, firewalld zones, and service abstractions.
+Astronaut, every ship needs shields. In this section you learn to program the Linux host firewall: the kernel's shield generator, netfilter, and the two consoles that control it. First you write the rules by hand with nftables, then you manage the same protection through firewalld zones and services.
 
----
+## What you will be able to do
 
-## What You Will Master
+After this section you can:
 
-By completing this section, you will acquire three core capabilities:
-*   **Nftables Ruleset Architecture**: Build custom IPv4 packet-filtering tables and base ingress chains.
-*   **Service & Port Overrides**: Deny targeted port queries and enforce workstation-only source access controls.
-*   **Firewalld Zones Segmentation**: Bind system adapters to logical trust zones (public, internal, dmz) and reload states dynamically.
+- Build nftables tables, base chains and rules from an empty ruleset, and put each chain on the right hook.
+- Drop a port, allow a port from one source only, block outgoing traffic to one host, and redirect one port to another.
+- Keep a ruleset after a reboot with `/etc/nftables.conf` and `nftables.service`.
+- Read and change firewalld zones, open services and ports, and write rich rules.
+- Make every firewalld change both live now and saved for after a reload.
 
----
+## The modules
 
-## The Learning & Lab Path
+Each module has a short landing page and a few parts. Read the landing page first, then the parts in order. Each module has its own playground and a graded mission.
 
-### 1. Theoretical Concepts & Metaphors
+1. [Packet Filtering with nftables](./module-01/course.md): the packet path, tables, chains, rules, rule order, port redirects, connection tracking, sets and maps, and persistence.
+2. [firewalld Zones and Services](./module-02/course.md): the firewalld daemon, zones, services and rich rules, and the runtime and permanent split.
 
-Each module has a short landing page and a set of ordered deep-dive parts. Read the landing page first, then the parts in order.
+## Check your knowledge
 
-*   **[Module 1: Packet Filtering with nftables](./module-01/course.md)**
-    1.  [Netfilter and the packet path](./module-01/course-01-netfilter-and-packet-flow.md)
-    2.  [Tables and address families](./module-01/course-02-tables-and-families.md)
-    3.  [Chains, hooks, priority, and policy](./module-01/course-03-chains-hooks-priority.md)
-    4.  [Rules: matches and verdicts](./module-01/course-04-rules-matches-verdicts.md)
-    5.  [Connection tracking, sets, and maps](./module-01/course-05-conntrack-sets-maps.md)
-    6.  [Persistence and operating a ruleset](./module-01/course-06-persistence-and-operations.md)
-*   **[Module 2: firewalld Zones and Services](./module-02/course.md)**
-    1.  [Architecture and the nftables backend](./module-02/course-01-architecture-and-backends.md)
-    2.  [Zones](./module-02/course-02-zones.md)
-    3.  [Services, ports, and rich rules](./module-02/course-03-services-ports-richrules.md)
-    4.  [Runtime, permanent, and operations](./module-02/course-04-runtime-permanent-operations.md)
+When you have finished both modules, take the [Section 030 knowledge check](./quiz.md): short scenario questions on nftables and firewalld.
 
-### 2. Guided Training Labs
-*   **Hands-on Training Lab 1 (nftables):** **[section-030/module-01](module-01/labs/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-030/module-01/labs/lab-01")
-*   **Hands-on Training Lab 2 (firewalld):** **[section-030/module-02](module-02/labs/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-030/module-02/labs/lab-01")
+## The capstone
 
-### 3. Unguided Challenge Lab
-*   **Hands-on Challenge Lab (Capstone):** **[section-030/capstone](capstone/labs/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-030/capstone/labs/lab-01")
-
----
-
-## Ready for Assessment?
-
-*   **[Take the Section 030 Knowledge Check Quiz](./quiz.md)**
+The section ends with one graded capstone mission with no step-by-step help: build a complete nftables policy on an empty ruleset, with a dropped port, a port redirect, a source-limited port and an outgoing block. Its task is in the [capstone question](./capstone/labs/lab-01/question.md).
