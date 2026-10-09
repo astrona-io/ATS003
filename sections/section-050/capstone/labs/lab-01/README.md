@@ -1,20 +1,29 @@
-# section-050 / capstone: Application Proxy and SSH Capstone
+# Application Proxy and SSH Capstone Lab
 
-This is the **unguid challenge lab** that serves as the section capstone assessment.
+The capstone mission for this section, with no step-by-step guidance. NGINX must proxy every path on one port to a fixed page of an existing app, and balance requests over two existing apps on another port, while the apps stay untouched.
 
-## Start the Sandbox VM
-To spin up this certification challenge sandbox in your host terminal, run:
-```bash
-astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-050/capstone/labs/lab-01
+## Run the mission
+
+Start the training ship from your own terminal:
+
+```sh
+astrona run --git ssh://git@github.com/astrona-io/ATS003.git -c sections/section-050/capstone/labs/lab-01
 ```
 
-## Learning Path & Objectives
-This challenge lab tests the integrated concepts learned across all modules in Section 050. Open the prompt file inside the VM to read the scenario goals:
-```bash
-cat question.md
+Open a shell on it:
+
+```sh
+astrona ssh ats-003-lab-050
 ```
 
-Implement your changes, and run the validation scripts inside the VM to verify your solutions:
-```bash
-/usr/local/bin/validate-*.sh
+Read the task in [`question.md`](./question.md) and solve it on the training ship. Then send it for grading from your own terminal, not from inside the ship:
+
+```sh
+astrona submit -c sections/section-050/capstone/labs/lab-01
+```
+
+When you are done, remove the training ship. The command takes the lab's name, not its folder path:
+
+```sh
+astrona destroy ats-003-lab-050
 ```

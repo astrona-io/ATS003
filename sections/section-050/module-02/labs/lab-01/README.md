@@ -1,15 +1,29 @@
-# section-050 / module-02: Nginx Upstream Load Balancers (Guided Practice)
+# Nginx Upstream Load Balancers Lab
 
-This is a **guided training lab** designed to walk you step-by-step through configuration and diagnostic actions.
+A graded mission for the Nginx Load Balancers module. You build an `upstream` pool over two existing apps on one port, and a proxy to a fixed page of one app on another port, without changing the apps.
 
-## Start the Sandbox VM
-To spin up this practice sandbox in your host terminal, run:
-```bash
-astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-050/module-02/labs/lab-01
+## Run the mission
+
+Start the training ship from your own terminal:
+
+```sh
+astrona run --git ssh://git@github.com/astrona-io/ATS003.git -c sections/section-050/module-02/labs/lab-01
 ```
 
-## Learning Path & Objectives
-This training sandbox maps directly to the step-by-step guided instructions inside:
-**[Section 050, Module 02](../../course.md)**
+Open a shell on it:
 
-Once completed, you can run the validation scripts inside the VM to test your work.
+```sh
+astrona ssh ats-003-lab-052
+```
+
+Read the task in [`question.md`](./question.md) and solve it on the training ship. Then send it for grading from your own terminal, not from inside the ship:
+
+```sh
+astrona submit -c sections/section-050/module-02/labs/lab-01
+```
+
+When you are done, remove the training ship. The command takes the lab's name, not its folder path:
+
+```sh
+astrona destroy ats-003-lab-052
+```

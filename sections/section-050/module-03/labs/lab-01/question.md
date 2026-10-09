@@ -4,25 +4,18 @@ Solve this question on: `terminal`
 
 ## Scenario
 
-`sshd` is running with a deliberately loose baseline:
-`PasswordAuthentication yes` and `X11Forwarding yes`, no `Match` blocks.
-Two local users exist — `elena` and `victor` — each with a password equal
-to their username and no SSH keys. Harden the daemon as follows, without
-locking out the key-based admin account.
+Astronaut, the airlock guard of this training ship, `sshd` (the OpenSSH server), runs with loose standing orders on purpose: `PasswordAuthentication yes` and `X11Forwarding yes`, and no `Match` blocks. Two local users exist, `elena` and `victor`. Each one has a password equal to their user name, and neither has an SSH key.
+
+Harden `sshd` as described below. Do not lock out the administrator account you are using: it logs in with a key.
 
 ## Tasks
 
-1. **Disable X11 forwarding globally.** `sshd -T` must report
-   `x11forwarding no`.
+1. **Turn off X11 forwarding for everyone.** `sudo sshd -T` must report `x11forwarding no`.
 
-2. **Password auth: only `elena`.** The effective config must resolve to
-   `passwordauthentication yes` for `elena` and `passwordauthentication no`
-   for `victor` (check with `sshd -T -C user=<name>,host=<hostname>,addr=127.0.0.1`).
-   Use a global `no` plus a `Match User elena` exception.
+2. **Password login for `elena` only.** The effective configuration must resolve to `passwordauthentication yes` for `elena` and `passwordauthentication no` for `victor`. Check it with `sudo sshd -T -C user=<name>,host=<hostname>,addr=127.0.0.1`. Use a global `no` plus a `Match User elena` exception.
 
-3. **Login banner for both users.** Create the file `/etc/ssh/sshd-banner`
-   (any text), and configure `sshd` so the effective `banner` value for
-   both `elena` and `victor` is `/etc/ssh/sshd-banner`.
+3. **A login banner for both users.** Create the file `/etc/ssh/sshd-banner` (any text). Configure `sshd` so that the effective `banner` value for both `elena` and `victor` is `/etc/ssh/sshd-banner`.
 
-4. **Working end state.** `sshd`/`ssh` stays active; a real password SSH
-   login as `elena` succeeds, and one as `victor` is rejected.
+4. **A working end state.** The `ssh` service (or `sshd`) stays active. A real password login over SSH as `elena` succeeds, and one as `victor` is rejected.
+
+The grader reads the effective values with `sshd -T` and `sshd -T -C`, and tries real password logins as `elena` and `victor` on `localhost`.
