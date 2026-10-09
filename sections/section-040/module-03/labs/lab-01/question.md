@@ -1,6 +1,6 @@
 # Question
 
-Solve this question on: `terminal`
+Solve this question on: `client`
 
 ## Scenario
 
