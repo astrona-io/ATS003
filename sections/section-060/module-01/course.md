@@ -1,274 +1,50 @@
 # Persistent Network Managers
 
-<!-- astrona:playground -->
-> [!NOTE]
-> 🧪 **Hands-on playground for this module** — a clean, throwaway machine to explore on. No task, no grading. Folder: [`playground/`](https://github.com/astrona-io/ATS003/tree/main/sections/section-060/module-01/playground)
->
-> ```sh
-> astrona run --git ssh://git@github.com/astrona-io/ATS003.git -c sections/section-060/module-01/playground
-> astrona destroy networkmanager-nmcli-playground
-> ```
+Astronaut, every address you set with `ip addr add` or `ip route add` is chalked on the console. It works right now, but the next restart wipes it clean. To make a setting stick, someone has to write it into the flight manual and read it back at every start-up.
 
-Addresses and routes set with `ip addr add` or `ip route add` live only in the running kernel — a reboot wipes them. To make network configuration **stick**, it has to be written to disk by a system that reapplies it on every boot. The common ones on Linux are **NetworkManager**, **systemd-networkd**, **netplan** (an Ubuntu front end that renders to one of the other two), and the older **ifupdown**. Exactly one should own any given interface.
-
-This module is about **NetworkManager**, driven from the command line with **`nmcli`**. Its core idea is a separation:
-
-- A **device** is an interface the kernel has — `enp1s0`, `wlan0`, `bond0`. NetworkManager does not store settings on the device.
-- A **connection** (or connection *profile*) is a named bundle of settings — addressing, DNS, routes, which device it binds to, whether to activate automatically. Profiles are what you create, edit, and save.
-
-One device can have several profiles on file — a static one for the office, a DHCP one for elsewhere — with one **active** at a time. Bringing a profile "up" applies its settings to its device.
+On Linux that someone is a network manager. This module is about **NetworkManager**, driven from the command line with **`nmcli`**. Think of NetworkManager as a communications officer: it reads saved orders from disk and sets each antenna (network interface) to match them, at every boot.
 
 ## Learning objectives
 
 After this module you can:
 
-- Explain why `ip addr` / `ip route` changes do not persist, and which system makes them persistent.
-- Describe NetworkManager's split between devices and connection profiles, and read `nmcli device status` and `nmcli connection show`.
+- Explain why `ip addr` and `ip route` changes do not survive a reboot, and which system makes them persistent.
+- Describe the split in NetworkManager between devices and connection profiles, and read `nmcli device status` and `nmcli connection show`.
 - Create a static connection profile with `nmcli connection add` and activate it with `nmcli connection up`.
-- Modify a profile's addressing, DNS, and autoconnect with `nmcli connection modify`, and explain why a reactivation is needed.
-- Locate a profile's keyfile under `/etc/NetworkManager/system-connections/` and reload it after a hand edit.
-- Explain `managed` versus `unmanaged` devices and why only one tool should own an interface.
+- Change a profile's addressing, DNS (Domain Name System, the galaxy-wide directory of call signs) servers and autoconnect with `nmcli connection modify`, and explain why the profile must be activated again.
+- Find a profile's keyfile under `/etc/NetworkManager/system-connections/` and reload it after a hand edit.
+- Explain `managed` and `unmanaged` devices, and why only one tool should own an interface.
 
 ## Before you start
 
-This module builds on the interfaces, addressing, and DNS material — interface names, CIDR notation (`192.168.120.50/24`), default gateway, and DNS resolver are used without re-explaining. You should be able to open a shell, use `sudo`, and read an INI-style file.
+Every mission starts with a pre-flight check. Make sure you know the basics below and know what waits in your playground before you open the first part.
 
-Open a shell on the playground VM with `astrona ssh astro-networkmanager-nmcli-playground`. NetworkManager is installed but **restricted to one spare NIC** on the isolated `192.168.120.0/24` segment. That segment has **no DHCP server and no router**. The interface carrying your SSH session is left `unmanaged` by NetworkManager, so every `nmcli` command below is safe. The spare NIC has **no profile yet** — find its name with `ip -br link` or `nmcli device status` (it is the one shown `disconnected`, not `unmanaged`). `sudo` needs no password.
+### What you should already know
 
-## Where this fits
+- **Addresses and prefixes.** An interface name such as `enp2s0`, an address with its prefix length such as `192.168.120.50/24`, what a default gateway is, and what a DNS server does.
+- **The shell.** You can open a shell, use `sudo`, and read a simple INI-style file (sections in `[brackets]`, then `key=value` lines).
 
-This is the persistent layer beneath everything from the interfaces, addressing, routing, and DNS modules — the same `inet` addresses, prefixes, gateways, and resolvers, now written to a keyfile instead of typed into `ip`. `nmcli` is one way in; `nmtui` (a text UI), editing `.nmconnection` files plus `nmcli connection reload`, and configuration-management tools (Ansible's `nmcli` module) are others, all driving the same profiles. On Ubuntu, netplan may be the front end and can be told to use NetworkManager as its renderer; on a NetworkManager-managed host, `nmcli` writes DNS into `/etc/resolv.conf` or hands it to `systemd-resolved`, tying back to the local-resolution module.
+### What is in your playground
 
-## Reading `nmcli`
+Your playground is one training ship: an Ubuntu 24.04 virtual machine. Open a shell on it with `astrona ssh networkmanager-nmcli-playground`.
 
-`nmcli` (NetworkManager command-line interface) is organised by **object**, then a command on it:
+- **NetworkManager** is installed and running, but a rule in `/etc/NetworkManager/conf.d/10-managed.conf` lets it manage **only one spare interface**. That interface sits on the isolated `192.168.120.0/24` segment.
+- The spare interface has **no connection profile yet**. Building one is your job. Find its name with `ip -br link` or `nmcli device status`: it is the one shown as `disconnected`, not `unmanaged`.
+- The **management interface** carries your SSH (Secure Shell, a sealed communications channel between two ships) session. NetworkManager leaves it `unmanaged`, so no `nmcli` command in this module can cut you off.
+- The segment has **no DHCP (Dynamic Host Configuration Protocol, the harbour master who hands out call signs) server and no router**. Static (`manual`) addressing is the realistic case here.
+- `nmcli`, `nmtui` and `ip` are installed, and `sudo` needs no password.
 
-| Object | What it is | Common commands |
-|---|---|---|
-| `nmcli device` | interfaces the kernel has | `status`, `show`, `connect`, `disconnect`, `reapply` |
-| `nmcli connection` | saved profiles | `show`, `add`, `modify`, `up`, `down`, `delete`, `reload` |
-| `nmcli general` / `nmcli networking` | daemon and global state | `status`, `on`, `off` |
+Launch your playground now, and keep it running next to you while you read the parts:
 
-Memory hook: **device** is what the kernel has right now; **connection** is what you saved to disk. `show` / `status` read; `add` / `modify` / `up` / `down` / `delete` change and need `sudo`. Most objects also take a short alias (`nmcli dev`, `nmcli con` or `nmcli c`).
+<!-- astrona:playground -->
 
-## Devices and connections
+## The parts of this module
 
-The first thing to look at is which devices NetworkManager can see and what state they are in — `connected`, `disconnected` (managed but no active profile), `unavailable`, or `unmanaged`.
+1. [Devices And Connection Profiles](./course-01-devices-and-profiles.md): why runtime settings vanish, and how NetworkManager splits devices from profiles.
+2. [Create A Static Profile](./course-02-create-a-static-profile.md): build a profile with `nmcli`, activate it, and read its keyfile on disk.
+3. [Change, Reactivate And Keep A Profile](./course-03-change-and-reactivate.md): modify a profile, switch methods, control autoconnect, survive a reboot and spot a second manager.
+4. [Wrap-Up: Mission Debrief](./course-04-wrap-up.md): what you learned, your mission, a self-check and cleanup.
 
-> [!TIP]
-> **Try it — what NetworkManager is managing**
->
-> ```sh
-> nmcli device status
-> nmcli connection show
-> ```
->
-> Expect the spare NIC managed with no profile, and the SSH NIC untouched:
->
-> ```text
-> DEVICE  TYPE      STATE         CONNECTION
-> enp1s0  ethernet  unmanaged     --
-> enp2s0  ethernet  disconnected  --
-> lo      loopback  unmanaged     --
->
-> NAME  UUID  TYPE  DEVICE
-> ```
->
-> `enp1s0` (your SSH interface) is `unmanaged` — NetworkManager will not touch it. `enp2s0` is `disconnected`: managed, but with no connection profile, so it has no address. `nmcli connection show` is empty because nothing has been created. Interface names vary — use yours below.
+## Why this matters
 
-## Creating a static profile
-
-`nmcli connection add` creates a profile. The essentials: a `type`, a `con-name` (the profile's name — *not* the interface name), the `ifname` it binds to, and the addressing. For a static address, set `ipv4.method manual` and give `ipv4.addresses`:
-
-```sh
-sudo nmcli connection add type ethernet con-name lab-static ifname enp2s0 \
-    ipv4.method manual \
-    ipv4.addresses 192.168.120.50/24 \
-    ipv4.gateway 192.168.120.1 \
-    ipv4.dns 192.168.120.1
-```
-
-(The shorthand `ip4 192.168.120.50/24 gw4 192.168.120.1` on the `add` line does the same and sets `manual` for you.) Creating a profile does not apply it — `nmcli connection up` does.
-
-> [!TIP]
-> **Try it — build the profile and activate it**
->
-> Use your spare interface name in place of `enp2s0`:
->
-> ```sh
-> sudo nmcli connection add type ethernet con-name lab-static ifname enp2s0 \
->     ipv4.method manual ipv4.addresses 192.168.120.50/24
-> sudo nmcli connection up lab-static
-> nmcli -f ipv4 connection show lab-static
-> ip -brief addr show enp2s0
-> ```
->
-> Expect the address on the interface and the profile now active:
->
-> ```text
-> ipv4.method:       manual
-> ipv4.addresses:    192.168.120.50/24
-> ```
->
-> ```text
-> enp2s0   UP   192.168.120.50/24
-> ```
->
-> `nmcli device status` now shows `enp2s0` as `connected` using `lab-static`. The address is exactly what `ip addr add` would have set — but this one is on disk and will come back after a reboot.
-
-## Where the profile is stored
-
-NetworkManager writes each profile to a **keyfile** under `/etc/NetworkManager/system-connections/`, named `<con-name>.nmconnection`. It is INI format, owned by root, mode `600` — because profiles can hold secrets (Wi-Fi passwords, VPN keys).
-
-> [!TIP]
-> **Try it — read the on-disk form**
->
-> ```sh
-> sudo cat /etc/NetworkManager/system-connections/lab-static.nmconnection
-> ```
->
-> Expect the settings you passed to `nmcli`, as INI sections:
->
-> ```text
-> [connection]
-> id=lab-static
-> type=ethernet
-> interface-name=enp2s0
->
-> [ipv4]
-> method=manual
-> address1=192.168.120.50/24
-> ```
->
-> Everything `nmcli` did is here. You can edit this file directly, but then you must run `sudo nmcli connection reload` so NetworkManager re-reads it — otherwise it keeps using its cached copy and may overwrite your edit.
-
-## A change is not live until you reactivate
-
-`nmcli connection modify` edits the saved profile. It does **not** change the running interface. The new settings take effect only when the profile is brought up again — `nmcli connection up <name>`, or `nmcli device reapply <dev>`.
-
-`modify` also has `+` and `-` prefixes: `+ipv4.addresses` adds another address, `-ipv4.dns` removes one, plain `ipv4.addresses` replaces the whole list.
-
-> [!TIP]
-> **Try it — add a second address, see it stay inert, then apply it**
->
-> ```sh
-> sudo nmcli connection modify lab-static +ipv4.addresses 192.168.120.51/24
-> ip -brief addr show enp2s0
-> ```
->
-> The interface still shows only the first address:
->
-> ```text
-> enp2s0   UP   192.168.120.50/24
-> ```
->
-> Now reactivate and look again:
->
-> ```sh
-> sudo nmcli connection up lab-static
-> ip -brief addr show enp2s0
-> ```
->
-> ```text
-> enp2s0   UP   192.168.120.50/24 192.168.120.51/24
-> ```
->
-> The profile held the change from the moment you ran `modify`; the interface only caught up on `up`. Editing and forgetting to reactivate is the most common "my nmcli change did nothing".
-
-## `manual` versus `auto`
-
-`ipv4.method` decides where the address comes from. `manual` is the static case above. `auto` runs a DHCP client on the interface. There is no DHCP server on this segment, so `auto` is a good way to see what "no lease" looks like.
-
-> [!TIP]
-> **Try it — switch to DHCP where there is no DHCP**
->
-> ```sh
-> sudo nmcli connection modify lab-static ipv4.method auto
-> sudo nmcli connection up lab-static ; echo "exit: $?"
-> ip -brief addr show enp2s0
-> ```
->
-> Activation stalls and then fails, and the interface ends up with no routable address:
->
-> ```text
-> Error: Connection activation failed: IP configuration could not be reserved (no available address, timeout, etc.)
-> exit: 4
-> ```
->
-> With `method auto` and nothing answering DHCP, NetworkManager cannot bring the profile up. Set it back with `sudo nmcli connection modify lab-static ipv4.method manual` and `sudo nmcli connection up lab-static`.
-
-## Autoconnect
-
-`connection.autoconnect` (default `yes`) decides whether NetworkManager brings a profile up on its own — at boot, or when its device appears, or after the profile is deactivated. That last case surprises people: with autoconnect on, `nmcli connection down` is often undone within a second.
-
-> [!TIP]
-> **Try it — down with autoconnect on, then off**
->
-> ```sh
-> sudo nmcli connection down lab-static
-> sleep 2
-> nmcli -f NAME,DEVICE,STATE connection show --active
-> ```
->
-> With autoconnect at its default, `lab-static` is likely **back**:
->
-> ```text
-> NAME        DEVICE  STATE
-> lab-static  enp2s0  activated
-> ```
->
-> Now turn autoconnect off and try again:
->
-> ```sh
-> sudo nmcli connection modify lab-static connection.autoconnect no
-> sudo nmcli connection down lab-static
-> sleep 2
-> nmcli -f NAME,DEVICE,STATE connection show --active
-> ```
->
-> This time it stays down. `nmcli device disconnect enp2s0` is the stronger form — it also blocks autoconnect on that device until you reconnect it.
-
-## Persistence
-
-The whole point of a profile is that it outlives a reboot. With `connection.autoconnect yes`, the profile is reapplied automatically at boot.
-
-> [!TIP]
-> **Try it — reboot and check**
->
-> Set autoconnect back on first, then restart the VM (this drops your SSH session for about a minute; reconnect with `astrona ssh astro-networkmanager-nmcli-playground`):
->
-> ```sh
-> sudo nmcli connection modify lab-static connection.autoconnect yes
-> sudo reboot
-> ```
->
-> After reconnecting:
->
-> ```sh
-> nmcli -f NAME,DEVICE,STATE connection show
-> ip -brief addr show enp2s0
-> ```
->
-> Expect `lab-static` still listed and `enp2s0` addressed again — the keyfile survived and NetworkManager reapplied it. Contrast with an `ip addr add`, which would be gone.
-
-## Managed versus unmanaged
-
-NetworkManager only configures devices it **manages**. A device is left `unmanaged` when another tool already owns it (netplan, systemd-networkd, ifupdown), or when a rule says so. In this playground, `/etc/NetworkManager/conf.d/10-managed.conf` restricts NetworkManager to the spare NIC:
-
-```ini
-[keyfile]
-unmanaged-devices=*,except:interface-name:enp2s0
-```
-
-On a real host, the mirror-image mistake is having **two** managers active on one interface — NetworkManager and systemd-networkd both trying to set it. The interface flaps, addresses appear and vanish. `nmcli device status` showing `unmanaged` for an interface you expected NM to control is the tell that something else has claimed it.
-
-> [!WARNING]
-> **Common pitfalls**
->
-> - **`modify` without `up`.** `nmcli connection modify` changes the saved profile only. The interface does not change until `nmcli connection up` (or `nmcli device reapply`).
-> - **Two managers on one interface.** NetworkManager and systemd-networkd / netplan / ifupdown all configuring the same NIC causes flapping. One owner per interface; check `nmcli device status` for `unmanaged`.
-> - **`ipv4.addresses` without `ipv4.method manual`.** Setting an address via `modify` does not switch the method off `auto`. The `ip4` shorthand on `add` does; a later `modify ipv4.addresses` does not.
-> - **Editing the keyfile without `nmcli connection reload`.** NetworkManager keeps its cached copy and can overwrite your hand edit on the next `up`.
-> - **Confusing `con-name` with `ifname`.** The profile name and the interface name are independent. `nmcli connection up` takes the profile name; `nmcli device connect` takes the interface.
-> - **Deleting the active profile on a remote box's only NIC.** `nmcli connection delete` drops the connection immediately. Safe here on the spare NIC; a lockout on a production host.
-> - **Autoconnect undoing a `down`.** With `connection.autoconnect yes`, a deactivated profile often comes straight back. Set it to `no`, or use `nmcli device disconnect`.
+The exam often asks for a network setting that is still there after a reboot. A setting made only with `ip` passes a quick look and then fails the moment the machine restarts. Knowing how to write a profile, activate it and prove it is on disk is what turns a working change into a lasting one.

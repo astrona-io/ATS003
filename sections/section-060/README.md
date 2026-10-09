@@ -1,37 +1,26 @@
 # Section 060: Persistent Configurations & Diagnostics
 
-System modifications configured purely at runtime will disappear upon host reboots. This portal coordinates the conceptual reading, guided training, and unguided challenge sandboxes for NetworkManager nmcli profiles, Netplan YAML files, active socket tracking with ss, and packet capturing with tcpdump.
+Astronaut, a network change made with `ip` is chalked on the console: the next restart wipes it. This section teaches you to write network settings into the ship's flight manual so they survive a reboot, and to find out what is really happening when a connection fails.
 
----
+## What you will be able to do
 
-## What You Will Master
+After this section you can:
 
-By completing this section, you will acquire three core capabilities:
-*   **nmcli Profiles**: Persistently add static network connections, gateway nexthops, and custom DNS servers.
-*   **Netplan Configuration**: Write structured indentation YAML files and apply them safely using "netplan try".
-*   **Forensic Diagnostics**: Capture raw packet dumps, isolate port binding crashes, and diagnose network drops.
+- **Keep settings with NetworkManager.** Build a static connection profile with `nmcli`, change it, activate it again, and prove it survives a reboot.
+- **Keep settings with Netplan.** Write a Netplan YAML file with correct indentation, check it with `netplan get`, and apply it safely with `netplan try`.
+- **Read the socket roster.** Use `ss` to see what listens on which address, which process owns a port, and which connections are open.
+- **Record real traffic.** Use `tcpdump` to capture, filter and save packets, and read what a connection really sent.
 
----
+## The modules
 
-## The Learning & Lab Path
+Work through the modules in order. Each one has a playground to try things in, reading parts, and a graded mission.
 
-### 1. Theoretical Concepts & Metaphors
-*   **[Module 1: Persistent Network Managers](./module-01/course.md)**
-*   **[Module 2: Netplan YAML Configurations](./module-02/course.md)**
-*   **[Module 3: Active Socket Diagnostics (ss)](./module-03/course.md)**
-*   **[Module 4: Raw Packet Capturing (tcpdump)](./module-04/course.md)**
+1. [Persistent Network Managers](./module-01/course.md): NetworkManager devices and profiles with `nmcli`.
+2. [Netplan YAML Configurations](./module-02/course.md): the Ubuntu YAML front end and how to apply it without losing your session.
+3. [Active Socket Diagnostics (ss)](./module-03/course.md): listening sockets, bind addresses, connections and filters.
+4. [Raw Packet Capturing (tcpdump)](./module-04/course.md): capture, filter, look inside and save packets.
 
-### 2. Guided Training Labs
-*   **Hands-on Training Lab 1 (nmcli):** **[section-060/module-01](module-01/labs/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-060/module-01/labs/lab-01")
-*   **Hands-on Training Lab 2 (Netplan):** **[section-060/module-02](module-02/labs/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-060/module-02/labs/lab-01")
-*   **Hands-on Training Lab 3 (ss sockets):** **[section-060/module-03](module-03/labs/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-060/module-03/labs/lab-01")
-*   **Hands-on Training Lab 4 (tcpdump Sniffing):** **[section-060/module-04](module-04/labs/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-060/module-04/labs/lab-01")
+## Check yourself and the capstone
 
-### 3. Unguided Challenge Lab
-*   **Hands-on Challenge Lab (Capstone):** **[section-060/capstone](capstone/labs/lab-01)** (astrona command: "astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-060/capstone/labs/lab-01")
-
----
-
-## Ready for Assessment?
-
-*   **[Take the Section 060 Knowledge Check Quiz](./quiz.md)**
+- [Section 060 Knowledge Check](./quiz.md): five scenario questions on this section.
+- [Connection Recovery and Audit Capstone Lab](./capstone/labs/lab-01/README.md): one graded task with no step-by-step guidance. A web service is running but cannot be reached; you diagnose it with `ss` and the firewall ruleset, fix it, and prove it answers.

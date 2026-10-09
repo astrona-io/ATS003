@@ -394,6 +394,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-030/module-01/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-030/module-01/labs/lab-01/question.md
       - type: lab
         title: "Packet Filtering with nftables Lab"
         path: sections/section-030/module-01/labs/lab-01
@@ -443,6 +446,9 @@ modules:
       - type: reading
         title: "Question"
         path: sections/section-030/module-02/labs/lab-01/question.md
+      - type: reading
+        title: "Question"
+        path: sections/section-030/module-02/labs/lab-01/question.md
       - type: lab
         title: "firewalld Zones and Services Lab"
         path: sections/section-030/module-02/labs/lab-01
@@ -462,6 +468,9 @@ modules:
       - type: reading
         title: "Section 030 Knowledge Check: Packet Filtering"
         path: sections/section-030/quiz.md
+      - type: reading
+        title: "Question"
+        path: sections/section-030/capstone/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-030/capstone/labs/lab-01/question.md
@@ -795,17 +804,14 @@ modules:
         title: "Persistent Network Managers"
         path: sections/section-060/module-01/course.md
       - type: reading
-        title: "Question"
-        path: sections/section-060/module-01/labs/lab-01/question.md
+        title: "Devices And Connection Profiles"
+        path: sections/section-060/module-01/course-01-devices-and-profiles.md
       - type: reading
-        title: "Question"
-        path: sections/section-060/module-01/labs/lab-01/question.md
+        title: "Create A Static Profile"
+        path: sections/section-060/module-01/course-02-create-a-static-profile.md
       - type: reading
-        title: "Question"
-        path: sections/section-060/module-01/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-060/module-01/labs/lab-01/question.md
+        title: "Change, Reactivate And Keep A Profile"
+        path: sections/section-060/module-01/course-03-change-and-reactivate.md
       - type: reading
         title: "Question"
         path: sections/section-060/module-01/labs/lab-01/question.md
@@ -828,20 +834,20 @@ modules:
           - name: "dig(1) manual page (Ubuntu 24.04)"
             url: https://manpages.ubuntu.com/manpages/noble/man1/dig.1.html
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-060/module-01/course-04-wrap-up.md
+      - type: reading
         title: "Netplan YAML Configurations"
         path: sections/section-060/module-02/course.md
       - type: reading
-        title: "Question"
-        path: sections/section-060/module-02/labs/lab-01/question.md
+        title: "How Netplan Works"
+        path: sections/section-060/module-02/course-01-how-netplan-works.md
       - type: reading
-        title: "Question"
-        path: sections/section-060/module-02/labs/lab-01/question.md
+        title: "Write And Render A Netplan File"
+        path: sections/section-060/module-02/course-02-write-and-render.md
       - type: reading
-        title: "Question"
-        path: sections/section-060/module-02/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-060/module-02/labs/lab-01/question.md
+        title: "Apply Safely And Merge Files"
+        path: sections/section-060/module-02/course-03-apply-and-merge.md
       - type: reading
         title: "Question"
         path: sections/section-060/module-02/labs/lab-01/question.md
@@ -864,20 +870,20 @@ modules:
           - name: "dig(1) manual page (Ubuntu 24.04)"
             url: https://manpages.ubuntu.com/manpages/noble/man1/dig.1.html
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-060/module-02/course-04-wrap-up.md
+      - type: reading
         title: "Active Socket Diagnostics (ss)"
         path: sections/section-060/module-03/course.md
       - type: reading
-        title: "Question"
-        path: sections/section-060/module-03/labs/lab-01/question.md
+        title: "Listening Sockets And Who Owns Them"
+        path: sections/section-060/module-03/course-01-listening-sockets.md
       - type: reading
-        title: "Question"
-        path: sections/section-060/module-03/labs/lab-01/question.md
+        title: "Connections, UDP And Unix Sockets"
+        path: sections/section-060/module-03/course-02-connections-udp-unix.md
       - type: reading
-        title: "Question"
-        path: sections/section-060/module-03/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-060/module-03/labs/lab-01/question.md
+        title: "Filter And Find The Port Holder"
+        path: sections/section-060/module-03/course-03-filter-and-find-the-holder.md
       - type: reading
         title: "Question"
         path: sections/section-060/module-03/labs/lab-01/question.md
@@ -899,20 +905,20 @@ modules:
           - name: "nftables quick reference"
             url: https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-060/module-03/course-04-wrap-up.md
+      - type: reading
         title: "Raw Packet Capturing (tcpdump)"
         path: sections/section-060/module-04/course.md
       - type: reading
-        title: "Question"
-        path: sections/section-060/module-04/labs/lab-01/question.md
+        title: "Your First Capture"
+        path: sections/section-060/module-04/course-01-first-capture.md
       - type: reading
-        title: "Question"
-        path: sections/section-060/module-04/labs/lab-01/question.md
+        title: "Filter The Capture"
+        path: sections/section-060/module-04/course-02-filter-the-capture.md
       - type: reading
-        title: "Question"
-        path: sections/section-060/module-04/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-060/module-04/labs/lab-01/question.md
+        title: "Look Inside And Save The Tape"
+        path: sections/section-060/module-04/course-03-contents-and-files.md
       - type: reading
         title: "Question"
         path: sections/section-060/module-04/labs/lab-01/question.md
@@ -936,20 +942,11 @@ modules:
           - name: "nftables quick reference"
             url: https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes
       - type: reading
+        title: "Wrap-Up: Mission Debrief"
+        path: sections/section-060/module-04/course-04-wrap-up.md
+      - type: reading
         title: "Section 060 Knowledge Check: Persistence & Diagnostics"
         path: sections/section-060/quiz.md
-      - type: reading
-        title: "Question"
-        path: sections/section-060/capstone/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-060/capstone/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-060/capstone/labs/lab-01/question.md
-      - type: reading
-        title: "Question"
-        path: sections/section-060/capstone/labs/lab-01/question.md
       - type: reading
         title: "Question"
         path: sections/section-060/capstone/labs/lab-01/question.md

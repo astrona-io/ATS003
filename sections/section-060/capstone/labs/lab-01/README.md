@@ -1,20 +1,27 @@
-# section-060 / capstone: Connection Recovery and Audit Capstone
+# Connection Recovery and Audit Capstone Lab
 
-This is the **unguid challenge lab** that serves as the section capstone assessment.
+The section 060 capstone: one graded task with no step-by-step guidance. It runs on one Ubuntu 24.04 virtual machine. The web application `myapp` listens on port 8080, but an nftables rule silently drops its traffic. You confirm the listener with `ss`, remove the rule, and prove the application answers with `curl`.
 
-## Start the Sandbox VM
-To spin up this certification challenge sandbox in your host terminal, run:
+## Start the lab
+
+Start the lab from your own terminal:
+
 ```bash
 astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-060/capstone/labs/lab-01
 ```
 
-## Learning Path & Objectives
-This challenge lab tests the integrated concepts learned across all modules in Section 060. Open the prompt file inside the VM to read the scenario goals:
+Open a terminal on the lab machine with `astrona ssh ats-003-lab-060`, then read the task in [`question.md`](./question.md).
+
+## Grade and clean up
+
+Grading runs from your own terminal, not inside the lab machine:
+
 ```bash
-cat question.md
+astrona submit -c sections/section-060/capstone/labs/lab-01
 ```
 
-Implement your changes, and run the validation scripts inside the VM to verify your solutions:
+When you are done, remove the lab. The command takes the lab's name, not its folder path:
+
 ```bash
-/usr/local/bin/validate-*.sh
+astrona destroy ats-003-lab-060
 ```
