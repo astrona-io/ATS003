@@ -1,15 +1,31 @@
-# section-010 / module-01: IPv4 & IPv6 Interface Configuration (Guided Practice)
+---
+estimated_duration: 25m
+---
 
-This is a **guided training lab** designed to walk you step-by-step through configuration and diagnostic actions.
+# IPv4 & IPv6 Interface Configuration Lab
 
-## Start the Sandbox VM
-To spin up this practice sandbox in your host terminal, run:
-```bash
-astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-010/module-01/labs/lab-01
+A guided mission on one Ubuntu 24.04 training ship. You add a second IPv4 address and an IPv6 address next to the management address, make both survive a reboot, and give the new address the name `app-srv1` in `/etc/hosts`. The step-by-step walkthrough is in [`solution.md`](./solution.md).
+
+Start the mission from your own terminal:
+
+```sh
+astrona run --git ssh://git@github.com/astrona-io/ATS003.git -c sections/section-010/module-01/labs/lab-01
 ```
 
-## Learning Path & Objectives
-This training sandbox maps directly to the step-by-step guided instructions inside:
-**[Section 010, Module 01](../../course.md)**
+Open a terminal on the lab machine:
 
-Once completed, you can run the validation scripts inside the VM to test your work.
+```sh
+astrona ssh ats-003-lab-011
+```
+
+Read the task in [`question.md`](./question.md). When you think you are done, send it for grading from your own terminal:
+
+```sh
+astrona submit -c sections/section-010/module-01/labs/lab-01
+```
+
+When the mission is done, remove it:
+
+```sh
+astrona destroy ats-003-lab-011
+```

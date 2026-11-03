@@ -1,15 +1,8 @@
 # Packet Filtering with nftables
 
-<!-- astrona:playground -->
-> [!NOTE]
-> 🧪 **Hands-on playground for this module** — a clean, throwaway machine to explore on. No task, no grading. Folder: [`playground/`](https://github.com/astrona-io/ATS003/tree/main/sections/section-030/module-01/playground)
->
-> ```sh
-> astrona run --git ssh://git@github.com/astrona-io/ATS003.git -c sections/section-030/module-01/playground
-> astrona destroy nftables-filtering-playground
-> ```
+Astronaut, every ship needs shields. On a Linux machine, the shields decide what happens to each **packet**, one burst of signal arriving at or leaving the ship. For every packet they choose one of three things: let it through, let it vanish, or bounce it back with a refusal. That choice is called **packet filtering**.
 
-**Packet filtering** is deciding, for every network packet, whether to let it through, discard it, or send back an error. On Linux that decision happens in the kernel's **netfilter** framework, and **nftables** is the current tool for writing the rules that drive it — the successor to `iptables`, `ip6tables`, `arptables`, and `ebtables`, all of which are now thin compatibility shims over the same nftables machinery.
+The shield generator sits in the kernel, the ship's core, and is called **netfilter**. You program it from a console called **nftables** (the `nft` command). nftables replaced the older `iptables`, `ip6tables`, `arptables` and `ebtables` tools. Those old names still work, but today they are thin wrappers that write nftables rules underneath.
 
 A finished rule looks like this:
 
@@ -17,57 +10,71 @@ A finished rule looks like this:
 tcp dport 22 accept
 ```
 
-"For a TCP packet whose destination port is 22, accept it." But that rule cannot exist on its own. nftables needs a place to put it, and — unlike `iptables`, which ships with built-in tables and chains — **nftables starts completely empty**. Nothing is filtered until you build the structure, which has four nested layers:
+It says: "for a TCP packet whose destination port is 22, accept it." (TCP, the Transmission Control Protocol, is the way most programs hold a steady conversation; a port is a numbered radio channel on the antenna.) But that rule cannot stand on its own. Unlike `iptables`, which came with ready-made tables and chains, **nftables starts completely empty**. Nothing is filtered until you build the structure, and the structure has four layers:
 
 ```text
 ruleset  ->  tables  ->  chains  ->  rules
 ```
 
-- A **ruleset** is everything nftables currently holds — every table, chain, and rule together.
-- A **table** groups related chains and belongs to one **address family** (`ip`, `ip6`, `inet`, …) that fixes which kinds of packet its chains can see.
-- A **chain** holds an ordered list of rules. A **base chain** attaches to a netfilter **hook** — a fixed point on a packet's path through the kernel — so packets actually flow through it. A chain with no hook is just a container other chains can jump into.
-- A **rule** is one line: zero or more **matches** (conditions the packet must meet) then one or more **statements** (what to do), such as a **verdict** of `accept` or `drop`.
-
-This module builds that structure from the bottom up, one concept per part, on a live machine.
-
-## How this module is organised
-
-Work through the parts in order. Each is a single sitting, front-loads *why* the concept matters, and ends with the one line worth memorising for the exam. Every part has hands-on **Try it** checkpoints you run on the playground VM.
-
-1. **[Netfilter and the packet path](./course-01-netfilter-and-packet-flow.md)** — the kernel hook framework nftables plugs into: the five hooks, the routing decision, hook priorities, and where a base chain sits in the flow.
-2. **[Tables and address families](./course-02-tables-and-families.md)** — what a table really is, all six families (`ip`, `ip6`, `inet`, `arp`, `bridge`, `netdev`), and why `inet` is the right default for a host firewall.
-3. **[Chains, hooks, priority, and policy](./course-03-chains-hooks-priority.md)** — base vs regular chains, the four things a base chain declares, `jump`/`goto`, chain policy, and the lock-out trap.
-4. **[Rules: matches and verdicts](./course-04-rules-matches-verdicts.md)** — match expressions, verdict and non-verdict statements, rule order, editing by handle, and counters.
-5. **[Connection tracking, sets, and maps](./course-05-conntrack-sets-maps.md)** — stateful filtering with `ct state`, and collapsing many rules into one with named sets, maps, and verdict maps.
-6. **[Persistence and operating a ruleset](./course-06-persistence-and-operations.md)** — why a ruleset dies on reboot, `/etc/nftables.conf` and `nftables.service`, atomic loads, tracing, and the full pitfalls list.
+This module builds that structure from the bottom up, one idea per part, on a live machine.
 
 ## Learning objectives
 
 After this module you can:
 
-- Name the five netfilter hooks in the order a packet meets them, and explain which category of traffic (`input`, `forward`, `output`) each base chain sees.
-- Explain what a hook **priority** is, why it is a signed integer, and which keyword bands (`raw`, `mangle`, `dstnat`, `filter`, `srcnat`, `security`) map to which numbers.
-- Describe the nftables object model — ruleset, table, chain, rule — and explain why nftables starts with an empty ruleset.
-- Choose an address family for a table and explain why `inet` covers both IPv4 and IPv6 while `ip`, `ip6`, `bridge`, and `netdev` do not.
-- Create a base chain, and name the hook, type, priority, and policy it needs to filter traffic; jump to a regular chain and explain how the verdict returns.
-- Write rules that match on `tcp dport`, `ip saddr`, `iif`, and `ct state`, apply `accept` / `drop` / `reject` verdicts, and explain why rule order decides the outcome.
+- Name the five netfilter hooks in the order a packet meets them, and say which kind of traffic (`input`, `forward`, `output`) each base chain sees.
+- Explain what a hook **priority** is, why it is a signed whole number, and which keyword bands (`raw`, `mangle`, `dstnat`, `filter`, `srcnat`, `security`) map to which numbers.
+- Describe the nftables object model (ruleset, table, chain, rule) and explain why nftables starts with an empty ruleset.
+- Choose an address family for a table, and explain why `inet` covers both IPv4 and IPv6 while `ip`, `ip6`, `bridge` and `netdev` do not.
+- Create a base chain with the hook, type, priority and policy it needs; jump to a regular chain and explain how evaluation comes back.
+- Write rules that match on `tcp dport`, `ip saddr`, `iif` and `ct state`, use the `accept`, `drop` and `reject` verdicts, and explain why rule order decides the outcome.
 - Read `nft list ruleset` and `nft -a list ruleset`, delete a rule by its handle, `insert` a rule at the top, and add a `counter` to see how often a rule matches.
-- Use a named set and a verdict map to replace a block of repetitive rules.
-- Explain why an nftables ruleset is lost on reboot, how `/etc/nftables.conf` and `nftables.service` make it persistent, and why `nft -f` applies a whole file atomically.
+- Redirect one port to another with a `nat` chain on the `prerouting` hook.
+- Use a named set and a verdict map to replace a block of repeated rules.
+- Explain why an nftables ruleset is lost on reboot, how `/etc/nftables.conf` and `nftables.service` keep it, and why `nft -f` applies a whole file in one step.
 
 ## Before you start
 
-This module assumes you can open a shell, run commands with `sudo`, and know what a TCP port and an IPv4 address are. Netfilter, hook, address family, verdict, handle, and connection tracking are all defined as they come up. Having seen the interfaces and addressing module helps but is not required.
+Run a short pre-flight check before your first shield program. Make sure you have the knowledge this module expects, and know what is waiting in your playground.
 
-Open a shell on the playground VM with `astrona ssh astro-nftables-filtering-playground`; every state-changing command uses `sudo`. The playground gives you:
+### What you should already know
 
-- An **empty nftables ruleset**. `sudo nft list ruleset` prints nothing until you add a table — no stock firewall in the way.
-- `nft`, plus `conntrack`, `curl`, `ncat`, and `python3` for generating and observing traffic.
-- Two local IPv4 addresses: the **management interface** that carries your SSH session, and **`192.168.80.10/24`** on a local dummy interface, used later for source-address rules. Find their kernel names with `ip -brief -4 addr show`.
-- Password-less `sudo`.
+- **The shell.** You can open a terminal and run commands with `sudo` (borrowing the captain's authority).
+- **Ports and addresses.** You know what a TCP port and an IPv4 address are. Every other term (netfilter, hook, address family, verdict, handle, connection tracking) is explained when it first appears.
 
-Several checkpoints need a listener to filter; you start one yourself with `python3 -m http.server 5000` and restart it as needed. Run it in one SSH session and the `nft` / `curl` commands in a second, or append `&` to background it.
+### What is in your playground
 
-## Where this fits
+Your playground is a training ship in the simulator: one Ubuntu 24.04 virtual machine. Open a shell on it with `astrona ssh nftables-filtering-playground`. Every command that changes the shields uses `sudo`, and `sudo` needs no password.
 
-nftables is the rule-writing layer on top of **netfilter**, the set of hooks the kernel already runs every packet through. Filtering does not replace the rest of the stack: a port only answers if a service is listening on it; nftables can block or allow *reaching* a service, not create one. And on many systems a higher-level tool — `firewalld` (the next module), `ufw`, or a cloud provider's security groups — already manages nftables for you, and hand-written rules can conflict with what it expects. Check what is managing the ruleset before adding rules by hand.
+| What | Details |
+| --- | --- |
+| The ruleset | **Empty.** `sudo nft list ruleset` prints nothing until you add a table. There is no stock firewall in the way. |
+| Tools | `nft`, plus `conntrack`, `curl`, `ncat` and `python3` to make and watch traffic |
+| Management interface | The antenna that carries your SSH session. Never add a rule that drops traffic to it, or you lock yourself out. |
+| A second address | `192.168.80.10/24` on a local `dummy` interface, a practice antenna used for rules that match on the source address |
+
+Find the names of both interfaces with `ip -brief -4 addr show`.
+
+Several steps need a program listening on a port, so the shields have something to protect. You start one yourself with `python3 -m http.server 5000`. Run it in one SSH (Secure Shell, the sealed communications channel between ships) session and the `nft` and `curl` commands in a second one, or add `&` to run it in the background.
+
+Launch your playground now, and keep it running next to you while you read the parts:
+
+<!-- astrona:playground -->
+
+## The parts of this module
+
+1. [Netfilter And The Packet Path](./course-01-netfilter-and-packet-flow.md): the five hooks, the routing decision and hook priorities.
+2. [Tables And Address Families](./course-02-tables-and-families.md): what a table is, the six families, and why `inet` is the right default.
+3. [Chains, Hooks, Priority And Policy](./course-03-chains-hooks-priority.md): base and regular chains, `jump` and `goto`, chain policy and the lock-out trap.
+4. [Rules: Matches And Verdicts](./course-04-rules-matches-verdicts.md): how a rule is built, the match expressions and every verdict.
+5. [Rule Order, Handles And Redirects](./course-05-rule-order-handles-redirects.md): why order decides everything, editing by handle, counters, source rules and a port redirect.
+6. [Connection Tracking](./course-06-connection-tracking.md): stateful filtering with `ct state`.
+7. [Sets And Maps](./course-07-sets-and-maps.md): one rule for many values, and verdict maps.
+8. [Persistence And Operating A Ruleset](./course-08-persistence-and-operations.md): keeping a ruleset after a reboot, loading it in one step, and watching it work.
+9. [Wrap-Up: Mission Debrief](./course-09-wrap-up.md): what you learned, your mission, a self-check and clean-up.
+
+## Why this matters
+
+The shields are the last line of defence on every Linux ship. On the exam you write nftables rules by hand on a live machine and must prove they work, so you need to know where a rule runs, in what order, and what happens to packets that no rule matched.
+
+nftables is also what runs underneath the higher-level firewall tools. `firewalld`, `ufw` and many container tools all write nftables rules for you. When one of them behaves strangely, reading the raw ruleset with `nft list ruleset` is how you find out why.

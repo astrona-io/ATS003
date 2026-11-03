@@ -1,14 +1,17 @@
 # Solution Walkthrough
 
 You will open one service and one port in the `public` zone, and make both
-changes permanent. Everything runs on the VM's `terminal`.
+changes live and permanent. Every command runs in the `terminal` of the lab
+virtual machine (your training ship).
 
-The one idea to hold onto: firewalld keeps **two** copies of its config.
+The one idea to hold onto: firewalld keeps **two** copies of its
+configuration. One is the shield setting in force now; the other is the
+setting saved for the next start.
 
 | Copy | What it is | How you change it |
 | --- | --- | --- |
 | Runtime | what is enforced right now | `firewall-cmd …` (no `--permanent`) |
-| Permanent | what is saved to disk for next boot | `firewall-cmd … --permanent` |
+| Permanent | what is saved to disk for the next start | `firewall-cmd … --permanent` |
 | — | copy permanent → runtime | `firewall-cmd --reload` |
 
 The clean way to change both: make the change `--permanent`, then
@@ -16,14 +19,15 @@ The clean way to change both: make the change `--permanent`, then
 
 ## The feedback loop
 
-Grading runs from the **host terminal** — the shell where you typed
-`astrona run`, not inside the VM:
+Grading runs from your **own terminal**, the shell where you typed
+`astrona run`, not inside the virtual machine:
 
 ```bash
 astrona submit --git git@github.com:astrona-io/ATS003.git -c sections/section-030/module-02/labs/lab-01
 ```
 
-Seven checks. Three already pass from the setup script:
+There are seven checks. Three already pass, because the setup script put
+them in place; keep them that way:
 
 ```text
 PASS  firewalld-active
@@ -39,9 +43,9 @@ Run it now to confirm, then again after each step.
 
 ---
 
-## Step 1: See the current zone config
+## Step 1: See the current zone configuration
 
-On the VM:
+On the virtual machine:
 
 ```bash
 sudo firewall-cmd --get-default-zone
@@ -49,7 +53,7 @@ sudo firewall-cmd --zone=public --list-all
 ```
 
 `public` is the default zone and holds your interface. Its service list does
-not include `https`; its port list is empty.
+not include `https`, and its port list is empty.
 
 ---
 
@@ -60,8 +64,8 @@ sudo firewall-cmd --zone=public --add-service=https --permanent
 sudo firewall-cmd --reload
 ```
 
-The first line writes to the permanent config. `--reload` re-reads the
-permanent config into the runtime, so now both have it. Check:
+The first line writes to the permanent configuration. `--reload` reads the
+permanent configuration into the runtime one, so now both have it. Check:
 
 ```bash
 sudo firewall-cmd --zone=public --list-services
@@ -70,7 +74,7 @@ sudo firewall-cmd --zone=public --list-services --permanent
 
 `https` should appear in both.
 
-**Run the check** — `https-runtime` and `https-permanent` now pass.
+**Run the check.** `https-runtime` and `https-permanent` now pass.
 
 ---
 
@@ -90,14 +94,14 @@ sudo firewall-cmd --zone=public --list-ports --permanent
 
 `8443/tcp` should appear in both.
 
-**Run the check** — `port-8443-runtime` and `port-8443-permanent` now pass.
-All seven green.
+**Run the check.** `port-8443-runtime` and `port-8443-permanent` now pass.
+All seven checks are green.
 
 ---
 
 ## Step 4: Submit
 
-When `astrona submit` shows all seven `PASS`, submit from the host terminal:
+When `astrona submit` shows all seven `PASS`, submit from your own terminal:
 
 ```bash
 astrona submit --git git@github.com:astrona-io/ATS003.git -c sections/section-030/module-02/labs/lab-01
@@ -113,8 +117,13 @@ astrona submit --git git@github.com:astrona-io/ATS003.git -c sections/section-03
 - **`…-permanent` passes but `…-runtime` fails.** You added it with
   `--permanent` but never reloaded. Run `sudo firewall-cmd --reload`.
 - **Shortcut if you already changed runtime only.** `sudo firewall-cmd
-  --runtime-to-permanent` copies the current runtime into the permanent
-  config in one go.
-- **Nothing changed.** Make sure you passed `--zone=public` — edits without
-  a zone go to the default zone, which here is `public`, but being explicit
+  --runtime-to-permanent` copies the current runtime configuration into the
+  permanent one in one step.
+- **Nothing changed.** Make sure you passed `--zone=public`. Changes without
+  a zone go to the default zone, which here is `public`, but naming the zone
   avoids surprises.
+- **`default-zone` or `interface-zone` fails.** You changed the default zone
+  or moved the primary interface. Put them back with
+  `sudo firewall-cmd --set-default-zone=public` and, for the interface,
+  `sudo firewall-cmd --zone=public --change-interface=<name>` (the name comes
+  from `ip -o -4 route show to default`).

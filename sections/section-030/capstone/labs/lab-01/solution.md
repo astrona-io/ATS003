@@ -1,27 +1,28 @@
 # Solution Walkthrough
 
-You will build two nftables tables: `inet filter` for the inbound/outbound
-rules, and `ip nat` for the port redirect. Everything runs on the VM's
-`terminal`.
+You will build two nftables tables: `inet filter` for the incoming and
+outgoing rules, and `ip nat` for the port redirect. Every command runs in
+the `terminal` of the lab virtual machine (your training ship).
 
-The shape of every nftables policy is the same three layers:
+Every nftables policy has the same three layers. Think of them as a shield
+program, its checkpoints, and the lines each checkpoint reads:
 
 | Layer | What it is | Command |
 | --- | --- | --- |
-| Table | a container, by address family | `sudo nft add table inet filter` |
-| Chain | a hook point + default policy | `sudo nft add chain inet filter input { type filter hook input priority 0 \; policy accept \; }` |
-| Rule | one match + action, top to bottom | `sudo nft add rule inet filter input tcp dport 5000 drop` |
+| Table | a container, tied to one address family | `sudo nft add table inet filter` |
+| Chain | a hook point plus a default policy | `sudo nft add chain inet filter input { type filter hook input priority 0 \; policy accept \; }` |
+| Rule | one match plus an action, read top to bottom | `sudo nft add rule inet filter input tcp dport 5000 drop` |
 
 ## The feedback loop
 
-Grading runs from the **host terminal** — the shell where you typed
-`astrona run`, not inside the VM:
+Grading runs from your **own terminal**, the shell where you typed
+`astrona run`, not inside the virtual machine:
 
 ```bash
 astrona submit --git git@github.com:astrona-io/ATS003.git -c sections/section-030/capstone/labs/lab-01
 ```
 
-Four checks:
+There are four checks. At the start, all four fail:
 
 ```text
 FAIL  port-5000-drop
@@ -36,19 +37,20 @@ Run it now, then again after each step.
 
 ## Step 1: Look at the starting point
 
-On the VM:
+On the virtual machine, list the ruleset:
 
 ```bash
 sudo nft list ruleset
 ```
 
-It is empty. Confirm the redirect target is up:
+It prints nothing: the ruleset is empty. Now check that the redirect target
+is up:
 
 ```bash
 sudo ss -tulpn | grep 6001
 ```
 
-Something (a small Python web server) is listening on `6001`.
+A small Python web server is listening on `6001`.
 
 ---
 
@@ -60,15 +62,15 @@ sudo nft add chain inet filter input '{ type filter hook input priority 0 ; poli
 sudo nft add chain inet filter output '{ type filter hook output priority 0 ; policy accept ; }'
 ```
 
-`type filter hook input` is what actually attaches the chain to incoming
-traffic — a chain without a hook line is never consulted. `policy accept`
-means "allow anything no rule explicitly drops".
+`type filter hook input` is what attaches the chain to incoming traffic. A
+chain without a hook line is never used. `policy accept` means "allow
+anything that no rule drops".
 
-*(No check flips yet — chains with no rules.)*
+No check changes yet, because the chains have no rules.
 
 ---
 
-## Step 3: Drop inbound port 5000
+## Step 3: Drop incoming port 5000
 
 ```bash
 sudo nft add rule inet filter input tcp dport 5000 drop
@@ -80,42 +82,43 @@ Check it:
 sudo nft list chain inet filter input
 ```
 
-**Run the check** — `port-5000-drop` now passes.
+**Run the check.** `port-5000-drop` now passes.
 
 ---
 
-## Step 4: Restrict port 6002 to one source — accept first, then drop
+## Step 4: Limit port 6002 to one source: accept first, then drop
 
-Order matters. Add the **accept** rule first so it sits above the drop:
+Order matters. Add the **accept** rule first, so it sits above the drop:
 
 ```bash
 sudo nft add rule inet filter input tcp dport 6002 ip saddr 192.168.10.80 accept
 sudo nft add rule inet filter input tcp dport 6002 drop
 ```
 
-Verify the order — the accept line must appear before the drop line:
+Check the order. The accept line must appear before the drop line:
 
 ```bash
 sudo nft -a list chain inet filter input
 ```
 
-**Run the check** — `port-6002-source-restriction` now passes.
+**Run the check.** `port-6002-source-restriction` now passes.
 
 ---
 
-## Step 5: Block egress to 192.168.10.70
+## Step 5: Block outgoing traffic to 192.168.10.70
 
 ```bash
 sudo nft add rule inet filter output ip daddr 192.168.10.70 drop
 ```
 
-**Run the check** — `egress-block` now passes.
+**Run the check.** `egress-block` now passes.
 
 ---
 
 ## Step 6: Create the NAT table and the redirect
 
-The redirect lives in a separate `ip nat` table with a `prerouting` chain:
+The redirect lives in a separate `ip nat` table, with a chain of
+`type nat` on the `prerouting` hook:
 
 ```bash
 sudo nft add table ip nat
@@ -123,8 +126,8 @@ sudo nft add chain ip nat prerouting '{ type nat hook prerouting priority -100 ;
 sudo nft add rule ip nat prerouting tcp dport 6000 redirect to :6001
 ```
 
-`priority -100` (also called `dstnat`) is the standard priority for a
-prerouting NAT chain. `redirect to :6001` rewrites the destination port to
+`priority -100` (also called `dstnat`) is the standard priority for a NAT
+chain on `prerouting`. `redirect to :6001` changes the destination port to
 `6001` on this same host.
 
 Check it:
@@ -133,7 +136,8 @@ Check it:
 sudo nft list chain ip nat prerouting
 ```
 
-**Run the check** — `port-6000-redirect` now passes. All four green.
+**Run the check.** `port-6000-redirect` now passes, and all four checks are
+green.
 
 ---
 
@@ -148,30 +152,34 @@ PASS  port-6002-source-restriction
 PASS  egress-block
 ```
 
-Submit from the host terminal:
+submit from your own terminal:
 
 ```bash
 astrona submit --git git@github.com:astrona-io/ATS003.git -c sections/section-030/capstone/labs/lab-01
 ```
 
-> **Optional — make it stick.** These rules live only in the running
-> kernel. To keep them after a reboot:
-> `sudo nft list ruleset | sudo tee /etc/nftables.conf` then
-> `sudo systemctl enable nftables`. Not required to pass this lab.
+These rules live only in the running kernel. To keep them after a reboot,
+you would run `sudo nft list ruleset | sudo tee /etc/nftables.conf` and
+then `sudo systemctl enable nftables`. That is not needed to pass this lab.
 
 ---
 
 ## If a check stays red
 
-- **A rule was added but the check still fails.** The chain probably has no
-  hook. Re-create it with the full
+- **A rule was added, but the check still fails.** The chain probably has
+  no hook. Create it again with the full
   `{ type filter hook input priority 0 ; policy accept ; }` form.
-- **`port-6002-source-restriction` fails.** The drop is above the accept.
-  Fix the order without wiping everything:
-  `sudo nft flush chain inet filter input`, then re-add all four `input`
-  rules from Steps 3–4 in order (5000 drop, 6002 accept, 6002 drop).
-- **`port-6000-redirect` fails.** Check the rule reads exactly
-  `tcp dport 6000 redirect to :6001` (with the colon) and that
+- **`port-6002-source-restriction` fails.** Either the drop is above the
+  accept, or the accept rule names the source before the port (the checker
+  wants `tcp dport 6002` first on that line). Fix it without wiping
+  everything: run `sudo nft flush chain inet filter input`, then add the
+  `input` rules from Steps 3 and 4 again, in order (5000 drop, 6002 accept,
+  6002 drop).
+- **`port-5000-drop` or `egress-block` fails, but the rule is there.** The
+  checker wants the verdict right after the match. A rule such as
+  `tcp dport 5000 counter drop` does not count.
+- **`port-6000-redirect` fails.** Check that the rule reads exactly
+  `tcp dport 6000 redirect to :6001` (with the colon), and that
   `sudo ss -tulpn | grep 6001` still shows a listener.
-- **Everything is wrong and you want a clean slate.** `sudo nft flush
-  ruleset` empties it, then start again from Step 2.
+- **Everything is wrong and you want a clean start.** `sudo nft flush
+  ruleset` empties the ruleset; then start again from Step 2.

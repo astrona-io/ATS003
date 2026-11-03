@@ -1,0 +1,37 @@
+# OpenSSH Client (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+#
+# Runtime: a single qemu VM — a plain Ubuntu 24.04 server. OS prep creates the
+# users `cadet` (the visitor) and `pilot`, starts two throwaway sshd services
+# (port 2222 = the "station", port 2223 = the "relay" jump host) and a web
+# service on 127.0.0.1:8081 that only a tunnel can reach "from outside".
+
+metadata:
+  name: "ssh-client-playground"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Create the cadet and pilot users, two throwaway sshd services on 2222 and 2223, and a loopback-only web service on 8081."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  qemu:
+    - name: "host"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+      cpus: 1
+      memoryMB: 1536
+      diskSizeGB: 20
+      sshPasswordAuth: false

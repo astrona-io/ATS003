@@ -1,0 +1,37 @@
+# DNS Client Resolution (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+#
+# Runtime: a single qemu VM — a plain Ubuntu 24.04 server with systemd-resolved
+# at stock settings. OS prep adds a dummy interface `dns0` (10.55.0.53/24) and
+# a small BIND server on it for the zone lab.example. The resolver is NOT told
+# about that server: doing so is the point of the module.
+
+metadata:
+  name: "dns-resolver-playground"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Create dns0, start a BIND server for lab.example on 10.55.0.53, and leave systemd-resolved at its defaults."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  qemu:
+    - name: "host"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+      cpus: 1
+      memoryMB: 1536
+      diskSizeGB: 20
+      sshPasswordAuth: false

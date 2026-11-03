@@ -1,0 +1,242 @@
+# Knowledge check for section 030. Listed in astrona.yaml as a `type: quiz` entry after the capstone lab.
+schema_version: 1
+kind: question_bank
+id: ats003-030
+course_id: ATS003
+exam_code: LFCS
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-030
+  title: "Firewalls And Packet Filtering"
+questions:
+  - id: ats003-030-q01
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Create a base chain that filters traffic for the host"
+    source_readings:
+      - sections/section-030/module-01/course-03-chains-hooks-priority.md
+    prompt: "Which chain definition filters packets addressed to the host itself and drops what no rule allows?"
+    options:
+      - id: a
+        text: "`type filter hook forward priority 0; policy drop;`"
+        explanation: "The `forward` hook sees traffic passing through the machine, not traffic for it."
+      - id: b
+        text: "`type filter hook input priority 0; policy drop;`"
+        explanation: "Correct. The `input` hook sees packets for the local host. `policy drop` is the default verdict when no rule matches."
+      - id: c
+        text: "`type nat hook prerouting priority 0; policy drop;`"
+        explanation: "A `nat` chain translates addresses and is not a general filter."
+      - id: d
+        text: "`type filter hook output priority 0; policy accept;`"
+        explanation: "`output` sees packets the host sends."
+    correct_option: b
+    explanation: "The `input` hook sees packets for the local host. `policy drop` is the default verdict when no rule matches."
+
+  - id: ats003-030-q02
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Choose an nftables family"
+    source_readings:
+      - sections/section-030/module-01/course-02-tables-and-families.md
+    prompt: "Which family lets one table filter both IPv4 and IPv6?"
+    options:
+      - id: a
+        text: "`inet`"
+        explanation: "Correct. The `inet` family covers both protocols, so you write each rule once."
+      - id: b
+        text: "`ip`"
+        explanation: "This covers IPv4 only."
+      - id: c
+        text: "`arp`"
+        explanation: "This covers address resolution packets only."
+      - id: d
+        text: "`bridge`"
+        explanation: "This covers bridged frames."
+    correct_option: a
+    explanation: "The `inet` family covers both protocols, so you write each rule once."
+
+  - id: ats003-030-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Place and remove rules by position and handle"
+    source_readings:
+      - sections/section-030/module-01/course-05-rule-order-handles-redirects.md
+    prompt: "A drop rule you appended sits below an accept rule that matches first. How do you put a new rule at the top?"
+    options:
+      - id: a
+        text: "Use `nft add rule` again."
+        explanation: "`add` appends to the end."
+      - id: b
+        text: "Restart the `nftables` service."
+        explanation: "A restart reloads the file and does not reorder anything."
+      - id: c
+        text: "Rename the table."
+        explanation: "Names do not change the order of rules."
+      - id: d
+        text: "Use `nft insert rule`, which adds at the beginning, and use `nft -a list ruleset` to see handles for deletes."
+        explanation: "Correct. Rules are checked top to bottom and a terminal verdict ends the check. `add` appends, `insert` prepends."
+    correct_option: d
+    explanation: "Rules are checked top to bottom and a terminal verdict ends the check. `add` appends, `insert` prepends."
+
+  - id: ats003-030-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Allow replies with connection tracking"
+    source_readings:
+      - sections/section-030/module-01/course-06-connection-tracking.md
+    prompt: "Which rule lets replies to connections the host started come back in?"
+    options:
+      - id: a
+        text: "`ct state new accept`"
+        explanation: "This accepts the first packet of any new flow, which is too open."
+      - id: b
+        text: "`ct state invalid accept`"
+        explanation: "Invalid packets should be dropped."
+      - id: c
+        text: "`ct state established,related accept`"
+        explanation: "Correct. Connection tracking remembers flows. This rule accepts packets that belong to a known flow."
+      - id: d
+        text: "`tcp flags syn accept`"
+        explanation: "This matches connection starts, not replies."
+    correct_option: c
+    explanation: "Connection tracking remembers flows. This rule accepts packets that belong to a known flow."
+
+  - id: ats003-030-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Make nftables rules survive a reboot"
+    source_readings:
+      - sections/section-030/module-01/course-08-persistence-and-operations.md
+    prompt: "On Ubuntu 24.04 how do you keep the current rules after a reboot?"
+    options:
+      - id: a
+        text: "Rules typed with `nft` are always kept."
+        explanation: "They are kept only in the running kernel."
+      - id: b
+        text: "Save them in `/etc/nftables.conf` and enable the `nftables` service."
+        explanation: "Correct. The service loads that file at boot. Rules typed on the command line live only in memory."
+      - id: c
+        text: "Put them in `/etc/hosts`."
+        explanation: "This file is not read for firewall rules."
+      - id: d
+        text: "Run `nft flush ruleset` at boot."
+        explanation: "This removes all rules."
+    correct_option: b
+    explanation: "The service loads that file at boot. Rules typed on the command line live only in memory."
+
+  - id: ats003-030-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Use a set to match several ports"
+    source_readings:
+      - sections/section-030/module-01/course-07-sets-and-maps.md
+    prompt: "You want one rule that accepts TCP ports 22, 80 and 443. Which form is correct?"
+    options:
+      - id: a
+        text: "`tcp dport { 22, 80, 443 } accept`"
+        explanation: "Correct. Curly braces create an anonymous set, so one rule matches any member."
+      - id: b
+        text: "`tcp dport 22,80,443 accept` in one `nft` call with no braces"
+        explanation: "nft needs the braces to treat the list as a set."
+      - id: c
+        text: "`tcp dport 22-80-443 accept`"
+        explanation: "This is not valid range syntax."
+      - id: d
+        text: "`tcp dport all accept`"
+        explanation: "`all` is not a port value."
+    correct_option: a
+    explanation: "Curly braces create an anonymous set, so one rule matches any member."
+
+  - id: ats003-030-q07
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Assign an interface to a zone"
+    source_readings:
+      - sections/section-030/module-02/course-02-zones.md
+    prompt: "Which command moves `eth1` to the `internal` zone permanently?"
+    options:
+      - id: a
+        text: "`sudo firewall-cmd --zone=internal --add-service=eth1`"
+        explanation: "`--add-service` takes a service name, not an interface."
+      - id: b
+        text: "`sudo ip link set eth1 zone internal`"
+        explanation: "`ip link` has no zone setting."
+      - id: c
+        text: "`sudo firewall-cmd --set-default-zone=eth1`"
+        explanation: "The default zone is a zone name, not an interface."
+      - id: d
+        text: "`sudo firewall-cmd --permanent --zone=internal --change-interface=eth1`"
+        explanation: "Correct. A zone is a set of trust rules. An interface belongs to exactly one zone at a time."
+    correct_option: d
+    explanation: "A zone is a set of trust rules. An interface belongs to exactly one zone at a time."
+
+  - id: ats003-030-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain runtime versus permanent firewalld settings"
+    source_readings:
+      - sections/section-030/module-02/course-04-runtime-permanent-operations.md
+    prompt: "You ran `firewall-cmd --permanent --add-service=http`, but the web port is still closed. Why, and what fixes it?"
+    options:
+      - id: a
+        text: "The `http` service does not exist."
+        explanation: "It is a built-in service."
+      - id: b
+        text: "`--permanent` deletes the rule at once."
+        explanation: "It writes the rule to disk for later."
+      - id: c
+        text: "Permanent changes do not alter the running firewall. Run `sudo firewall-cmd --reload`."
+        explanation: "Correct. firewalld keeps a runtime and a permanent configuration. A reload applies the permanent one."
+      - id: d
+        text: "You must reboot the machine."
+        explanation: "A reload is enough."
+    correct_option: c
+    explanation: "firewalld keeps a runtime and a permanent configuration. A reload applies the permanent one."
+
+  - id: ats003-030-q09
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Open a port that has no named service"
+    source_readings:
+      - sections/section-030/module-02/course-03-services-ports-richrules.md
+    prompt: "How do you open TCP port 8080 in the default zone, now and after a reboot?"
+    options:
+      - id: a
+        text: "`sudo firewall-cmd --add-service=8080`"
+        explanation: "A service is a name, not a port number."
+      - id: b
+        text: "`sudo firewall-cmd --permanent --add-port=8080/tcp` then `sudo firewall-cmd --reload`"
+        explanation: "Correct. A port has the form number/protocol. Using `--permanent` and then a reload covers both."
+      - id: c
+        text: "`sudo firewall-cmd --add-port=8080`"
+        explanation: "The protocol is missing, and without `--permanent` it is not kept."
+      - id: d
+        text: "`sudo nft add port 8080`"
+        explanation: "`nft` has no such command."
+    correct_option: b
+    explanation: "A port has the form number/protocol. Using `--permanent` and then a reload covers both."
+
+  - id: ats003-030-q10
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain how firewalld relates to nftables"
+    source_readings:
+      - sections/section-030/module-02/course-01-architecture-and-backends.md
+    prompt: "How does firewalld relate to nftables on a current Ubuntu system?"
+    options:
+      - id: a
+        text: "firewalld is a manager. It keeps zones and services and builds its own nftables rules from them."
+        explanation: "Correct. Change firewalld settings with `firewall-cmd`. Hand-written nft rules are a separate layer and can conflict."
+      - id: b
+        text: "firewalld replaces the kernel packet filter."
+        explanation: "It only configures the filter that is already in the kernel."
+      - id: c
+        text: "firewalld and nftables cannot be installed on the same machine."
+        explanation: "They can coexist, but only one should be your main manager."
+      - id: d
+        text: "firewalld reads `/etc/hosts` to decide rules."
+        explanation: "It reads its own zone and service files."
+    correct_option: a
+    explanation: "Change firewalld settings with `firewall-cmd`. Hand-written nft rules are a separate layer and can conflict."

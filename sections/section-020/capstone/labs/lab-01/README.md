@@ -1,20 +1,23 @@
-# section-020 / capstone: Aggregation and Routing Capstone
+# Aggregation and Routing Capstone Lab
 
-This is the **unguid challenge lab** that serves as the section capstone assessment.
+The section capstone: one static routing task on two training ships, `target` and `gateway`, with no step-by-step help. Add the route, prove it, and make it survive a reboot.
 
-## Start the Sandbox VM
-To spin up this certification challenge sandbox in your host terminal, run:
+## Start the mission
+
+Run this in your own terminal to start the lab:
+
 ```bash
 astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-020/capstone/labs/lab-01
 ```
 
-## Learning Path & Objectives
-This challenge lab tests the integrated concepts learned across all modules in Section 020. Open the prompt file inside the VM to read the scenario goals:
+Read the task in [`question.md`](./question.md). When you think you are done, send it for grading:
+
 ```bash
-cat question.md
+astrona submit -c sections/section-020/capstone/labs/lab-01
 ```
 
-Implement your changes, and run the validation scripts inside the VM to verify your solutions:
+When the mission is done, remove it:
+
 ```bash
-/usr/local/bin/validate-*.sh
+astrona destroy ats-003-lab-020
 ```

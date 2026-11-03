@@ -1,20 +1,27 @@
-# section-030 / capstone: Host Security and Filtering Capstone
+# Host Security and Filtering Capstone Lab
 
-This is the **unguid challenge lab** that serves as the section capstone assessment.
+The Section 030 capstone: a graded mission with no step-by-step help. On one training ship (an Ubuntu 24.04 virtual machine) with an empty nftables ruleset, you build a complete policy: a dropped port, a port redirect, a port limited to one source, and a block on outgoing traffic to one host.
 
-## Start the Sandbox VM
-To spin up this certification challenge sandbox in your host terminal, run:
+## Start the mission
+
+Run this in your own terminal:
+
 ```bash
 astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-030/capstone/labs/lab-01
 ```
 
-## Learning Path & Objectives
-This challenge lab tests the integrated concepts learned across all modules in Section 030. Open the prompt file inside the VM to read the scenario goals:
+Open a terminal on the lab machine with `astrona ssh ats-003-lab-030`, and read the task in [question.md](./question.md).
+
+## Grade and clean up
+
+When you think you are done, send it for grading from your own terminal:
+
 ```bash
-cat question.md
+astrona submit -c sections/section-030/capstone/labs/lab-01
 ```
 
-Implement your changes, and run the validation scripts inside the VM to verify your solutions:
+Then remove the lab. The command takes its name, not its folder path:
+
 ```bash
-/usr/local/bin/validate-*.sh
+astrona destroy ats-003-lab-030
 ```

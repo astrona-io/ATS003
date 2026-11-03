@@ -1,0 +1,49 @@
+metadata:
+  name: "ats-003-lab-065"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+
+bootstrap:
+  init:
+    - name: "troubleshooting-lab-setup"
+      description: "Creates the dummy interface lab0 (10.66.0.10/24), starts the portal web service on port 8443, then breaks three rungs: lab0 is set down, portal.lab points at the wrong address in /etc/hosts, and an nftables rule drops outgoing tcp port 8443"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-link"
+      description: "Confirms lab0 is administratively up and still has 10.66.0.10/24"
+      type: "file"
+      source: "validation/validate-link.sh"
+
+    - name: "verify-name"
+      description: "Confirms getent resolves portal.lab to 10.66.0.10"
+      type: "file"
+      source: "validation/validate-name.sh"
+
+    - name: "verify-firewall"
+      description: "Confirms no live nftables rule drops tcp port 8443"
+      type: "file"
+      source: "validation/validate-firewall.sh"
+
+    - name: "verify-portal"
+      description: "Confirms curl gets a 2xx or 3xx answer from http://portal.lab:8443/ and the portal service was left running"
+      type: "file"
+      source: "validation/validate-portal.sh"
+
+teardown:
+  keepCluster: false

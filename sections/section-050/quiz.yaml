@@ -1,0 +1,242 @@
+# Knowledge check for section 050. Listed in astrona.yaml as a `type: quiz` entry after the capstone lab.
+schema_version: 1
+kind: question_bank
+id: ats003-050
+course_id: ATS003
+exam_code: LFCS
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-050
+  title: "Web Services And Remote Access"
+questions:
+  - id: ats003-050-q01
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain the trailing slash in proxy_pass"
+    source_readings:
+      - sections/section-050/module-01/course-02-a-first-proxy-and-the-trailing-slash.md
+    prompt: "A `location /app/` block uses `proxy_pass http://127.0.0.1:8080/;`. A request for `/app/x` arrives. What does the backend get?"
+    options:
+      - id: a
+        text: "`/app/x`"
+        explanation: "That happens when `proxy_pass` has no URI part."
+      - id: b
+        text: "`/x`, because the matched prefix is replaced by the URI given in `proxy_pass`."
+        explanation: "Correct. A `proxy_pass` with a URI part, even just `/`, replaces the matched location prefix. Without the slash the original path is passed unchanged."
+      - id: c
+        text: "`/app/x/`"
+        explanation: "No slash is added."
+      - id: d
+        text: "A 404 from nginx itself."
+        explanation: "The block matches, so nginx forwards the request."
+    correct_option: b
+    explanation: "A `proxy_pass` with a URI part, even just `/`, replaces the matched location prefix. Without the slash the original path is passed unchanged."
+
+  - id: ats003-050-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Pass the original Host header to a backend"
+    source_readings:
+      - sections/section-050/module-01/course-03-headers-and-location-matching.md
+    prompt: "The backend needs the host name the client typed. Which directive does that?"
+    options:
+      - id: a
+        text: "`proxy_set_header Host $host;`"
+        explanation: "Correct. By default nginx sends the backend's own address as the Host header. This directive replaces it."
+      - id: b
+        text: "`proxy_pass_host off;` only"
+        explanation: "This changes how the Host header is chosen, but does not name the client host."
+      - id: c
+        text: "`add_header Host $host;`"
+        explanation: "This adds a header to the response for the client."
+      - id: d
+        text: "`server_name $host;`"
+        explanation: "This matches incoming requests and does not alter the proxied ones."
+    correct_option: a
+    explanation: "By default nginx sends the backend's own address as the Host header. This directive replaces it."
+
+  - id: ats003-050-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Define an upstream pool"
+    source_readings:
+      - sections/section-050/module-01/course-04-upstream-pools-and-failing-backends.md
+    prompt: "How do you send traffic to two backends from one `proxy_pass`?"
+    options:
+      - id: a
+        text: "List two addresses in one `proxy_pass` line."
+        explanation: "`proxy_pass` takes one target."
+      - id: b
+        text: "Write two `location /` blocks."
+        explanation: "Duplicate locations are an error."
+      - id: c
+        text: "Set `worker_processes 2;`"
+        explanation: "This sets nginx's own workers, not backends."
+      - id: d
+        text: "Define an `upstream pool { server 10.0.0.11; server 10.0.0.12; }` block and use `proxy_pass http://pool;`."
+        explanation: "Correct. The `upstream` block names a group. The name is then used in `proxy_pass`."
+    correct_option: d
+    explanation: "The `upstream` block names a group. The name is then used in `proxy_pass`."
+
+  - id: ats003-050-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Choose a balancing method"
+    source_readings:
+      - sections/section-050/module-02/course-02-least-connections-and-hashing.md
+    prompt: "Some requests take much longer than others. Which method sends the next request to the backend with the fewest active connections?"
+    options:
+      - id: a
+        text: "`ip_hash;`"
+        explanation: "This ties each client address to one backend."
+      - id: b
+        text: "`random;` with no arguments"
+        explanation: "Random ignores load."
+      - id: c
+        text: "`least_conn;` inside the `upstream` block"
+        explanation: "Correct. Round robin ignores load. `least_conn` looks at the open connections."
+      - id: d
+        text: "`keepalive 32;`"
+        explanation: "This keeps connections to backends open and does not choose them."
+    correct_option: c
+    explanation: "Round robin ignores load. `least_conn` looks at the open connections."
+
+  - id: ats003-050-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Mark a backend as failed"
+    source_readings:
+      - sections/section-050/module-02/course-03-health-checks-and-retries.md
+    prompt: "Which server options mark a backend unavailable for 30 seconds after 3 failures?"
+    options:
+      - id: a
+        text: "`server 10.0.0.11 weight=3 backup;`"
+        explanation: "Weight and backup set preference and role. They do not detect failures."
+      - id: b
+        text: "`server 10.0.0.11 max_fails=3 fail_timeout=30s;`"
+        explanation: "Correct. After `max_fails` failures inside `fail_timeout`, nginx stops using the server for that same time."
+      - id: c
+        text: "`server 10.0.0.11 down;`"
+        explanation: "This marks the server down permanently."
+      - id: d
+        text: "`server 10.0.0.11 max_conns=30;`"
+        explanation: "This limits connections."
+    correct_option: b
+    explanation: "After `max_fails` failures inside `fail_timeout`, nginx stops using the server for that same time."
+
+  - id: ats003-050-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Understand sshd keyword precedence"
+    source_readings:
+      - sections/section-050/module-03/course-02-drop-ins-keys-and-root.md
+    prompt: "On Ubuntu `sshd_config` starts with `Include /etc/ssh/sshd_config.d/*.conf`. A drop-in sets `PasswordAuthentication no` and the main file later says `yes`. What applies?"
+    options:
+      - id: a
+        text: "`no`, because the first value found for a keyword wins and the include is read first."
+        explanation: "Correct. Use `sudo sshd -T` to see the settings that really apply."
+      - id: b
+        text: "`yes`, because the main file is the last word."
+        explanation: "In sshd the first value wins, not the last."
+      - id: c
+        text: "Both, one for each file."
+        explanation: "A keyword has one value."
+      - id: d
+        text: "Neither, sshd refuses to start."
+        explanation: "Repeated keywords are allowed."
+    correct_option: a
+    explanation: "Use `sudo sshd -T` to see the settings that really apply."
+
+  - id: ats003-050-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Test sshd settings before applying them"
+    source_readings:
+      - sections/section-050/module-03/course-04-match-blocks-and-safe-reloads.md
+    prompt: "How do you avoid locking yourself out after editing the server configuration?"
+    options:
+      - id: a
+        text: "Restart the server and hope."
+        explanation: "A mistake could leave nobody able to log in."
+      - id: b
+        text: "Reboot the machine first."
+        explanation: "This does not test the file."
+      - id: c
+        text: "Delete `/etc/ssh/sshd_config.d`."
+        explanation: "This removes settings and does not test anything."
+      - id: d
+        text: "Run `sudo sshd -t` to check syntax, keep your current session open, reload, then test a new login."
+        explanation: "Correct. A reload does not close sessions that are already open, so you can still fix a mistake."
+    correct_option: d
+    explanation: "A reload does not close sessions that are already open, so you can still fix a mistake."
+
+  - id: ats003-050-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Install a public key on a server"
+    source_readings:
+      - sections/section-050/module-04/course-01-keys-and-known-hosts.md
+    prompt: "Which command installs your public key on a remote account for key login?"
+    options:
+      - id: a
+        text: "`ssh-keygen -R host`"
+        explanation: "This removes a host from `known_hosts`."
+      - id: b
+        text: "`ssh-keyscan host`"
+        explanation: "This prints the server's host keys and installs nothing."
+      - id: c
+        text: "`ssh-copy-id user@host`"
+        explanation: "Correct. It appends your public key to `~/.ssh/authorized_keys` on the server."
+      - id: d
+        text: "`scp id_ed25519 user@host:`"
+        explanation: "This copies the private key, which must never leave your machine."
+    correct_option: c
+    explanation: "It appends your public key to `~/.ssh/authorized_keys` on the server."
+
+  - id: ats003-050-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Handle a changed host key warning"
+    source_readings:
+      - sections/section-050/module-04/course-01-keys-and-known-hosts.md
+    prompt: "After a server was rebuilt, `ssh` warns that the remote host identification has changed. You know the change is legitimate. What do you do?"
+    options:
+      - id: a
+        text: "Delete `~/.ssh/id_ed25519`."
+        explanation: "This is your own key and unrelated to the server's key."
+      - id: b
+        text: "Remove the old entry with `ssh-keygen -R host` and connect again, checking the new fingerprint."
+        explanation: "Correct. The old key in `known_hosts` no longer matches. Remove it only when you know why it changed."
+      - id: c
+        text: "Edit the server's `/etc/hosts`."
+        explanation: "The warning is about the key, not the name."
+      - id: d
+        text: "Always add `StrictHostKeyChecking no` for all hosts."
+        explanation: "This turns off protection for every connection."
+    correct_option: b
+    explanation: "The old key in `known_hosts` no longer matches. Remove it only when you know why it changed."
+
+  - id: ats003-050-q10
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Open a local port forward"
+    source_readings:
+      - sections/section-050/module-04/course-03-tunnels.md
+    prompt: "Which command makes local port 8080 reach port 80 on `web.internal` through the SSH server `gate`?"
+    options:
+      - id: a
+        text: "`ssh -L 8080:web.internal:80 user@gate`"
+        explanation: "Correct. `-L` listens on a local port and forwards the traffic through the SSH connection."
+      - id: b
+        text: "`ssh -R 8080:web.internal:80 user@gate`"
+        explanation: "`-R` opens the listening port on the server side."
+      - id: c
+        text: "`ssh -D 8080 user@gate`"
+        explanation: "`-D` makes a SOCKS proxy, not a fixed forward."
+      - id: d
+        text: "`ssh -J 8080 user@gate`"
+        explanation: "`-J` names a jump host."
+    correct_option: a
+    explanation: "`-L` listens on a local port and forwards the traffic through the SSH connection."

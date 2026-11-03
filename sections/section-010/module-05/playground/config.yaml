@@ -1,0 +1,36 @@
+# Dynamic Addressing with DHCP (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+#
+# Runtime: a single qemu VM — a plain Ubuntu 24.04 server. OS prep creates a
+# veth pair dhcpsrv0/dhcp0 and a systemd-networkd DHCP server on dhcpsrv0
+# (10.77.0.1/24, pool .100-.149, 10 minute leases). dhcp0 has no configuration.
+
+metadata:
+  name: "dhcp-client-playground"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Create the veth pair dhcpsrv0/dhcp0 and a networkd DHCP server on 10.77.0.1/24."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  qemu:
+    - name: "host"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+      cpus: 1
+      memoryMB: 1536
+      diskSizeGB: 20
+      sshPasswordAuth: false

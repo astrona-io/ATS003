@@ -1,20 +1,25 @@
-# section-040 / capstone: Time and Name Services Capstone
+---
+estimated_duration: 20m
+---
 
-This is the **unguid challenge lab** that serves as the section capstone assessment.
+# Time and Name Services Capstone Lab
 
-## Start the Sandbox VM
-To spin up this certification challenge sandbox in your host terminal, run:
-```bash
-astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-040/capstone/labs/lab-01
+Astronaut, this is a graded mission. One task with no step-by-step guidance: point a client's resolver at an internal Domain Name System (DNS) server and prove its records with `dig`. The task is in [`question.md`](./question.md), and a step-by-step walkthrough is in [`solution.md`](./solution.md).
+
+Start the mission from your own terminal:
+
+```sh
+astrona run --git ssh://git@github.com/astrona-io/ATS003.git -c sections/section-040/capstone/labs/lab-01
 ```
 
-## Learning Path & Objectives
-This challenge lab tests the integrated concepts learned across all modules in Section 040. Open the prompt file inside the VM to read the scenario goals:
-```bash
-cat question.md
+Open a shell on the lab machine with `astrona ssh`, and solve the task there. When you think you are done, send it for grading from your own terminal (not inside the lab machine):
+
+```sh
+astrona submit -c sections/section-040/capstone/labs/lab-01
 ```
 
-Implement your changes, and run the validation scripts inside the VM to verify your solutions:
-```bash
-/usr/local/bin/validate-*.sh
+When you are finished, remove the mission. The command takes its name, not its folder path:
+
+```sh
+astrona destroy ats-003-lab-040
 ```

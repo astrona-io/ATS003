@@ -1,0 +1,587 @@
+# Final domain knowledge check across all six sections.
+schema_version: 1
+kind: question_bank
+id: ats003-final
+course_id: ATS003
+exam_code: LFCS
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: domain
+  id: linux-networking
+  title: "Networking"
+questions:
+  - id: ats003-final-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Read interface state"
+    source_readings:
+      - sections/section-010/module-01/course-01-antennas-and-their-state.md
+    prompt: "Which command prints a short one-line summary of every interface with its state and addresses?"
+    options:
+      - id: a
+        text: "`ip route`"
+        explanation: "This lists routes."
+      - id: b
+        text: "`ip -br addr`"
+        explanation: "Correct. The `-br` flag prints one brief line per interface, with UP or DOWN and the addresses."
+      - id: c
+        text: "`hostnamectl`"
+        explanation: "This shows host names."
+      - id: d
+        text: "`ss -tlnp`"
+        explanation: "This lists listening sockets."
+    correct_option: b
+    explanation: "The `-br` flag prints one brief line per interface, with UP or DOWN and the addresses."
+
+  - id: ats003-final-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Spot the transient name"
+    source_readings:
+      - sections/section-010/module-02/course-02-pretty-transient-and-reboots.md
+    prompt: "`hostnamectl` shows a static name `web01` and a transient name `tmp-9f2`. What does the running system use for its own name, and what is read at the next boot?"
+    options:
+      - id: a
+        text: "Right now it uses `tmp-9f2`. At the next boot it reads `web01` from `/etc/hostname`."
+        explanation: "Correct. The transient name is the live one. The static name is the stored one."
+      - id: b
+        text: "It always uses `web01`."
+        explanation: "The transient name is the one in use until the next boot."
+      - id: c
+        text: "It uses `tmp-9f2` also after the reboot."
+        explanation: "The transient name is lost at reboot."
+      - id: d
+        text: "It uses the pretty name."
+        explanation: "The pretty name is only a label."
+    correct_option: a
+    explanation: "The transient name is the live one. The static name is the stored one."
+
+  - id: ats003-final-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain NAT address sharing"
+    source_readings:
+      - sections/section-010/module-03/course-02-ask-what-the-internet-sees.md
+    prompt: "Three VMs in one private network all report the same public address to an outside service. Why?"
+    options:
+      - id: a
+        text: "They all have the same private address."
+        explanation: "Private addresses on one network are unique."
+      - id: b
+        text: "The outside service is broken."
+        explanation: "This is normal NAT behaviour."
+      - id: c
+        text: "They use the same MAC address."
+        explanation: "The MAC address is not the cause."
+      - id: d
+        text: "They share the one public address of the NAT gateway they send traffic through."
+        explanation: "Correct. The gateway rewrites each source address to its own public one."
+    correct_option: d
+    explanation: "The gateway rewrites each source address to its own public one."
+
+  - id: ats003-final-q04
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Use /etc/hosts for a quick local name"
+    source_readings:
+      - sections/section-010/module-04/course-01-the-pocket-address-book.md
+    prompt: "You need `printer` to resolve to `192.168.1.40` on this host only, with no DNS change. What do you do?"
+    options:
+      - id: a
+        text: "Add `printer` to `/etc/hostname`."
+        explanation: "This names the host itself."
+      - id: b
+        text: "Run `ip addr add printer`."
+        explanation: "`ip addr` needs an address, not a name."
+      - id: c
+        text: "Add `192.168.1.40 printer` to `/etc/hosts`."
+        explanation: "Correct. The hosts file is read first on a default system, and it affects only this host."
+      - id: d
+        text: "Edit `/etc/resolv.conf`."
+        explanation: "This is the resolver setup and not an address book."
+    correct_option: c
+    explanation: "The hosts file is read first on a default system, and it affects only this host."
+
+  - id: ats003-final-q05
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Turn on DHCP in Netplan"
+    source_readings:
+      - sections/section-010/module-05/course-02-a-dhcp-client-in-netplan.md
+    prompt: "Which Netplan snippet asks for an IPv4 lease on `dhcp0`?"
+    options:
+      - id: a
+        text: "`dhcp0: dhcp: yes` at the top level"
+        explanation: "The interface must be under `ethernets:`."
+      - id: b
+        text: "`ethernets:` then `dhcp0:` then `dhcp4: true`"
+        explanation: "Correct. The interface name goes under `ethernets:` and `dhcp4: true` asks for a lease."
+      - id: c
+        text: "`ethernets: dhcp0: addresses: [dhcp]`"
+        explanation: "`addresses` takes real addresses."
+      - id: d
+        text: "`bonds: dhcp0: dhcp4: true`"
+        explanation: "`bonds:` defines a bond, not an ordinary interface."
+    correct_option: b
+    explanation: "The interface name goes under `ethernets:` and `dhcp4: true` asks for a lease."
+
+  - id: ats003-final-q06
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Choose LACP"
+    source_readings:
+      - sections/section-020/module-01/course-02-modes-and-failover.md
+    prompt: "A switch pair is configured for link aggregation with LACP. Which bond mode must the server use?"
+    options:
+      - id: a
+        text: "`802.3ad`"
+        explanation: "Correct. This is the standard LACP mode, and both ends must agree on it."
+      - id: b
+        text: "`active-backup`"
+        explanation: "This works without the switch and does not speak LACP."
+      - id: c
+        text: "`balance-rr`"
+        explanation: "This needs a static switch setup and is not LACP."
+      - id: d
+        text: "`broadcast`"
+        explanation: "This sends every frame on all links."
+    correct_option: a
+    explanation: "This is the standard LACP mode, and both ends must agree on it."
+
+  - id: ats003-final-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Read the bridge table"
+    source_readings:
+      - sections/section-020/module-02/course-02-how-a-bridge-learns.md
+    prompt: "Which command shows which MAC addresses a bridge learned on which port?"
+    options:
+      - id: a
+        text: "`ip route show`"
+        explanation: "This shows routes."
+      - id: b
+        text: "`ss -tlnp`"
+        explanation: "This shows sockets."
+      - id: c
+        text: "`nmcli device status`"
+        explanation: "This shows devices known to NetworkManager."
+      - id: d
+        text: "`bridge fdb show`"
+        explanation: "Correct. The forwarding database lists MAC addresses and the ports where they were seen."
+    correct_option: d
+    explanation: "The forwarding database lists MAC addresses and the ports where they were seen."
+
+  - id: ats003-final-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Make a static route persistent"
+    source_readings:
+      - sections/section-020/module-03/course-05-make-routes-last.md
+    prompt: "Which Netplan block keeps the route to `10.20.0.0/16` via `192.168.1.1` after a reboot?"
+    options:
+      - id: a
+        text: "`ip route add` in a shell"
+        explanation: "This is lost at reboot."
+      - id: b
+        text: "`gateway4: 10.20.0.0/16`"
+        explanation: "This is the default gateway field and takes one address."
+      - id: c
+        text: "`routes:` with `- to: 10.20.0.0/16` and `via: 192.168.1.1` under the interface"
+        explanation: "Correct. Netplan routes use `to` and `via`, and are stored with the interface."
+      - id: d
+        text: "`/etc/hosts` with the network"
+        explanation: "The hosts file does not hold routes."
+    correct_option: c
+    explanation: "Netplan routes use `to` and `via`, and are stored with the interface."
+
+  - id: ats003-final-q09
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Order the firewall rules"
+    source_readings:
+      - sections/section-030/module-01/course-06-connection-tracking.md
+    prompt: "An input chain has `policy drop`. Which rule set lets a host answer SSH and its own outgoing connections, and nothing else from outside?"
+    options:
+      - id: a
+        text: "`ct state new accept` only"
+        explanation: "This allows every new connection."
+      - id: b
+        text: "`ct state established,related accept` and `tcp dport 22 accept`"
+        explanation: "Correct. Replies to known flows are allowed, one new service is allowed, and the policy drops the rest."
+      - id: c
+        text: "`tcp dport 22 drop` with `policy accept`"
+        explanation: "This blocks the one thing you want to allow."
+      - id: d
+        text: "No rules, because `policy drop` allows replies"
+        explanation: "Without a rule for replies even answers are dropped."
+    correct_option: b
+    explanation: "Replies to known flows are allowed, one new service is allowed, and the policy drops the rest."
+
+  - id: ats003-final-q10
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Check the effective zone setup"
+    source_readings:
+      - sections/section-030/module-02/course-04-runtime-permanent-operations.md
+    prompt: "Which command lists what is allowed in the currently active zones, in the running firewall?"
+    options:
+      - id: a
+        text: "`sudo firewall-cmd --list-all`"
+        explanation: "Correct. It prints the services, ports and rules of the default or chosen zone as they run now."
+      - id: b
+        text: "`sudo firewall-cmd --reload`"
+        explanation: "This applies the stored configuration, it does not list anything."
+      - id: c
+        text: "`sudo nft flush ruleset`"
+        explanation: "This removes all nftables rules."
+      - id: d
+        text: "`sudo ss -tlnp`"
+        explanation: "This lists sockets."
+    correct_option: a
+    explanation: "It prints the services, ports and rules of the default or chosen zone as they run now."
+
+  - id: ats003-final-q11
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Check chrony health"
+    source_readings:
+      - sections/section-040/module-01/course-04-slew-step-and-the-system-view.md
+    prompt: "Which command shows the clock offset and whether chrony is synchronised?"
+    options:
+      - id: a
+        text: "`chronyc add`"
+        explanation: "This is not a read command."
+      - id: b
+        text: "`timedatectl set-time`"
+        explanation: "This sets the time by hand."
+      - id: c
+        text: "`dig time`"
+        explanation: "`dig` does not read the clock."
+      - id: d
+        text: "`chronyc tracking`"
+        explanation: "Correct. It prints the reference source, the offset and the leap status."
+    correct_option: d
+    explanation: "It prints the reference source, the offset and the leap status."
+
+  - id: ats003-final-q12
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Serve time when the upstream is gone"
+    source_readings:
+      - sections/section-040/module-02/course-03-local-stratum-and-firewalls.md
+    prompt: "An isolated lab network has no upstream NTP source but clients still need the server to answer. Which chrony setting makes that possible?"
+    options:
+      - id: a
+        text: "`makestep 1 3`"
+        explanation: "This controls stepping."
+      - id: b
+        text: "`server 127.127.1.0`"
+        explanation: "This is an old reference clock syntax, not the chrony way."
+      - id: c
+        text: "`local stratum 10`"
+        explanation: "Correct. It lets the server keep serving its own clock at a high stratum when no source is reachable."
+      - id: d
+        text: "`allow all`"
+        explanation: "This opens access, but does not provide a clock source."
+    correct_option: c
+    explanation: "It lets the server keep serving its own clock at a high stratum when no source is reachable."
+
+  - id: ats003-final-q13
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Read an alias"
+    source_readings:
+      - sections/section-040/module-03/course-03-aliases-and-zone-transfers.md
+    prompt: "`dig www.example.lan` shows a `CNAME` to `web01.example.lan` and then an `A` record. What is a `CNAME`?"
+    options:
+      - id: a
+        text: "A mail server entry."
+        explanation: "That is an `MX` record."
+      - id: b
+        text: "An alias that points one name at another name."
+        explanation: "Correct. The resolver follows the alias and then returns the address of the target."
+      - id: c
+        text: "A reverse lookup record."
+        explanation: "That is a `PTR` record."
+      - id: d
+        text: "An address for IPv6."
+        explanation: "That is an `AAAA` record."
+    correct_option: b
+    explanation: "The resolver follows the alias and then returns the address of the target."
+
+  - id: ats003-final-q14
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Debug a name that works for dig only"
+    source_readings:
+      - sections/section-040/module-04/course-01-who-answers-a-name.md
+    prompt: "`dig db.lab.example` works, but `ping db.lab.example` says `Name or service not known`. Which check comes first?"
+    options:
+      - id: a
+        text: "Check that `/etc/nsswitch.conf` lists `dns` on the `hosts:` line and that the system resolver knows the server."
+        explanation: "Correct. `dig` asks a server directly. `ping` uses the system lookup chain, so a break there explains the difference."
+      - id: b
+        text: "Check the `dig` version."
+        explanation: "Its version does not matter."
+      - id: c
+        text: "Reinstall the DNS server."
+        explanation: "The server answers, so it works."
+      - id: d
+        text: "Disable the firewall."
+        explanation: "A firewall does not give a name error."
+    correct_option: a
+    explanation: "`dig` asks a server directly. `ping` uses the system lookup chain, so a break there explains the difference."
+
+  - id: ats003-final-q15
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Pick the matching location"
+    source_readings:
+      - sections/section-050/module-01/course-03-headers-and-location-matching.md
+    prompt: "nginx has `location /` and `location /api/`. Which block handles `/api/users`?"
+    options:
+      - id: a
+        text: "`location /`, because it is first in the file."
+        explanation: "Order does not decide between prefix locations."
+      - id: b
+        text: "Both at the same time."
+        explanation: "One location handles a request."
+      - id: c
+        text: "Neither, nginx returns 404."
+        explanation: "A prefix match exists."
+      - id: d
+        text: "`location /api/`, because it is the longest matching prefix."
+        explanation: "Correct. For prefix locations nginx picks the longest match."
+    correct_option: d
+    explanation: "For prefix locations nginx picks the longest match."
+
+  - id: ats003-final-q16
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Know the default balancing"
+    source_readings:
+      - sections/section-050/module-02/course-01-the-pool-and-round-robin.md
+    prompt: "An `upstream` block lists three servers and no method. How does nginx spread requests?"
+    options:
+      - id: a
+        text: "By least connections."
+        explanation: "That needs `least_conn;`."
+      - id: b
+        text: "By client address."
+        explanation: "That needs `ip_hash;`."
+      - id: c
+        text: "In turn, one after the other (round robin)."
+        explanation: "Correct. Round robin is the default."
+      - id: d
+        text: "Only to the first server."
+        explanation: "The others would sit idle."
+    correct_option: c
+    explanation: "Round robin is the default."
+
+  - id: ats003-final-q17
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Limit who may log in"
+    source_readings:
+      - sections/section-050/module-03/course-03-who-may-log-in.md
+    prompt: "Which directive allows only the user `ops` to log in by SSH?"
+    options:
+      - id: a
+        text: "`DenyUsers ops`"
+        explanation: "This blocks `ops`."
+      - id: b
+        text: "`AllowUsers ops`"
+        explanation: "Correct. Once `AllowUsers` is set, only the listed users may log in."
+      - id: c
+        text: "`PermitRootLogin ops`"
+        explanation: "This setting takes yes, no or similar values, not user names."
+      - id: d
+        text: "`PubkeyAuthentication ops`"
+        explanation: "This takes yes or no."
+    correct_option: b
+    explanation: "Once `AllowUsers` is set, only the listed users may log in."
+
+  - id: ats003-final-q18
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Use a host alias"
+    source_readings:
+      - sections/section-050/module-04/course-02-the-client-configuration-file.md
+    prompt: "Which `~/.ssh/config` block lets you type `ssh station` for `cadet` on host `10.0.0.5` port 2222?"
+    options:
+      - id: a
+        text: "`Host station`, then `HostName 10.0.0.5`, `User cadet` and `Port 2222`"
+        explanation: "Correct. `Host` names the alias and the lines below it set the real values."
+      - id: b
+        text: "`Alias station 10.0.0.5:2222`"
+        explanation: "There is no `Alias` keyword."
+      - id: c
+        text: "`Host 10.0.0.5` then `Name station`"
+        explanation: "The alias goes on the `Host` line."
+      - id: d
+        text: "`station = cadet@10.0.0.5`"
+        explanation: "This is not the file format."
+    correct_option: a
+    explanation: "`Host` names the alias and the lines below it set the real values."
+
+  - id: ats003-final-q19
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Make a static profile with nmcli"
+    source_readings:
+      - sections/section-060/module-01/course-02-create-a-static-profile.md
+    prompt: "Which `nmcli` option set makes a profile use a fixed address instead of DHCP?"
+    options:
+      - id: a
+        text: "`ipv4.method auto`"
+        explanation: "This asks DHCP."
+      - id: b
+        text: "`ipv4.dns 10.0.0.5`"
+        explanation: "This sets a DNS server only."
+      - id: c
+        text: "`connection.autoconnect yes`"
+        explanation: "This only starts the profile at boot."
+      - id: d
+        text: "`ipv4.addresses 10.0.0.5/24 ipv4.method manual`"
+        explanation: "Correct. The method must be `manual` and an address must be given."
+    correct_option: d
+    explanation: "The method must be `manual` and an address must be given."
+
+  - id: ats003-final-q20
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Know what Netplan does"
+    source_readings:
+      - sections/section-060/module-02/course-01-how-netplan-works.md
+    prompt: "What is the role of Netplan on Ubuntu Server?"
+    options:
+      - id: a
+        text: "It routes packets."
+        explanation: "The kernel routes packets."
+      - id: b
+        text: "It is a DHCP server."
+        explanation: "It only writes client settings."
+      - id: c
+        text: "It reads YAML files and writes the configuration for a backend such as `systemd-networkd` or NetworkManager."
+        explanation: "Correct. Netplan is a front end. The backend does the work."
+      - id: d
+        text: "It is a firewall."
+        explanation: "It does not filter traffic."
+    correct_option: c
+    explanation: "Netplan is a front end. The backend does the work."
+
+  - id: ats003-final-q21
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Show UDP and Unix sockets"
+    source_readings:
+      - sections/section-060/module-03/course-02-connections-udp-unix.md
+    prompt: "Which command lists listening UDP sockets with numbers and owners?"
+    options:
+      - id: a
+        text: "`sudo ss -tlnp`"
+        explanation: "This is TCP."
+      - id: b
+        text: "`sudo ss -ulnp`"
+        explanation: "Correct. `-u` selects UDP and `-l`, `-n` and `-p` act as before."
+      - id: c
+        text: "`sudo ss -xl`"
+        explanation: "This shows Unix sockets."
+      - id: d
+        text: "`sudo tcpdump -u`"
+        explanation: "This is not a socket listing."
+    correct_option: b
+    explanation: "`-u` selects UDP and `-l`, `-n` and `-p` act as before."
+
+  - id: ats003-final-q22
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Filter a capture by host and port"
+    source_readings:
+      - sections/section-060/module-04/course-02-filter-the-capture.md
+    prompt: "Which tcpdump filter shows only TCP traffic to or from `10.0.0.5` on port 443?"
+    options:
+      - id: a
+        text: "`tcp port 443 and host 10.0.0.5`"
+        explanation: "Correct. Primitives join with `and`. The filter runs in the kernel, so it cuts the noise early."
+      - id: b
+        text: "`port 443 host 10.0.0.5` with a comma"
+        explanation: "Primitives need `and`, `or` or `not`."
+      - id: c
+        text: "`-p 443 -h 10.0.0.5`"
+        explanation: "These are not tcpdump options for filtering."
+      - id: d
+        text: "`grep 443`"
+        explanation: "This is not a capture filter."
+    correct_option: a
+    explanation: "Primitives join with `and`. The filter runs in the kernel, so it cuts the noise early."
+
+  - id: ats003-final-q23
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Tell a closed port from a blocked one"
+    source_readings:
+      - sections/section-060/module-05/course-03-prove-the-port-and-read-the-wire.md
+    prompt: "`curl` to a server returns `Connection refused` immediately. What does that tell you?"
+    options:
+      - id: a
+        text: "A firewall dropped the packet."
+        explanation: "A drop leads to a timeout."
+      - id: b
+        text: "The name did not resolve."
+        explanation: "The error would be about the name."
+      - id: c
+        text: "The route is missing."
+        explanation: "The error would be `Network is unreachable`."
+      - id: d
+        text: "The host answered, but nothing listens on that port, so check the service."
+        explanation: "Correct. A blocked port usually hangs until a timeout. A refusal is an answer."
+    correct_option: d
+    explanation: "A blocked port usually hangs until a timeout. A refusal is an answer."
+
+  - id: ats003-final-q24
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Use trace tools in the right place"
+    source_readings:
+      - sections/section-060/module-05/course-02-follow-the-path.md
+    prompt: "Pings to a server fail. Which sequence is the right way to find out where packets stop?"
+    options:
+      - id: a
+        text: "Run `tcpdump` on a random interface."
+        explanation: "Capturing without a target gives no answer."
+      - id: b
+        text: "Reinstall the network stack."
+        explanation: "A guess that changes too much."
+      - id: c
+        text: "Check `ip route get <address>`, then run `mtr <address>` and read where loss starts."
+        explanation: "Correct. Route first, then the path. This finds the first broken rung or hop."
+      - id: d
+        text: "Edit `/etc/hosts`."
+        explanation: "This helps names, not packets."
+    correct_option: c
+    explanation: "Route first, then the path. This finds the first broken rung or hop."
+
+  - id: ats003-final-q25
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Renew a lease by hand"
+    source_readings:
+      - sections/section-010/module-05/course-03-overrides-and-renewals.md
+    prompt: "Which command asks systemd-networkd to renew the lease on `dhcp0`?"
+    options:
+      - id: a
+        text: "`sudo netplan renew dhcp0`"
+        explanation: "Netplan has no `renew` command."
+      - id: b
+        text: "`sudo networkctl renew dhcp0`"
+        explanation: "Correct. It asks the server again for the lease on that interface."
+      - id: c
+        text: "`sudo ip addr flush dhcp0`"
+        explanation: "This removes addresses and requests nothing."
+      - id: d
+        text: "`sudo hostnamectl renew`"
+        explanation: "`hostnamectl` is for names."
+    correct_option: b
+    explanation: "It asks the server again for the lease on that interface."

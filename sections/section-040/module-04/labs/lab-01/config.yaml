@@ -1,0 +1,49 @@
+metadata:
+  name: "ats-003-lab-044"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+
+bootstrap:
+  init:
+    - name: "dns-client-lab-setup"
+      description: "Creates the dummy interface dns0 (10.55.0.53/24), starts a BIND server for lab.example on it, and leaves systemd-resolved unaware of it (bind9 and systemd-resolved ship in the base LFCS image)"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-dropin"
+      description: "Confirms a resolved.conf drop-in sets DNS=10.55.0.53 and Domains=lab.example"
+      type: "file"
+      source: "validation/validate-dropin.sh"
+
+    - name: "verify-resolver-live"
+      description: "Confirms systemd-resolved is running and reports 10.55.0.53 as a DNS server"
+      type: "file"
+      source: "validation/validate-resolver-live.sh"
+
+    - name: "verify-short-name"
+      description: "Confirms getent resolves the short name db to 203.0.113.20 through the search domain"
+      type: "file"
+      source: "validation/validate-short-name.sh"
+
+    - name: "verify-hosts-override"
+      description: "Confirms getent resolves www.lab.example to 198.51.100.80 from /etc/hosts while the DNS server still answers 203.0.113.10"
+      type: "file"
+      source: "validation/validate-hosts-override.sh"
+
+teardown:
+  keepCluster: false

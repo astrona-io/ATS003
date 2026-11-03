@@ -1,0 +1,242 @@
+# Knowledge check for section 010. Listed in astrona.yaml as a `type: quiz` entry after the capstone lab.
+schema_version: 1
+kind: question_bank
+id: ats003-010
+course_id: ATS003
+exam_code: LFCS
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-010
+  title: "Core Host Configuration"
+questions:
+  - id: ats003-010-q01
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain why an address added with ip addr add is lost at reboot and how to make it persistent"
+    source_readings:
+      - sections/section-010/module-01/course-03-runtime-and-persistent-configuration.md
+    prompt: "You run `sudo ip addr add 192.168.50.10/24 dev eth1` and traffic flows. After a reboot the address is gone. What happened, and what is the lasting fix?"
+    options:
+      - id: a
+        text: "The address expired because `/24` is a lease time."
+        explanation: "The prefix length sets the sector size. It is not a time."
+      - id: b
+        text: "The command changed the running kernel state only. Put the address in a Netplan file and run `sudo netplan apply`."
+        explanation: "Correct. `ip addr add` edits the live kernel table, which starts empty at boot. Netplan holds the settings the system re-reads at every start."
+      - id: c
+        text: "The kernel rejected the address at boot because `eth1` was down."
+        explanation: "The command worked, so the address was accepted. It simply is not stored anywhere."
+      - id: d
+        text: "Run `ip addr add` again with `--permanent`."
+        explanation: "`ip addr add` has no `--permanent` option. That belongs to `firewall-cmd`."
+    correct_option: b
+    explanation: "`ip addr add` edits the live kernel table, which starts empty at boot. Netplan holds the settings the system re-reads at every start."
+
+  - id: ats003-010-q02
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Read an IPv4 address with a prefix length and find its network"
+    source_readings:
+      - sections/section-010/module-01/course-02-call-signs-sectors-and-the-way-out.md
+    prompt: "A host has the address `192.168.50.77/24`. Which statement is true?"
+    options:
+      - id: a
+        text: "It belongs to the network `192.168.50.0/24`, and the first three bytes name the sector."
+        explanation: "Correct. A `/24` prefix fixes the first 24 bits (three bytes) as the network part. The last byte is the host part."
+      - id: b
+        text: "It belongs to the network `192.168.0.0/24`."
+        explanation: "With `/24` the third byte is part of the network, so it stays `50`."
+      - id: c
+        text: "The prefix `/24` means the host may use 24 addresses."
+        explanation: "A `/24` holds 256 addresses. The number is the count of network bits."
+      - id: d
+        text: "The prefix tells the lease time in hours."
+        explanation: "A prefix has nothing to do with time."
+    correct_option: a
+    explanation: "A `/24` prefix fixes the first 24 bits (three bytes) as the network part. The last byte is the host part."
+
+  - id: ats003-010-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Distinguish the static, transient and pretty hostnames and set the static one"
+    source_readings:
+      - sections/section-010/module-02/course-02-pretty-transient-and-reboots.md
+    prompt: "You must rename a server so the new name survives a reboot. Which command does that?"
+    options:
+      - id: a
+        text: "`sudo hostname web01`"
+        explanation: "This changes only the running (transient) name, which is lost at reboot."
+      - id: b
+        text: "`sudo hostnamectl set-hostname --pretty web01`"
+        explanation: "The pretty name is a free-text label. It does not change the name the network uses."
+      - id: c
+        text: "`echo web01 > /etc/hosts`"
+        explanation: "`/etc/hosts` is an address book, not the host name file. This would also overwrite it."
+      - id: d
+        text: "`sudo hostnamectl set-hostname web01`"
+        explanation: "Correct. `hostnamectl set-hostname` writes the static name to `/etc/hostname` and also updates the running name."
+    correct_option: d
+    explanation: "`hostnamectl set-hostname` writes the static name to `/etc/hostname` and also updates the running name."
+
+  - id: ats003-010-q04
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Name the three host names Linux keeps"
+    source_readings:
+      - sections/section-010/module-02/course-01-three-names-for-one-ship.md
+    prompt: "Which list names the three host names that `hostnamectl` can show?"
+    options:
+      - id: a
+        text: "Short, long and fully qualified."
+        explanation: "Those describe how a name is written, not the three kinds `hostnamectl` stores."
+      - id: b
+        text: "Primary, backup and cached."
+        explanation: "These are not host name kinds."
+      - id: c
+        text: "Static, transient and pretty."
+        explanation: "Correct. The static name lives in `/etc/hostname`, the transient name is the one running now, and the pretty name is a free-form label."
+      - id: d
+        text: "Local, domain and global."
+        explanation: "These are not host name kinds."
+    correct_option: c
+    explanation: "The static name lives in `/etc/hostname`, the transient name is the one running now, and the pretty name is a free-form label."
+
+  - id: ats003-010-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain why a machine behind NAT shows a private address locally"
+    source_readings:
+      - sections/section-010/module-03/course-01-private-addresses-and-nat.md
+    prompt: "On a cloud VM `ip addr show` lists only `10.0.0.50`, but an API partner needs your public IP. Why is it not listed?"
+    options:
+      - id: a
+        text: "The interface is down."
+        explanation: "An interface that is down would show no `10.0.0.50` address either."
+      - id: b
+        text: "The VM sits behind a NAT gateway. The public address belongs to the gateway, not to the VM's own interface."
+        explanation: "Correct. NAT rewrites the private source address at the edge. The VM only knows its own interface configuration."
+      - id: c
+        text: "The transient host name hides it."
+        explanation: "Host names never hide addresses."
+      - id: d
+        text: "IPv6 link-local addresses take priority."
+        explanation: "They are shown in addition, and they do not hide IPv4 addresses."
+    correct_option: b
+    explanation: "NAT rewrites the private source address at the edge. The VM only knows its own interface configuration."
+
+  - id: ats003-010-q06
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Find the public address the internet sees"
+    source_readings:
+      - sections/section-010/module-03/course-02-ask-what-the-internet-sees.md
+    prompt: "Which action shows the public address that the internet sees for your VM?"
+    options:
+      - id: a
+        text: "Ask an outside service that echoes the address it sees, for example with `curl`."
+        explanation: "Correct. Only a machine outside the NAT gateway can tell which address your traffic arrives from."
+      - id: b
+        text: "Run `ip route show default`."
+        explanation: "This shows the gateway inside your network, not your public address."
+      - id: c
+        text: "Run `hostnamectl`."
+        explanation: "This shows host names, not addresses seen from outside."
+      - id: d
+        text: "Read `/etc/hosts`."
+        explanation: "This file is a local address book. It knows nothing about the outside."
+    correct_option: a
+    explanation: "Only a machine outside the NAT gateway can tell which address your traffic arrives from."
+
+  - id: ats003-010-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Write an /etc/hosts entry and explain lookup order"
+    source_readings:
+      - sections/section-010/module-04/course-01-the-pocket-address-book.md
+    prompt: "`/etc/hosts` contains `10.1.1.20 db01` and `nsswitch.conf` has `hosts: files dns`. A DNS server also holds `db01 = 10.9.9.9`. What does `getent hosts db01` print?"
+    options:
+      - id: a
+        text: "`10.9.9.9`, because DNS is more official."
+        explanation: "The order in `nsswitch.conf` decides, not how official a source is."
+      - id: b
+        text: "Both addresses, one per line."
+        explanation: "The lookup stops at the first source that answers."
+      - id: c
+        text: "An error, because the sources disagree."
+        explanation: "The sources are never compared. The first answer is used."
+      - id: d
+        text: "`10.1.1.20`, because `files` is consulted before `dns`."
+        explanation: "Correct. The `hosts:` line in `nsswitch.conf` lists the sources in order. The first source with an answer wins."
+    correct_option: d
+    explanation: "The `hosts:` line in `nsswitch.conf` lists the sources in order. The first source with an answer wins."
+
+  - id: ats003-010-q08
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Write a valid /etc/hosts line"
+    source_readings:
+      - sections/section-010/module-04/course-02-write-an-entry-and-test-it.md
+    prompt: "Which line is a correct `/etc/hosts` entry for `app01` with the alias `app`?"
+    options:
+      - id: a
+        text: "`app01 app 10.1.1.30`"
+        explanation: "The address must come first."
+      - id: b
+        text: "`10.1.1.30 = app01`"
+        explanation: "There is no equals sign in this format."
+      - id: c
+        text: "`10.1.1.30 app01 app`"
+        explanation: "Correct. The format is: address first, then the official name, then any aliases, separated by spaces."
+      - id: d
+        text: "`app01: 10.1.1.30`"
+        explanation: "A colon is not part of the format."
+    correct_option: c
+    explanation: "The format is: address first, then the official name, then any aliases, separated by spaces."
+
+  - id: ats003-010-q09
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Name the four DHCP messages in order"
+    source_readings:
+      - sections/section-010/module-05/course-01-the-lease-conversation.md
+    prompt: "In which order do the four DHCP messages arrive?"
+    options:
+      - id: a
+        text: "Request, Offer, Discover, Acknowledge."
+        explanation: "The client cannot request before it has discovered a server and received an offer."
+      - id: b
+        text: "Discover, Offer, Request, Acknowledge."
+        explanation: "Correct. The client asks, the server offers, the client accepts the offer, the server confirms the lease."
+      - id: c
+        text: "Offer, Discover, Acknowledge, Request."
+        explanation: "The server never offers before it is asked."
+      - id: d
+        text: "Discover, Request, Offer, Acknowledge."
+        explanation: "The request answers an offer, so it comes after it."
+    correct_option: b
+    explanation: "The client asks, the server offers, the client accepts the offer, the server confirms the lease."
+
+  - id: ats003-010-q10
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Keep the address from a lease and refuse its routes"
+    source_readings:
+      - sections/section-010/module-05/course-03-overrides-and-renewals.md
+    prompt: "A client must take its address from DHCP but must keep its current default route. Which Netplan setting does that?"
+    options:
+      - id: a
+        text: "`dhcp4: true` with `dhcp4-overrides: use-routes: false`"
+        explanation: "Correct. The override tells the client to ignore the router and the routes from the lease and keep the address."
+      - id: b
+        text: "`dhcp4: false` with `use-routes: true`"
+        explanation: "With DHCP off there is no lease at all."
+      - id: c
+        text: "`dhcp4-overrides: use-dns: false`"
+        explanation: "This refuses the DNS servers, not the routes."
+      - id: d
+        text: "`dhcp4: true` with `route-metric: 0`"
+        explanation: "A metric of 0 would make the lease route more preferred, not removed."
+    correct_option: a
+    explanation: "The override tells the client to ignore the router and the routes from the lease and keep the address."

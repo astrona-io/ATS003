@@ -1,7 +1,6 @@
 # Solution Walkthrough
 
-You will replace the time-source list in one config file, restart the
-daemon, and wait for it to lock on. Everything runs on the VM's `terminal`.
+You will replace the list of time sources in one configuration file, restart chrony, and wait for it to lock on. chrony is the ship's clockmaster: `chronyd` corrects the clock, and `chronyc` is the console you talk to it with. Everything runs in the lab virtual machine's `terminal`.
 
 | Piece | Where | Note |
 | --- | --- | --- |
@@ -12,8 +11,7 @@ daemon, and wait for it to lock on. Everything runs on the VM's `terminal`.
 
 ## The feedback loop
 
-Grading runs from the **host terminal** — the shell where you typed
-`astrona run`, not inside the VM:
+Grading runs from the **host terminal**, the shell where you typed `astrona run`, not inside the virtual machine:
 
 ```bash
 astrona submit --git git@github.com:astrona-io/ATS003.git -c sections/section-040/module-01/labs/lab-01
@@ -29,24 +27,19 @@ FAIL  minpoll
 FAIL  chronyd-synced
 ```
 
-The first four read the config file and pass as soon as you save it. The
-last needs the daemon restarted *and* actually synced, which takes a little
-time. Run the check after each step.
+The first four read the configuration file and pass as soon as you save it. The last one needs chrony restarted *and* actually synchronised, which takes a little time. Run the check after each step.
 
 ---
 
-## Step 1: Open the config and clear the old sources
+## Step 1: Open the configuration file and clear the old sources
 
-On the VM:
+In the virtual machine:
 
 ```bash
 sudo nano /etc/chrony/chrony.conf
 ```
 
-Find every line that starts with `pool ` or `server ` and put a `#` in
-front of it. This matters: the checks look at the **first** line for each
-host, so a leftover default `pool ntp.ubuntu.com iburst` (with no
-`maxpoll`) would be read instead of your new line and fail the poll checks.
+Find every line that starts with `pool ` or `server ` and put a `#` in front of it. The task asks for exactly four sources, so the default sources (for example a `pool ntp.ubuntu.com iburst` line) must not stay active next to your new lines.
 
 ---
 
@@ -61,38 +54,34 @@ server ntp.ubuntu.com iburst minpoll 4 maxpoll 10
 server 0.debian.pool.ntp.org iburst minpoll 4 maxpoll 10
 ```
 
-- `server` names one time source.
-- `iburst` makes the first few polls fast, so sync happens in seconds not
-  minutes.
-- `minpoll 4` / `maxpoll 10` are the poll bounds as powers of two: 2⁴ = 16 s
-  and 2¹⁰ = 1024 s.
+- `server` names one time source, one time beacon.
+- `iburst` makes the first few polls fast, so sync happens in seconds, not minutes.
+- `minpoll 4` and `maxpoll 10` are the poll limits as powers of two: 2⁴ = 16 seconds and 2¹⁰ = 1024 seconds.
 
 Save and exit (`nano`: `Ctrl+O`, `Enter`, `Ctrl+X`).
 
-**Run the check** — `main-servers`, `fallback-servers`, `minpoll`, and
-`maxpoll` now pass.
+**Run the check.** `main-servers`, `fallback-servers`, `minpoll`, and `maxpoll` now pass.
 
 ---
 
 ## Step 3: Restart chrony and wait for sync
 
+chrony reads its configuration file only when it starts, so restart it:
+
 ```bash
 sudo systemctl restart chrony
 ```
 
-Give it 15–30 seconds, then look:
+Give it 15 to 30 seconds, then look:
 
 ```bash
 chronyc tracking
 chronyc sources -v
 ```
 
-In `chronyc tracking` you want `Leap status     : Normal`. In
-`chronyc sources` you want one source line with a `*` (the selected source).
-If it still says `Not synchronised`, wait a bit longer and re-check —
-`iburst` usually gets there within a minute.
+In `chronyc tracking` you want `Leap status     : Normal`. In `chronyc sources` you want one source line with a `*` (the selected source). If it still says `Not synchronised`, wait a bit longer and check again. `iburst` usually gets there within a minute.
 
-**Run the check** — `chronyd-synced` now passes. All five green.
+**Run the check.** `chronyd-synced` now passes. All five are green.
 
 ---
 
@@ -118,11 +107,7 @@ astrona submit --git git@github.com:astrona-io/ATS003.git -c sections/section-04
 
 ## If a check stays red
 
-- **`maxpoll` or `minpoll` fails even though your line looks right.** There
-  is another line for that host higher up in the file (a default `pool` or
-  `server` line). Comment it out — the check reads the first match.
-- **`chronyd-synced` fails.** Give it more time; `Leap status` has to reach
-  `Normal`. Confirm the daemon restarted (`systemctl status chrony`) and
-  that outbound UDP port 123 is not blocked.
-- **Edited the wrong file.** On this Ubuntu image the file is
-  `/etc/chrony/chrony.conf` (not `/etc/chrony.conf`).
+- **`main-servers` or `fallback-servers` fails.** A host name is misspelled, or its line is still commented out. The line must start with `server` (or `pool`) followed by the exact host name.
+- **`maxpoll` or `minpoll` fails.** The option is missing or mistyped on one of the four lines. Check every line with `grep -E '^(server|pool)' /etc/chrony/chrony.conf`.
+- **`chronyd-synced` fails.** Give it more time; `Leap status` has to reach `Normal`. Confirm that chrony restarted (`systemctl status chrony`) and that outgoing UDP port 123 (the NTP radio channel) is not blocked.
+- **Edited the wrong file.** On this Ubuntu image the file is `/etc/chrony/chrony.conf` (not `/etc/chrony.conf`).
