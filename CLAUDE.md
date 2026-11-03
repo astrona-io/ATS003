@@ -101,8 +101,9 @@ Strict guidelines:
   then pause the playground (`astrona stop <playground name>`), the
   `astrona run` and `astrona submit` commands, and finally
   `astrona destroy <lab name>` plus `astrona start <playground name>`. The
-  wrap-up lists the missions and ends with cleaning up the playground
-  (`astrona list`, `astrona destroy <playground name>`).
+  wrap-up (`# Summary`) lists the missions and ends with the single line
+  `<!-- astrona:playground:destroy -->`, which the platform expands into the
+  clean-up steps. Do not write the `astrona destroy` steps by hand there.
 - **Renew the playground before hands-on work.** Every reading part that
   runs commands has `<!-- astrona:playground:renew -->` exactly once, on its
   own line, right before the first hands-on step (the first "Save this as"
@@ -323,6 +324,7 @@ these names exactly as the scripts create them.
 | 010-02 | `linux-hostnames-playground` | Static hostname `web-01`, transient `dhcp-guest-42`, pretty unset |
 | 010-03 | `public-ip-playground` | An extra interface with `172.16.20.50/24` beside the management address |
 | 010-04 | `hostname-resolution-playground` | Hostname `prod-app-01`; `/etc/hosts` with `127.0.1.1 prod-app-01 app-server` and `192.168.50.10 db-primary db` |
+| 010-05 | `dhcp-client-playground` | Linked dummy-style pair `dhcpsrv0` (`10.77.0.1/24`, networkd DHCP server, pool `10.77.0.100` to `10.77.0.149`) and `dhcp0` (client, no configuration) |
 | 020-01 | `linux-bonding-playground` | Two spare member interfaces (segments `bond-net-a`, `bond-net-b`), `bonding` module loaded, no `bond0` |
 | 020-02 | `linux-bridging-playground` | Two spare bridge-port interfaces on segment `bridge-net`, no `br0` |
 | 020-03 | `static-routing-playground` | `10.0.0.50/24` (`route-net-a`) and `192.168.70.50/24` (`route-net-b`) |
@@ -331,13 +333,16 @@ these names exactly as the scripts create them.
 | 040-01 | `ntp-chrony-playground` | Two machines: `ntp-server` (`192.168.100.10`, `local stratum 8`) and `ntp-client` (`192.168.100.20`, no sources) |
 | 040-02 | `ntp-server-playground` | Two machines: `ntp-server` (`192.168.101.10`, no `allow` line) and `ntp-client` (`192.168.101.20`) |
 | 040-03 | `dns-dig-playground` | A local BIND server for the zone `lab.example` and its reverse zone `113.0.203.in-addr.arpa` |
+| 040-04 | `dns-resolver-playground` | BIND answers for `lab.example` on `dns0` (`10.55.0.53`); `systemd-resolved` is not pointed at it |
 | 050-01 | `nginx-proxy-playground` | NGINX on port 80, echo backends `backend-a` (`127.0.0.1:9001`) and `backend-b` (`127.0.0.1:9002`) |
 | 050-02 | `nginx-lb-playground` | NGINX load balancer on port 8080 (`/etc/nginx/conf.d/lb.conf`, `upstream app_pool`), backends on `9001` to `9003` |
 | 050-03 | `ssh-hardening-playground` | A second `sshd` on port 2222 (`/etc/ssh/sshd_test.conf`, `sshd-test.service`), users `alice` and `bob` |
+| 050-04 | `ssh-client-playground` | Two throwaway `sshd` services on ports 2222 and 2223 (own config files, port 22 untouched), a web service on `127.0.0.1:8081` |
 | 060-01 | `networkmanager-nmcli-playground` | NetworkManager managing only one spare interface on `192.168.120.0/24` |
 | 060-02 | `netplan-yaml-playground` | One spare interface on `192.168.130.0/24` with no Netplan file (name in `/root/lab-spare-iface`) |
 | 060-03 | `ss-socket-diagnostics-playground` | Listeners `lab-http-any` (`0.0.0.0:8080`), `lab-http-local` (`127.0.0.1:9000`), `lab-http-v6`, `lab-udp`, `lab-unix`, `lab-estab` |
 | 060-04 | `tcpdump-capture-playground` | `lab-traffic.service` on `lo`, `lab-http.service`, sample capture `/usr/local/share/lab-sample.pcap` |
+| 060-05 | `network-troubleshooting-playground` | Dummy interface `lab0` (`10.66.0.10/24`), systemd service `portal` on port 8443, tools `traceroute` and `mtr` best effort |
 
 **Graded labs** (one per module plus one capstone per section):
 
@@ -347,6 +352,7 @@ these names exactly as the scripts create them.
 | `ats-003-lab-012` | `section-010/module-02/labs/lab-01` | Rename `ubuntu-2404-base` to `web-srv1`, pretty name `Web Server 1 (Frankfurt)`, fix the `127.0.1.1` line |
 | `ats-003-lab-013` | `section-010/module-03/labs/lab-01` | Write the private and public address to `/opt/course/private_ip` and `/opt/course/public_ip` |
 | `ats-003-lab-014` | `section-010/module-04/labs/lab-01` | Same task and graders as `ats-003-lab-011` |
+| `ats-003-lab-015` | `section-010/module-05/labs/lab-01` | DHCP client: Netplan file with `dhcp4` and `dhcp4-overrides` (`use-routes: false`, `use-dns: false`) on `dhcp0`, lease from `10.77.0.100-149`, keep default route and DNS |
 | `ats-003-lab-010` | `section-010/capstone/labs/lab-01` | Same graders as `ats-003-lab-011`, with no guidance |
 | `ats-003-lab-021` | `section-020/module-01/labs/lab-01` | Bridge `br0` over `dummy0`, `active-backup` bond `bond0` over `dummy1` and `dummy2`, persisted |
 | `ats-003-lab-022` | `section-020/module-02/labs/lab-01` | Same task and graders as `ats-003-lab-021` |
@@ -358,15 +364,18 @@ these names exactly as the scripts create them.
 | `ats-003-lab-041` | `section-040/module-01/labs/lab-01` | chrony client: four `server` lines with `minpoll 4 maxpoll 10`, synchronised |
 | `ats-003-lab-042` | `section-040/module-02/labs/lab-01` | Two machines: chrony server with `allow 192.168.10.0/24`, client using `astrona-ats-003-lab-042-server` |
 | `ats-003-lab-043` | `section-040/module-03/labs/lab-01` | Two machines: point `client` at the `dns` machine, check records of `internal.example.com` with `dig` |
+| `ats-003-lab-044` | `section-040/module-04/labs/lab-01` | `systemd-resolved` drop-in with `DNS=10.55.0.53` and `Domains=lab.example`, `db` resolves, `/etc/hosts` override for `www.lab.example` |
 | `ats-003-lab-040` | `section-040/capstone/labs/lab-01` | Same task as `ats-003-lab-043`, with no guidance |
 | `ats-003-lab-051` | `section-050/module-01/labs/lab-01` | NGINX: port `8001` proxies to `2222/special`, port `8000` balances `1111` and `2222` |
 | `ats-003-lab-052` | `section-050/module-02/labs/lab-01` | Same task and graders as `ats-003-lab-051` |
 | `ats-003-lab-053` | `section-050/module-03/labs/lab-01` | `sshd`: no X11 forwarding, password login only for `elena` (not `victor`), banner `/etc/ssh/sshd-banner` |
+| `ats-003-lab-054` | `section-050/module-04/labs/lab-01` | SSH client as `cadet`: `ed25519` key, `ssh-copy-id` to `pilot` on port 2222, `Host station` in `~/.ssh/config`, tunnel `9090` to `127.0.0.1:8081` |
 | `ats-003-lab-050` | `section-050/capstone/labs/lab-01` | Same graders as `ats-003-lab-051`, with no guidance |
 | `ats-003-lab-061` | `section-060/module-01/labs/lab-01` | Same task and graders as `ats-003-lab-013` (private and public address) |
 | `ats-003-lab-062` | `section-060/module-02/labs/lab-01` | Same task and graders as `ats-003-lab-013` (private and public address) |
 | `ats-003-lab-063` | `section-060/module-03/labs/lab-01` | `myapp` on port 8080 is blocked by an nftables `drop` rule: find it with `ss`, remove it, prove it with `curl` |
 | `ats-003-lab-064` | `section-060/module-04/labs/lab-01` | Same task and graders as `ats-003-lab-063` |
+| `ats-003-lab-065` | `section-060/module-05/labs/lab-01` | Troubleshooting: `portal.lab:8443` fails on several rungs (`lab0`, name, nftables drop); fix them and prove it with `curl` |
 | `ats-003-lab-060` | `section-060/capstone/labs/lab-01` | Same graders as `ats-003-lab-063`, with no guidance |
 
 Several module labs share a task with another module's lab (see the table).
@@ -407,8 +416,8 @@ else: a lab's docs must match its `validation/` scripts.
 | Overview, sections table, how to run things | `README.md` |
 | Section overview and its modules | `sections/section-0N0/README.md` |
 | Module reading: landing page, deep-dive parts, wrap-up | `sections/section-0N0/module-0M/course.md`, `course-0N-*.md` |
-| Section knowledge check (multiple choice) | `sections/section-0N0/quiz.md` |
-| Final domain quiz | `sections/final-domain-quiz.md` |
+| Section knowledge check (multiple choice) | `sections/section-0N0/quiz.yaml` |
+| Final domain quiz | `sections/final-domain-quiz.yaml` |
 | Graded lab: task, walkthrough, setup, grader | `.../module-0M/labs/lab-01/` (`question.md`, `solution.md`, `bootstrap/`, `validation/`) |
 | Ungraded sandbox for a module | `.../module-0M/playground/` (`config.yaml`, `bootstrap/prepare.sh`, `docs/overview.md`) |
 | One graded integration lab per section | `sections/section-0N0/capstone/labs/lab-01/` |
@@ -495,7 +504,12 @@ this order:
 - Proxies and SSH: `nginx`, `reverse-proxy`, `proxy-pass`, `upstream`,
   `load-balancing`, `sshd-config`, `match-block`, `password-auth`,
   `x11-forwarding`, `ssh-banner`
-- Diagnostics: `ss`, `listening-sockets`, `tcpdump`, `curl`, `ping`
+- Diagnostics: `ip`, `ss`, `listening-sockets`, `tcpdump`, `curl`, `ping`,
+  `troubleshooting`
+- DHCP: `dhcp`, `dhcp4-overrides`, `lease`, `networkctl`
+- Resolver: `systemd-resolved`, `resolvectl`, `search-domain`
+- SSH client: `ssh-keygen`, `ssh-copy-id`, `ssh_config`, `known_hosts`,
+  `tunnel`
 
 ### Running things
 

@@ -23,5 +23,5 @@ Each module has its own playground and ends with a graded mission.
 
 When you have finished the modules:
 
-- Take the [Section 020 knowledge check](./quiz.md), five scenario questions on bonding, bridging and routing.
+- Take the [Section 020 knowledge check](./quiz.yaml), scenario questions on bonding, bridging and routing.
 - Then take on the [section capstone](./capstone/labs/lab-01/README.md): one static routing task between two machines, with no step-by-step help.

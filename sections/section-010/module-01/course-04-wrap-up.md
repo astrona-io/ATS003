@@ -1,4 +1,4 @@
-# Wrap-Up: Mission Debrief
+# Summary
 
 Well flown, astronaut. You have finished every part and the mission in this module. Before you move on, look back at what you learned, check yourself, and land the playground cleanly.
 
@@ -79,28 +79,4 @@ The default gateway: the router the machine sends traffic to when no more specif
 No. That is the link-local address every IPv6 interface gives itself. It works only on its own segment and does not make the interface reachable from other networks.
 </details>
 
-## Clean up the playground
-
-Your playground is a whole virtual machine running on your computer. When you are done with this module, remove it, and any mission that is still running.
-
-First, see what is still running:
-
-```sh
-astrona list
-```
-
-Remove the playground. The command takes its **name**, not its folder path:
-
-```sh
-astrona destroy network-interfaces-playground
-```
-
-If `astrona list` also showed the mission, remove it the same way:
-
-```sh
-astrona destroy ats-003-lab-011
-```
-
-Then run `astrona list` again and check that neither name is listed any more.
-
-You can start the playground again at any time with the `astrona run` command for its folder, `sections/section-010/module-01/playground`. It always starts clean, so nothing you broke carries over.
+<!-- astrona:playground:destroy -->

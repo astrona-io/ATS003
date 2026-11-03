@@ -1,4 +1,4 @@
-# Wrap-Up: Mission Debrief
+# Summary
 
 Well flown, astronaut. You have finished every part of this module. Before you move on, look back at what you learned, check yourself, and land the playground cleanly.
 
@@ -68,28 +68,4 @@ No. `-w` writes the packets to the file and prints only a count. Read it with `t
 tcpdump could not keep up, so the capture is incomplete. Narrow the filter, or write to a file with `-w` and analyse it later.
 </details>
 
-## Clean up the playground
-
-Your playground is a whole virtual machine running on your computer. When you are done with this module, remove it, and any mission that is still running.
-
-First, see what is still running:
-
-```sh
-astrona list
-```
-
-Remove the playground. The command takes its **name**, not its folder path:
-
-```sh
-astrona destroy tcpdump-capture-playground
-```
-
-If `astrona list` also showed the mission, remove it the same way:
-
-```sh
-astrona destroy ats-003-lab-064
-```
-
-Then run `astrona list` once more and check that neither name appears any longer.
-
-You can start the playground again at any time with the `astrona run` command for this module's playground. It always starts clean, so nothing you changed carries over.
+<!-- astrona:playground:destroy -->

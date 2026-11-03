@@ -8,6 +8,7 @@ After this section you can:
 
 - **Keep a clock in step.** Configure chrony as an NTP client, tune how often it polls, and prove the clock is synchronised.
 - **Serve time to a subnet.** Open a chrony server with `allow`, read stratum numbers, and check from the server which clients asked for the time.
+- **Resolve names on the client.** Read the lookup order in `nsswitch.conf`, find the `systemd-resolved` stub, and set DNS servers and search domains with a drop-in and `resolvectl`.
 - **Check DNS records.** Point a machine at a DNS server, and use `dig` to check address, mail, name server and reverse records, with and without `@server`.
 
 ## The modules
@@ -17,10 +18,11 @@ Each module has a short landing page, a few parts, a graded mission right after 
 1. [NTP Client Time Synchronization](./module-01/course.md): chrony as a client, `server` and `pool` lines, reading `chronyc sources` and `chronyc tracking`, slewing and stepping.
 2. [NTP Server Mode and Stratums](./module-02/course.md): chrony as a server, `allow` and `deny`, stratum, `local stratum`, and the firewall rule for port 123.
 3. [DNS Verification with dig](./module-03/course.md): reading a `dig` answer, `@server`, reverse lookups, `NXDOMAIN` versus `NODATA`, aliases and zone transfers.
+4. [DNS Client Resolution](./module-04/course.md): who answers a name, the `systemd-resolved` stub, `resolvectl`, drop-ins, search domains and `/etc/hosts` overrides.
 
 ## Check your knowledge
 
-- [Section 040 Knowledge Check](./quiz.md): multiple-choice questions on all three modules.
+- [Section 040 Knowledge Check](./quiz.yaml): multiple-choice questions on all four modules.
 
 ## The capstone
 

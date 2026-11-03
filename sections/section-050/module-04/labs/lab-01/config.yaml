@@ -1,0 +1,49 @@
+metadata:
+  name: "ats-003-lab-054"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+
+bootstrap:
+  init:
+    - name: "ssh-client-lab-setup"
+      description: "Creates the users cadet and pilot, a throwaway sshd on 127.0.0.1:2222 that accepts password and key logins for pilot, and a web service on 127.0.0.1:8081 (openssh and curl ship in the base LFCS image)"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-key-pair"
+      description: "Confirms cadet owns an ed25519 key pair with a private key readable only by cadet"
+      type: "file"
+      source: "validation/validate-key-pair.sh"
+
+    - name: "verify-key-installed"
+      description: "Confirms the public key of cadet is in the authorized_keys file of pilot"
+      type: "file"
+      source: "validation/validate-key-installed.sh"
+
+    - name: "verify-host-alias"
+      description: "Confirms 'ssh -G station' resolves to pilot@localhost port 2222 and a batch-mode login as cadet works"
+      type: "file"
+      source: "validation/validate-host-alias.sh"
+
+    - name: "verify-tunnel"
+      description: "Confirms an ssh process listens on 127.0.0.1:9090 and the web service answers through it"
+      type: "file"
+      source: "validation/validate-tunnel.sh"
+
+teardown:
+  keepCluster: false

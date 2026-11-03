@@ -1,4 +1,4 @@
-# Wrap-Up: Mission Debrief
+# Summary
 
 Well flown, astronaut. You have finished every part and the mission in this module. Before you move on, look back at what you learned, check yourself, and land the playground cleanly.
 
@@ -84,28 +84,4 @@ The restart. chrony reads the configuration file only when it starts: run `sudo 
 Not by itself. `makestep` only allows automatic steps during the first few updates after chrony starts. Later, chrony slews the error out slowly, unless you run `sudo chronyc makestep`.
 </details>
 
-## Clean up the playground
-
-Your playground is two training ships running on your machine. When you are done with this module, remove them, and any mission that is still running.
-
-First, see what is still running:
-
-```sh
-astrona list
-```
-
-Remove the playground. The command takes its **name**, not its folder path:
-
-```sh
-astrona destroy ntp-chrony-playground
-```
-
-If `astrona list` also showed the mission, remove it the same way:
-
-```sh
-astrona destroy ats-003-lab-041
-```
-
-Then run `astrona list` again and check that neither name appears any more.
-
-You can start the playground again at any time with the `astrona run` command from the module's landing page. It always starts clean, so nothing you broke carries over.
+<!-- astrona:playground:destroy -->

@@ -1,0 +1,242 @@
+# Knowledge check for section 040. Listed in astrona.yaml as a `type: quiz` entry after the capstone lab.
+schema_version: 1
+kind: question_bank
+id: ats003-040
+course_id: ATS003
+exam_code: LFCS
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-040
+  title: "Time, Names And Resolution"
+questions:
+  - id: ats003-040-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Read the chrony source list"
+    source_readings:
+      - sections/section-040/module-01/course-02-add-a-time-source.md
+    prompt: "In `chronyc sources`, which marker shows the source chrony is currently synchronised to?"
+    options:
+      - id: a
+        text: "`^?`"
+        explanation: "This means the source cannot be reached or has too little data."
+      - id: b
+        text: "`^*`"
+        explanation: "Correct. The `*` marks the selected source, and `^` means it is a server."
+      - id: c
+        text: "`^x`"
+        explanation: "This marks a source judged a falseticker."
+      - id: d
+        text: "`^~`"
+        explanation: "This marks a source with variable timing."
+    correct_option: b
+    explanation: "The `*` marks the selected source, and `^` means it is a server."
+
+  - id: ats003-040-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Add an NTP server to chrony"
+    source_readings:
+      - sections/section-040/module-01/course-03-write-the-source-into-the-configuration-file.md
+    prompt: "How do you add `ntp.example.lan` as a time source on Ubuntu 24.04?"
+    options:
+      - id: a
+        text: "Add `server ntp.example.lan iburst` to `/etc/chrony/chrony.conf` and restart the `chrony` service."
+        explanation: "Correct. The `server` line names a source. `iburst` speeds up the first sync."
+      - id: b
+        text: "Add `ntp.example.lan` to `/etc/hosts`."
+        explanation: "This only names a host. It does not make chrony use it."
+      - id: c
+        text: "Run `date -s ntp.example.lan`."
+        explanation: "`date -s` takes a time, not a server name."
+      - id: d
+        text: "Edit `/etc/hostname`."
+        explanation: "This file holds the host name."
+    correct_option: a
+    explanation: "The `server` line names a source. `iburst` speeds up the first sync."
+
+  - id: ats003-040-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain slewing and stepping"
+    source_readings:
+      - sections/section-040/module-01/course-04-slew-step-and-the-system-view.md
+    prompt: "What is the difference between slewing and stepping a clock?"
+    options:
+      - id: a
+        text: "Slewing needs reboot. Stepping does not."
+        explanation: "Neither needs a reboot."
+      - id: b
+        text: "Slewing is for hardware clocks and stepping for software clocks."
+        explanation: "Both change the system clock."
+      - id: c
+        text: "They are two names for the same thing."
+        explanation: "They behave very differently."
+      - id: d
+        text: "Slewing changes the clock speed a little until the error is gone. Stepping jumps the clock at once."
+        explanation: "Correct. Slewing is gentle and keeps time moving forward. A large step is used only for big errors, for example with `makestep`."
+    correct_option: d
+    explanation: "Slewing is gentle and keeps time moving forward. A large step is used only for big errors, for example with `makestep`."
+
+  - id: ats003-040-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Let clients use chrony as a server"
+    source_readings:
+      - sections/section-040/module-02/course-02-open-the-server-with-allow.md
+    prompt: "Which setting lets hosts in `192.168.50.0/24` use your chrony as their time source?"
+    options:
+      - id: a
+        text: "`server 192.168.50.0/24`"
+        explanation: "`server` adds a source to listen to, not clients to serve."
+      - id: b
+        text: "`bindcmdaddress 192.168.50.0`"
+        explanation: "This controls the command port."
+      - id: c
+        text: "`allow 192.168.50.0/24` in `chrony.conf`"
+        explanation: "Correct. Without an `allow` line chrony answers only the local machine."
+      - id: d
+        text: "`makestep 192.168.50.0/24`"
+        explanation: "`makestep` takes seconds and counts."
+    correct_option: c
+    explanation: "Without an `allow` line chrony answers only the local machine."
+
+  - id: ats003-040-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Open the firewall for NTP"
+    source_readings:
+      - sections/section-040/module-02/course-03-local-stratum-and-firewalls.md
+    prompt: "The server is configured but clients still time out. Which port must the firewall allow?"
+    options:
+      - id: a
+        text: "TCP port 123"
+        explanation: "NTP does not use TCP."
+      - id: b
+        text: "UDP port 123"
+        explanation: "Correct. NTP uses UDP port 123. Opening a TCP port does not help."
+      - id: c
+        text: "UDP port 53"
+        explanation: "This is DNS."
+      - id: d
+        text: "TCP port 22"
+        explanation: "This is SSH."
+    correct_option: b
+    explanation: "NTP uses UDP port 123. Opening a TCP port does not help."
+
+  - id: ats003-040-q06
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Read the status of a dig answer"
+    source_readings:
+      - sections/section-040/module-03/course-01-read-a-dig-answer.md
+    prompt: "A `dig` answer shows `status: NXDOMAIN`. What does it mean?"
+    options:
+      - id: a
+        text: "The server answered that the name does not exist."
+        explanation: "Correct. NXDOMAIN is a real answer, not a timeout. The name is not in the zone."
+      - id: b
+        text: "The server did not answer."
+        explanation: "A silent server gives a timeout, not a status."
+      - id: c
+        text: "The name exists but has no address."
+        explanation: "That is `NOERROR` with an empty answer."
+      - id: d
+        text: "The answer is cached."
+        explanation: "Caching is not shown by this status."
+    correct_option: a
+    explanation: "NXDOMAIN is a real answer, not a timeout. The name is not in the zone."
+
+  - id: ats003-040-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Query one specific DNS server"
+    source_readings:
+      - sections/section-040/module-03/course-02-ask-the-right-server-the-right-question.md
+    prompt: "How do you ask the server `10.55.0.53` for the address of `www.lab.example`?"
+    options:
+      - id: a
+        text: "`dig 10.55.0.53 www.lab.example`"
+        explanation: "Without `@` the address is read as a name to look up."
+      - id: b
+        text: "`dig -x 10.55.0.53`"
+        explanation: "`-x` does a reverse lookup of that address."
+      - id: c
+        text: "`getent hosts 10.55.0.53`"
+        explanation: "This looks up the address with the system sources."
+      - id: d
+        text: "`dig @10.55.0.53 www.lab.example`"
+        explanation: "Correct. The `@` selects the server to ask. Without it, `dig` uses the system resolver."
+    correct_option: d
+    explanation: "The `@` selects the server to ask. Without it, `dig` uses the system resolver."
+
+  - id: ats003-040-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain why getent and dig can disagree"
+    source_readings:
+      - sections/section-040/module-04/course-01-who-answers-a-name.md
+    prompt: "`/etc/hosts` pins `www.lab.example` to `198.51.100.80`. The DNS server says `203.0.113.10`. What do `getent hosts` and `dig` print?"
+    options:
+      - id: a
+        text: "Both print `198.51.100.80`."
+        explanation: "`dig` never reads `/etc/hosts`."
+      - id: b
+        text: "Both print `203.0.113.10`."
+        explanation: "`getent` uses `/etc/hosts` before DNS."
+      - id: c
+        text: "`getent` prints `198.51.100.80`. `dig` prints `203.0.113.10`."
+        explanation: "Correct. `getent` follows `nsswitch.conf`, so it reads `/etc/hosts` first. `dig` asks DNS directly and ignores the hosts file."
+      - id: d
+        text: "`getent` prints an error."
+        explanation: "The lookup works. It simply uses the first source."
+    correct_option: c
+    explanation: "`getent` follows `nsswitch.conf`, so it reads `/etc/hosts` first. `dig` asks DNS directly and ignores the hosts file."
+
+  - id: ats003-040-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Recognise the systemd-resolved stub"
+    source_readings:
+      - sections/section-040/module-04/course-02-the-stub-resolver.md
+    prompt: "`/etc/resolv.conf` shows `nameserver 127.0.0.53`. What is that address?"
+    options:
+      - id: a
+        text: "The company DNS server."
+        explanation: "It is a loopback address on this very host."
+      - id: b
+        text: "The local stub resolver of `systemd-resolved`, which forwards to the real DNS servers."
+        explanation: "Correct. The stub listens on this local address. Use `resolvectl status` to see the servers behind it."
+      - id: c
+        text: "The default gateway."
+        explanation: "The gateway is shown by `ip route`."
+      - id: d
+        text: "A broken setting that must be edited by hand."
+        explanation: "This is the normal Ubuntu default."
+    correct_option: b
+    explanation: "The stub listens on this local address. Use `resolvectl status` to see the servers behind it."
+
+  - id: ats003-040-q10
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Teach the resolver a DNS server and a search domain"
+    source_readings:
+      - sections/section-040/module-04/course-03-servers-and-search-domains.md
+    prompt: "How do you set the DNS server `10.55.0.53` and the search domain `lab.example` for the whole host?"
+    options:
+      - id: a
+        text: "Write a drop-in in `/etc/systemd/resolved.conf.d/` with `DNS=10.55.0.53` and `Domains=lab.example`, then restart `systemd-resolved`."
+        explanation: "Correct. The drop-in survives updates and reboots. The search domain lets `db` expand to `db.lab.example`."
+      - id: b
+        text: "Edit `/etc/resolv.conf` by hand."
+        explanation: "It is a generated link and the edit is overwritten."
+      - id: c
+        text: "Add `lab.example` to `/etc/hostname`."
+        explanation: "This sets the host name."
+      - id: d
+        text: "Run `ip addr add 10.55.0.53 dev lo`."
+        explanation: "This gives the host that address and does not set a resolver."
+    correct_option: a
+    explanation: "The drop-in survives updates and reboots. The search domain lets `db` expand to `db.lab.example`."

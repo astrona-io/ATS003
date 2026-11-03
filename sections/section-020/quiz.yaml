@@ -1,0 +1,242 @@
+# Knowledge check for section 020. Listed in astrona.yaml as a `type: quiz` entry after the capstone lab.
+schema_version: 1
+kind: question_bank
+id: ats003-020
+course_id: ATS003
+exam_code: LFCS
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-020
+  title: "Advanced Network Topologies"
+questions:
+  - id: ats003-020-q01
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Choose a bonding mode for simple failover"
+    source_readings:
+      - sections/section-020/module-01/course-02-modes-and-failover.md
+    prompt: "Two uplinks go to two ordinary switches with no special setup. You want one link active and the other as a spare. Which bonding mode fits?"
+    options:
+      - id: a
+        text: "`802.3ad`"
+        explanation: "This is LACP. It needs matching setup on the switch and uses all links at once."
+      - id: b
+        text: "`active-backup`"
+        explanation: "Correct. Only one link carries traffic, and the other takes over when it fails. No help from the switch is needed."
+      - id: c
+        text: "`balance-rr`"
+        explanation: "This sends packets across all links in turn and is not a spare-link design."
+      - id: d
+        text: "`broadcast`"
+        explanation: "This sends every packet on every link, which wastes the second link."
+    correct_option: b
+    explanation: "Only one link carries traffic, and the other takes over when it fails. No help from the switch is needed."
+
+  - id: ats003-020-q02
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Describe what a bond is"
+    source_readings:
+      - sections/section-020/module-01/course-01-one-link-from-many.md
+    prompt: "What is a bond interface?"
+    options:
+      - id: a
+        text: "A virtual interface made from several physical ones, used for redundancy or more capacity."
+        explanation: "Correct. The bond is the single interface the rest of the system sees. The physical links are its members."
+      - id: b
+        text: "A copy of an interface for monitoring."
+        explanation: "Copying traffic for monitoring is port mirroring, not bonding."
+      - id: c
+        text: "A saved set of firewall rules."
+        explanation: "Bonds do not filter."
+      - id: d
+        text: "A tunnel between two hosts."
+        explanation: "A tunnel crosses a network. A bond joins local links."
+    correct_option: a
+    explanation: "The bond is the single interface the rest of the system sees. The physical links are its members."
+
+  - id: ats003-020-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Make a bond persistent in Netplan"
+    source_readings:
+      - sections/section-020/module-01/course-03-make-the-bond-last.md
+    prompt: "Where do you describe a bond so it survives a reboot on Ubuntu 24.04?"
+    options:
+      - id: a
+        text: "In `/etc/hostname`."
+        explanation: "This file holds only the host name."
+      - id: b
+        text: "With `ip link add bond0 type bond` alone."
+        explanation: "This is lost at reboot, like any runtime change."
+      - id: c
+        text: "In `/etc/hosts`."
+        explanation: "This file maps names to addresses."
+      - id: d
+        text: "In a Netplan file under `bonds:`, with an `interfaces:` list and a `parameters:` block such as `mode: active-backup`."
+        explanation: "Correct. Netplan renders the file into the network backend configuration at every start."
+    correct_option: d
+    explanation: "Netplan renders the file into the network backend configuration at every start."
+
+  - id: ats003-020-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain how a bridge learns where hosts are"
+    source_readings:
+      - sections/section-020/module-02/course-02-how-a-bridge-learns.md
+    prompt: "How does a Linux bridge decide which port to use for a frame?"
+    options:
+      - id: a
+        text: "It reads the IP routing table."
+        explanation: "A bridge works on MAC addresses and does not route."
+      - id: b
+        text: "It asks a DHCP server."
+        explanation: "DHCP hands out addresses and has no role in forwarding."
+      - id: c
+        text: "It learns the source MAC address of each frame and remembers the port in its forwarding table."
+        explanation: "Correct. You can read the table with `bridge fdb show`. Unknown destinations are sent out on all ports."
+      - id: d
+        text: "An administrator must write every MAC address by hand."
+        explanation: "Learning is automatic."
+    correct_option: c
+    explanation: "You can read the table with `bridge fdb show`. Unknown destinations are sent out on all ports."
+
+  - id: ats003-020-q05
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Create a bridge and attach a port"
+    source_readings:
+      - sections/section-020/module-02/course-01-a-switch-inside-the-kernel.md
+    prompt: "Which commands create `br0` and attach `eth1` to it?"
+    options:
+      - id: a
+        text: "`ip addr add br0 eth1`"
+        explanation: "`ip addr add` sets an address and does not build bridges."
+      - id: b
+        text: "`ip link add br0 type bridge` and `ip link set eth1 master br0`"
+        explanation: "Correct. The first creates the bridge. The second makes `eth1` a port of it."
+      - id: c
+        text: "`ip route add br0 via eth1`"
+        explanation: "This adds a route and does not attach a port."
+      - id: d
+        text: "`bridge add eth1 br0`"
+        explanation: "This is not a command that exists."
+    correct_option: b
+    explanation: "The first creates the bridge. The second makes `eth1` a port of it."
+
+  - id: ats003-020-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain what spanning tree prevents"
+    source_readings:
+      - sections/section-020/module-02/course-03-loops-and-spanning-tree.md
+    prompt: "Two bridges are joined by two cables. What does spanning tree do for this?"
+    options:
+      - id: a
+        text: "It blocks one redundant path so frames cannot circle forever."
+        explanation: "Correct. Without it, a broadcast frame would loop between the bridges and flood the network."
+      - id: b
+        text: "It doubles the speed using both cables."
+        explanation: "Spanning tree blocks the second path. Using both needs bonding."
+      - id: c
+        text: "It encrypts frames between the bridges."
+        explanation: "It has no part in encryption."
+      - id: d
+        text: "It learns MAC addresses faster."
+        explanation: "Learning is separate from loop prevention."
+    correct_option: a
+    explanation: "Without it, a broadcast frame would loop between the bridges and flood the network."
+
+  - id: ats003-020-q07
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Add a static route with ip route"
+    source_readings:
+      - sections/section-020/module-03/course-02-draw-a-static-route.md
+    prompt: "Network `10.20.0.0/16` is reached through the router `192.168.1.1`. Which command adds that route?"
+    options:
+      - id: a
+        text: "`sudo ip addr add 10.20.0.0/16 via 192.168.1.1`"
+        explanation: "`ip addr` manages addresses, not routes."
+      - id: b
+        text: "`sudo ip route add 192.168.1.1 via 10.20.0.0/16`"
+        explanation: "The destination and the next hop are swapped."
+      - id: c
+        text: "`sudo route 10.20.0.0 192.168.1.1`"
+        explanation: "This is not the iproute2 syntax, and it is missing the mask and `add`."
+      - id: d
+        text: "`sudo ip route add 10.20.0.0/16 via 192.168.1.1`"
+        explanation: "Correct. The form is: destination, then `via` the next hop address."
+    correct_option: d
+    explanation: "The form is: destination, then `via` the next hop address."
+
+  - id: ats003-020-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain longest-prefix match"
+    source_readings:
+      - sections/section-020/module-03/course-03-metrics-sources-and-rules.md
+    prompt: "Routes exist for `default` and for `10.20.0.0/16`. A packet goes to `10.20.5.5`. Which route is used?"
+    options:
+      - id: a
+        text: "The `default` route, because it was added first."
+        explanation: "Age does not matter. Specificity decides."
+      - id: b
+        text: "Both routes, taking turns."
+        explanation: "One route is chosen for each packet."
+      - id: c
+        text: "The `/16` route, because the most specific matching prefix wins."
+        explanation: "Correct. The default route matches everything, so it is used only when nothing more specific matches."
+      - id: d
+        text: "Neither, because the routes overlap."
+        explanation: "Overlap is normal and is resolved by prefix length."
+    correct_option: c
+    explanation: "The default route matches everything, so it is used only when nothing more specific matches."
+
+  - id: ats003-020-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Use route metrics to prefer one path"
+    source_readings:
+      - sections/section-020/module-03/course-03-metrics-sources-and-rules.md
+    prompt: "Two routes to the same network exist with metrics 100 and 200. Which is used while both links are up?"
+    options:
+      - id: a
+        text: "The route with metric 200, because higher is stronger."
+        explanation: "A higher metric means a higher cost."
+      - id: b
+        text: "The route with metric 100, because a lower metric is preferred."
+        explanation: "Correct. The metric is a cost. The lowest cost wins, and the other route is the spare."
+      - id: c
+        text: "Both, split evenly."
+        explanation: "Equal-cost multipath needs equal metrics and extra setup."
+      - id: d
+        text: "Neither, because the metrics differ."
+        explanation: "Different metrics are normal and meaningful."
+    correct_option: b
+    explanation: "The metric is a cost. The lowest cost wins, and the other route is the spare."
+
+  - id: ats003-020-q10
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Check which route the kernel will use"
+    source_readings:
+      - sections/section-020/module-03/course-04-test-the-path.md
+    prompt: "Which command shows the route the kernel would use for a packet to `10.20.5.5`?"
+    options:
+      - id: a
+        text: "`ip route get 10.20.5.5`"
+        explanation: "Correct. It asks the routing table and prints the chosen next hop and interface."
+      - id: b
+        text: "`ip route add 10.20.5.5`"
+        explanation: "This adds a route and does not ask."
+      - id: c
+        text: "`ip neigh show 10.20.5.5`"
+        explanation: "This shows the address-to-MAC table, not the route."
+      - id: d
+        text: "`hostname -I`"
+        explanation: "This lists local addresses."
+    correct_option: a
+    explanation: "It asks the routing table and prints the chosen next hop and interface."

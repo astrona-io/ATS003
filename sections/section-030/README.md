@@ -21,7 +21,7 @@ Each module has a short landing page and a few parts. Read the landing page firs
 
 ## Check your knowledge
 
-When you have finished both modules, take the [Section 030 knowledge check](./quiz.md): short scenario questions on nftables and firewalld.
+When you have finished both modules, take the [Section 030 knowledge check](./quiz.yaml): short scenario questions on nftables and firewalld.
 
 ## The capstone
 

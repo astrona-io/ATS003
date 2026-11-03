@@ -1,4 +1,4 @@
-# Wrap-Up: Mission Debrief
+# Summary
 
 Well flown, astronaut. You have finished every part and the mission in this module. Before you move on, look back at what you learned, check yourself, and land the playground cleanly.
 
@@ -81,28 +81,4 @@ No. STP blocks one port on purpose so only one path between the same places is a
 A bridge connects different segments, like a switch. A bond merges several interfaces into one link for redundancy or more capacity. A bond can itself be a port of a bridge.
 </details>
 
-## Clean up the playground
-
-Your playground is a whole virtual machine running on your computer. When you are done with this module, remove it, and any mission that is still running.
-
-First, see what is still running:
-
-```sh
-astrona list
-```
-
-Remove the playground. The command takes its **name**, not its folder path:
-
-```sh
-astrona destroy linux-bridging-playground
-```
-
-If `astrona list` also showed the mission, remove it the same way:
-
-```sh
-astrona destroy ats-003-lab-022
-```
-
-Then run `astrona list` again and check that neither name appears any more.
-
-You can start the playground again at any time with the `astrona run` command from the module's landing page. It always starts clean, so nothing you broke carries over.
+<!-- astrona:playground:destroy -->

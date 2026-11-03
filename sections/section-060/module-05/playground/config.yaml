@@ -1,0 +1,36 @@
+# Network Troubleshooting Workflow (PLAYGROUND) — Playground environment
+# A clean sandbox: it spins up, runs OS prep, then stays running for free
+# exploration. No task, no grading, no `astrona submit`.
+# Schema: internal/config.LabConfig.
+#
+# Runtime: a single qemu VM — a plain Ubuntu 24.04 server with a small web
+# service (`portal`, port 8443), a dummy interface `lab0` (10.66.0.10/24) and
+# three helper commands that break one rung of the troubleshooting ladder.
+
+metadata:
+  name: "network-troubleshooting-playground"
+  docs:
+    guide: "docs/overview.md"
+
+bootstrap:
+  init:
+    - name: "prepare"
+      description: "Create lab0, start the portal web service, install break-link, break-name, break-firewall and fix-all, and install traceroute and mtr if they are missing."
+      type: "file"
+      source: "bootstrap/prepare.sh"
+  manifests: []
+
+teardown:
+  keepCluster: false
+
+runtime:
+  type: "qemu"
+  qemu:
+    - name: "host"
+      image:
+        type: "oci"
+        source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+      cpus: 1
+      memoryMB: 1536
+      diskSizeGB: 20
+      sshPasswordAuth: false

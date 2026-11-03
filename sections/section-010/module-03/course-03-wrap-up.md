@@ -1,4 +1,4 @@
-# Wrap-Up: Mission Debrief
+# Summary
 
 Well flown, astronaut. You have finished every part and the mission in this module. Before you move on, look back at what you learned, check yourself, and land the playground cleanly.
 
@@ -64,28 +64,4 @@ No. HTTP and DNS traffic can leave the network by different paths, proxies or fo
 Not necessarily. Discovery only tests outgoing connections. Incoming traffic can still be blocked by a firewall, a missing port forward, carrier-grade NAT or cloud security controls.
 </details>
 
-## Clean up the playground
-
-Your playground is a whole virtual machine running on your computer. When you are done with this module, remove it, and any mission that is still running.
-
-First, see what is still running:
-
-```sh
-astrona list
-```
-
-Remove the playground. The command takes its **name**, not its folder path:
-
-```sh
-astrona destroy public-ip-playground
-```
-
-If `astrona list` also showed the mission, remove it the same way:
-
-```sh
-astrona destroy ats-003-lab-013
-```
-
-Then run `astrona list` again and check that neither name is listed any more.
-
-You can start the playground again at any time with the `astrona run` command for its folder, `sections/section-010/module-03/playground`. It always starts clean, so nothing you broke carries over.
+<!-- astrona:playground:destroy -->

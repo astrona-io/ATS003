@@ -9,6 +9,7 @@ After this section you can:
 - **Keep settings with NetworkManager.** Build a static connection profile with `nmcli`, change it, activate it again, and prove it survives a reboot.
 - **Keep settings with Netplan.** Write a Netplan YAML file with correct indentation, check it with `netplan get`, and apply it safely with `netplan try`.
 - **Read the socket roster.** Use `ss` to see what listens on which address, which process owns a port, and which connections are open.
+- **Troubleshoot in a fixed order.** Climb the ladder from link to firewall with `ip`, `getent`, `ss`, `ping`, `traceroute` and `mtr`, and find the first rung that fails.
 - **Record real traffic.** Use `tcpdump` to capture, filter and save packets, and read what a connection really sent.
 
 ## The modules
@@ -19,8 +20,9 @@ Work through the modules in order. Each one has a playground to try things in, r
 2. [Netplan YAML Configurations](./module-02/course.md): the Ubuntu YAML front end and how to apply it without losing your session.
 3. [Active Socket Diagnostics (ss)](./module-03/course.md): listening sockets, bind addresses, connections and filters.
 4. [Raw Packet Capturing (tcpdump)](./module-04/course.md): capture, filter, look inside and save packets.
+5. [Network Troubleshooting Workflow](./module-05/course.md): the six-rung ladder, following the path with `traceroute` and `mtr`, proving a port, and reading the wire.
 
 ## Check yourself and the capstone
 
-- [Section 060 Knowledge Check](./quiz.md): five scenario questions on this section.
+- [Section 060 Knowledge Check](./quiz.yaml): scenario questions on this section.
 - [Connection Recovery and Audit Capstone Lab](./capstone/labs/lab-01/README.md): one graded task with no step-by-step guidance. A web service is running but cannot be reached; you diagnose it with `ss` and the firewall ruleset, fix it, and prove it answers.

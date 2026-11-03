@@ -11,6 +11,7 @@ After this section you can:
 - **Read and set addresses.** List the interfaces on a machine, read their state, and add IPv4 and IPv6 addresses, both for now and so they survive a reboot.
 - **Manage hostnames.** Read and set the static, transient and pretty hostnames with `hostnamectl`.
 - **Find your public address.** Tell a private address from a public one, and ask an outside service which address the internet sees after NAT (network address translation).
+- **Get an address from DHCP.** Walk through the four DHCP messages, turn on a DHCP client in Netplan, and refuse the routes or DNS servers of a lease.
 - **Resolve names locally.** Add entries to `/etc/hosts`, read the lookup order in `/etc/nsswitch.conf`, and test resolution with `getent`.
 
 ## The modules
@@ -21,10 +22,11 @@ Work through the modules in order. Each module has its own playground, a few sho
 2. [Managing Linux Hostnames](./module-02/course.md): the static, transient and pretty hostnames, and which ones survive a reboot.
 3. [Discovering Your Public IP Address](./module-03/course.md): private ranges, NAT, and asking an outside service for your public egress address.
 4. [Local Hostname Resolution](./module-04/course.md): `/etc/hosts`, the Name Service Switch, `getent`, and when to use DNS instead.
+5. [Dynamic Addressing with DHCP](./module-05/course.md): the Discover, Offer, Request, Acknowledge exchange, `dhcp4: true` in Netplan, `dhcp4-overrides`, and renewing leases.
 
 ## Check your knowledge
 
-When you have finished the modules, take the [section knowledge check](./quiz.md): a short multiple-choice quiz on the whole section.
+When you have finished the modules, take the [section knowledge check](./quiz.yaml): a short multiple-choice quiz on the whole section.
 
 ## The capstone
 

@@ -1,0 +1,49 @@
+metadata:
+  name: "ats-003-lab-015"
+  docs:
+    solution: "solution.md"
+    question: "question.md"
+
+runtime:
+  type: "qemu"
+  qemu:
+  - image:
+      type: "oci"
+      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
+
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 15
+    display: false
+
+bootstrap:
+  init:
+    - name: "dhcp-client-lab-setup"
+      description: "Creates the veth pair dhcpsrv0/dhcp0 and a systemd-networkd DHCP server on 10.77.0.1/24; dhcp0 is left unconfigured"
+      type: "folder"
+      source: "bootstrap/"
+
+validation:
+  scripts:
+    - name: "verify-netplan"
+      description: "Confirms a Netplan file enables dhcp4 for dhcp0 with use-routes false and use-dns false"
+      type: "file"
+      source: "validation/validate-netplan.sh"
+
+    - name: "verify-lease"
+      description: "Confirms dhcp0 holds an address from 10.77.0.100-149 obtained by DHCP"
+      type: "file"
+      source: "validation/validate-lease.sh"
+
+    - name: "verify-no-default-route"
+      description: "Confirms no default route uses dhcp0 and the management default route is unchanged"
+      type: "file"
+      source: "validation/validate-no-default-route.sh"
+
+    - name: "verify-no-dns"
+      description: "Confirms systemd-resolved holds no DNS server for dhcp0"
+      type: "file"
+      source: "validation/validate-no-dns.sh"
+
+teardown:
+  keepCluster: false
