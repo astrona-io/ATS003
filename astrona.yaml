@@ -828,7 +828,7 @@ modules:
         estimated_duration: 30m
         topic: ssh
         task_kind: build
-        tags: [ssh-keygen, ssh-copy-id, ssh_config, known_hosts, tunnel]
+        tags: [ssh-keygen, ssh-copy-id, ssh-config, known-hosts, tunnel]
         learning_goals:
           - Create a key pair and install the public key for key login
           - Write a host alias in the client configuration file
