@@ -56,7 +56,7 @@ enp2s0   UP   192.168.120.50/24
 
 ## Where the profile is stored
 
-NetworkManager writes each profile to a **keyfile** under `/etc/NetworkManager/system-connections/`, named `<con-name>.nmconnection`. Knowing where it lives lets you read exactly what NetworkManager will apply.
+With the keyfile backend, NetworkManager stores profiles under `/etc/NetworkManager/system-connections/`. This Ubuntu image also integrates NetworkManager with Netplan: a profile created through `nmcli` may instead be persisted as `/etc/netplan/90-NM-<uuid>.yaml`. Inspect the profile through `nmcli connection show lab-static` first, then find its UUID in the saved files.
 
 ### The keyfile format
 
@@ -64,13 +64,17 @@ The keyfile is in INI format, owned by root, with mode `600`. Only root may read
 
 ### Read the on-disk form
 
-Print the keyfile of your new profile:
+On a host using the keyfile backend, inspect the corresponding file. Its filename may differ from the connection name:
 
 ```sh
-sudo cat /etc/NetworkManager/system-connections/lab-static.nmconnection
+sudo ls /etc/NetworkManager/system-connections/
+# Read the matching file shown by ls.
+# On this Ubuntu image, also inspect the 90-NM-*.yaml files:
+sudo ls /etc/netplan/
+nmcli -g connection.uuid connection show lab-static
 ```
 
-Expect the settings you passed to `nmcli`, as INI sections:
+A keyfile contains the settings you passed to `nmcli`, grouped into INI sections:
 
 ```text
 [connection]
@@ -83,7 +87,7 @@ method=manual
 address1=192.168.120.50/24
 ```
 
-Everything `nmcli` did is here. You can edit this file directly. After a hand edit, run `sudo nmcli connection reload` so NetworkManager reads it again. Without the reload it keeps using its cached copy and may overwrite your edit.
+After editing a keyfile directly, run `sudo nmcli connection reload` so NetworkManager reads it again, then activate the profile. For a profile stored as Netplan YAML, use `nmcli connection modify` to keep the saved and loaded settings consistent; editing YAML directly requires `sudo netplan apply`.
 
 ## Common pitfalls
 

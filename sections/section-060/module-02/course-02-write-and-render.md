@@ -98,7 +98,7 @@ Address=192.168.130.50/24
 DNS=192.168.130.1
 ```
 
-Your few lines of YAML became a `systemd-networkd` unit. With `renderer: NetworkManager`, the same command would write an `.nmconnection` keyfile instead: the INI-style profile file NetworkManager keeps in `/etc/NetworkManager/system-connections/`.
+Your few lines of YAML became a `systemd-networkd` unit. With `renderer: NetworkManager`, Netplan generates a runtime `.nmconnection` file under `/run/NetworkManager/system-connections/`. The persistent source remains the Netplan YAML.
 
 ## Common pitfalls
 
