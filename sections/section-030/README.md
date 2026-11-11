@@ -26,3 +26,7 @@ When you have finished both modules, take the [Section 030 knowledge check](./qu
 ## The capstone
 
 The section ends with one graded capstone mission with no step-by-step help: build a complete nftables policy on an empty ruleset, with a dropped port, a port redirect, a source-limited port and an outgoing block. Its task is in the [capstone question](./capstone/labs/lab-01/question.md).
+
+## Routed NAT practice
+
+[Module 03](module-03/course.md) connects a client and server through a router. Configure forwarding, source masquerade and a forward-chain policy, then prove the source address seen by the server and test a reboot.
