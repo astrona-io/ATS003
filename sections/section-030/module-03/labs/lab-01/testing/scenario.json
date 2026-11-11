@@ -1,0 +1,53 @@
+{
+  "initial_failures": {
+    "client/verify-client": "allowed HTTP request does not cross",
+    "router/verify-router": "IPv4 forwarding is disabled"
+  },
+  "solution": [
+    {
+      "script": "testing/reference.sh",
+      "vm": "router"
+    }
+  ],
+  "negative": [
+    {
+      "name": "missing-masquerade",
+      "apply": [
+        {
+          "script": "testing/no-nat.sh",
+          "vm": "router"
+        }
+      ],
+      "failures": {
+        "client/verify-client": "allowed HTTP request does not cross"
+      },
+      "restore": [
+        {
+          "script": "testing/reference.sh",
+          "vm": "router"
+        }
+      ]
+    },
+    {
+      "name": "forwarding-disabled",
+      "apply": [
+        {
+          "script": "testing/no-forward.sh",
+          "vm": "router"
+        }
+      ],
+      "failures": {
+        "client/verify-client": "allowed HTTP request does not cross"
+      },
+      "restore": [
+        {
+          "script": "testing/reference.sh",
+          "vm": "router"
+        }
+      ]
+    }
+  ],
+  "reboot": [
+    "router"
+  ]
+}

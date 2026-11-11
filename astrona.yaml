@@ -484,6 +484,31 @@ modules:
       - type: reading
         title: "Wrap-Up: Mission Debrief"
         path: sections/section-030/module-02/course-05-wrap-up.md
+      - type: reading
+        title: Routed Traffic and Masquerade
+        path: sections/section-030/module-03/course.md
+      - type: reading
+        title: Forward, Filter and Translate
+        path: sections/section-030/module-03/course-01-forward-filter-and-translate.md
+      - type: reading
+        title: Routed NAT Tasks
+        path: sections/section-030/module-03/labs/lab-01/question.md
+      - type: lab
+        title: Routed NAT and Forward Filtering
+        path: sections/section-030/module-03/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: routing
+        task_kind: build
+        tags:
+        - nftables
+        - masquerade
+        - forwarding
+        - persistence
+        learning_goals:
+        - Forward permitted requests between two private subnets
+        - Prove source NAT from the destination response
+        - Reject forbidden traffic and survive a router reboot
       - type: quiz
         title: "Section 030 Knowledge Check: Packet Filtering"
         path: sections/section-030/quiz.yaml

@@ -1,0 +1,96 @@
+metadata:
+  name: ats-003-lab-033
+  docs:
+    question: question.md
+    solution: solution.md
+runtime:
+  type: qemu
+  qemu:
+  - name: client
+    image:
+      type: oci
+      source: ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-20261111-{ARCH}
+      checksums:
+        amd64: sha256:1cc87d6d68d76379c457e5372d5bfecf6dea00e78231cf0057a28a83b4970b11
+        arm64: sha256:bc72ff645ea1621408d18a09a638da3f077438d2dd3c5ebdd79bef8513a795e0
+    cpus: 1
+    memoryMB: 1024
+    diskSizeGB: 15
+    display: false
+    networks:
+    - name: inside
+      ipv4: 172.20.10.10
+    bootstrap:
+      init:
+      - name: prepare-client
+        description: Prepare the client for routed NAT practice
+        type: file
+        source: bootstrap/client.sh
+    validation:
+      scripts:
+      - name: verify-client
+        description: Prove permitted traffic is translated and forbidden traffic is
+          dropped
+        type: file
+        source: validation/client.sh
+  - name: router
+    image:
+      type: oci
+      source: ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-20261111-{ARCH}
+      checksums:
+        amd64: sha256:1cc87d6d68d76379c457e5372d5bfecf6dea00e78231cf0057a28a83b4970b11
+        arm64: sha256:bc72ff645ea1621408d18a09a638da3f077438d2dd3c5ebdd79bef8513a795e0
+    cpus: 1
+    memoryMB: 1024
+    diskSizeGB: 15
+    display: false
+    networks:
+    - name: inside
+      ipv4: 172.20.10.1
+    - name: outside
+      ipv4: 172.20.20.1
+    bootstrap:
+      init:
+      - name: prepare-router
+        description: Prepare the router for routed NAT practice
+        type: file
+        source: bootstrap/router.sh
+    validation:
+      scripts:
+      - name: verify-router
+        description: Check live forwarding and the boot-time firewall loader
+        type: file
+        source: validation/router.sh
+  - name: server
+    image:
+      type: oci
+      source: ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-20261111-{ARCH}
+      checksums:
+        amd64: sha256:1cc87d6d68d76379c457e5372d5bfecf6dea00e78231cf0057a28a83b4970b11
+        arm64: sha256:bc72ff645ea1621408d18a09a638da3f077438d2dd3c5ebdd79bef8513a795e0
+    cpus: 1
+    memoryMB: 1024
+    diskSizeGB: 15
+    display: false
+    networks:
+    - name: outside
+      ipv4: 172.20.20.20
+    bootstrap:
+      init:
+      - name: prepare-server
+        description: Prepare the server for routed NAT practice
+        type: file
+        source: bootstrap/server.sh
+    validation:
+      scripts:
+      - name: verify-server
+        description: Prove both destination listeners are available
+        type: file
+        source: validation/server.sh
+  networks:
+  - name: inside
+    cidr: 172.20.10.0/24
+  - name: outside
+    cidr: 172.20.20.0/24
+teardown:
+  keepCluster: false
