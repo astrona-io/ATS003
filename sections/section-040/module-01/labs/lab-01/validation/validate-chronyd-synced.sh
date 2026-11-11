@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Checks that chronyd picked up the edited config (reload/restart happened)
 # and is actively disciplining the clock, per `chronyc tracking`.
 
@@ -27,4 +29,5 @@ else
   echo "FAIL: chrony sync - Leap status is '$leap', expected 'Normal'"
   exit 1
 fi
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

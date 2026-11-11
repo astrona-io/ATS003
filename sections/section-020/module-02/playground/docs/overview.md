@@ -1,5 +1,8 @@
 # Overview: PLAYGROUND — Software Bridging (Playground)
 
+The practice ports `bridgeport0` and `bridgeport1` are the two ends of one veth cable. Enslaving both to the same bridge creates a loop that STP can block. Keep the management interface outside that bridge.
+
+
 > Declared in [`../config.yaml`](../config.yaml) under `metadata.docs.guide`.
 
 This is a **playground**, not a lab. The environment starts clean, runs
@@ -10,13 +13,7 @@ and no pass/fail. Explore, break things, `astrona destroy`, start over.
 
 - A single qemu VM — a plain Ubuntu 24.04 server host. Reach it with
   `astrona ssh linux-bridging-playground`.
-- Three network interfaces:
-  - the **management interface** carrying your SSH session — it has an IP;
-    leave it alone;
-  - **two extra bridge-port NICs**, both DOWN, both with no IP, both facing the
-    same `192.168.60.0/24` Layer 2 segment. Find their kernel names with
-    `ip -brief link show` (the ones that are not `lo` and not your SSH
-    interface).
+- The management interface and the unaddressed veth ports `bridgeport0` and `bridgeport1`, initially down.
 - Tools installed: `iproute2` (`ip`, `bridge`), `bridge-utils` (`brctl`),
   `ethtool`.
 - No `br0` exists yet — `bridge link show` prints nothing until you create one

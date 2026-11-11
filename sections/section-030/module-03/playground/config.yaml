@@ -1,7 +1,7 @@
 metadata:
   name: nat-routing-workshop
   docs:
-    overview: docs/overview.md
+    guide: docs/overview.md
 runtime:
   type: qemu
   qemu:

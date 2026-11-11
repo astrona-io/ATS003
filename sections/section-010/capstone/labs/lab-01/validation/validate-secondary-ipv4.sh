@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Checks that the secondary IPv4 address 192.168.10.71/24 is live on the
 # host's primary interface, in addition to (not instead of) its original
 # address.
@@ -29,4 +31,5 @@ else
   echo "FAIL: secondary-ipv4 - $expected not found on $iface"
   exit 1
 fi
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

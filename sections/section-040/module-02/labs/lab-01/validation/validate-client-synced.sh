@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Checks the client is actually synced through the internal server:
 # chronyd active, the server is the currently selected (^*) source,
 # Leap status Normal, and stratum one hop above the server (2-15).
@@ -31,4 +33,5 @@ else
   echo "FAIL: client-synced - Leap status '$leap', Stratum '$stratum' (expected Normal / 2-15, one hop above the server)"
   exit 1
 fi
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

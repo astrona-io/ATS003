@@ -1,48 +1,33 @@
-# Discovering Your Public IP Address (PLAYGROUND) — Playground environment
-# A clean sandbox: it spins up, runs OS prep, then stays running for free
-# exploration. No task, no grading, no `astrona submit`.
-# Schema: internal/config.LabConfig.
-#
-# Runtime: a single qemu VM (a plain Ubuntu host, no Kubernetes). It has its
-# normal management interface (a private address in 10.0.0.0/8, carrying the
-# default route) plus one extra NIC that bootstrap/prepare.sh addresses in the
-# 172.16.0.0/12 private range, so `ip addr` shows two different RFC 1918 ranges
-# at once. Public-IP discovery over the Internet depends on whether this
-# environment has outbound egress — the module and docs/overview.md cover both
-# cases.
-
 metadata:
-  name: "public-ip-playground"
+  name: public-ip-playground
   docs:
-    guide: "docs/overview.md"
-
+    guide: docs/overview.md
 bootstrap:
   init:
-    - name: "prepare"
-      description: "Install curl/dig; address the spare NIC in 172.16.0.0/12; print addresses and routes."
-      type: "file"
-      source: "bootstrap/prepare.sh"
+  - name: practice-interfaces
+    description: Create isolated practice interfaces without changing the management
+      NIC.
+    type: file
+    source: bootstrap/practice-interfaces.sh
+  - name: prepare
+    description: Install curl/dig; address the spare NIC in 172.16.0.0/12; print addresses
+      and routes.
+    type: file
+    source: bootstrap/prepare.sh
   manifests: []
-
 teardown:
   keepCluster: false
-
 runtime:
-  type: "qemu"
-  networks:
-    - name: lab-net
-      cidr: 172.16.20.0/24
+  type: qemu
   qemu:
-    - name: "host"
-      image:
-        type: "oci"
-        source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-20261111-{ARCH}"
-        checksums:
-          amd64: sha256:1cc87d6d68d76379c457e5372d5bfecf6dea00e78231cf0057a28a83b4970b11
-          arm64: sha256:bc72ff645ea1621408d18a09a638da3f077438d2dd3c5ebdd79bef8513a795e0
-      cpus: 2
-      memoryMB: 2048
-      diskSizeGB: 20
-      networks:
-        - { name: lab-net }
-      sshPasswordAuth: false
+  - name: host
+    image:
+      type: oci
+      source: ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-20261111-{ARCH}
+      checksums:
+        amd64: sha256:1cc87d6d68d76379c457e5372d5bfecf6dea00e78231cf0057a28a83b4970b11
+        arm64: sha256:bc72ff645ea1621408d18a09a638da3f077438d2dd3c5ebdd79bef8513a795e0
+    cpus: 2
+    memoryMB: 2048
+    diskSizeGB: 20
+    sshPasswordAuth: false

@@ -8,6 +8,15 @@ sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # dns0 (10.55.0.53). The resolver is deliberately NOT pointed at it.
 set -euo pipefail
 
+missing=()
+for package in bind9 dnsutils; do
+  dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed' || missing+=("$package")
+done
+if [ "${#missing[@]}" -gt 0 ]; then
+  sudo apt-get update -y
+  sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+fi
+
 echo "[playground] dns-resolver-playground: preparing..."
 
 # --- the practice antenna ------------------------------------------------------

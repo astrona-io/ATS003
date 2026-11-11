@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Confirms the primary interface (the one holding the default route) is
 # bound to the public zone, per `firewall-cmd --get-active-zones`.
 
@@ -22,4 +24,5 @@ else
   echo "FAIL: interface-zone - $IFACE is bound to '$actual', expected 'public'"
   exit 1
 fi
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 set -eu
 for port in 8080 8081; do
   if ! curl --noproxy '*' -fsS --max-time 3 "http://172.20.20.20:$port/" >/dev/null; then
@@ -8,4 +10,5 @@ for port in 8080 8081; do
   fi
 done
 echo 'PASS: both control listeners respond on the server'
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

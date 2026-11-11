@@ -1,5 +1,8 @@
 # Overview: PLAYGROUND — Netplan YAML Configurations (Playground)
 
+The spare interface is a persistent dummy device named `np0`. Configure its addresses with Netplan while preserving the management interface.
+
+
 > Declared in [`../config.yaml`](../config.yaml) under `metadata.docs.guide`.
 
 This is a **playground**, not a lab. The environment starts clean, runs

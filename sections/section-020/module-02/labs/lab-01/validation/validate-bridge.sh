@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Checks br0 exists, is administratively UP, and enslaves dummy0
 
 set -u
@@ -26,4 +28,5 @@ fi
 
 echo "PASS: bridge (br0 is UP, dummy0 master=br0)"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

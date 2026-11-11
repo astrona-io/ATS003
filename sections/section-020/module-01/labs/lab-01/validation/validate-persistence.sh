@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Checks br0 and bond0 are defined in persistent config (Netplan or
 # NetworkManager), not just live kernel state that would vanish on reboot.
 
@@ -32,4 +34,5 @@ fi
 
 echo "PASS: persistence (br0 and bond0 both found in persistent config)"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

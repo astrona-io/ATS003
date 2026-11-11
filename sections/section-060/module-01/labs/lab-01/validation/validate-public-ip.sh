@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Compare the recorded address with the current VM egress.
 
 set -u
@@ -49,4 +51,5 @@ if [[ "$live" != "$actual" ]]; then
   exit 1
 fi
 echo "PASS: public_ip matches the live VM egress ($actual)"
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

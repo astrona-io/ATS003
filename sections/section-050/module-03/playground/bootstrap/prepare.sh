@@ -11,6 +11,15 @@ sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # never touched. Nothing here is a graded outcome.
 set -euo pipefail
 
+missing=()
+for package in sshpass; do
+  dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed' || missing+=("$package")
+done
+if [ "${#missing[@]}" -gt 0 ]; then
+  sudo apt-get update -y
+  sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+fi
+
 echo "[playground] ssh-hardening-playground: preparing second sshd on :2222..."
 
 # --- test users (playground-only credentials) --------------------------------

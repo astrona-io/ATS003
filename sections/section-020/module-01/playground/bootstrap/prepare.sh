@@ -12,10 +12,9 @@ set -euo pipefail
 
 echo "[playground] linux-bonding-playground: preparing clean host..."
 
-# Make the bonding driver available. Loading it with no parameters does not
-# create any bond interface — `cat /proc/net/bonding/bond0` will simply fail
-# until you create bond0 yourself.
-sudo modprobe bonding || true
+# Load the driver without creating the bond that the student must build.
+echo "options bonding max_bonds=0" | sudo tee /etc/modprobe.d/playground-bonding.conf >/dev/null
+sudo modprobe bonding max_bonds=0
 echo "bonding" | sudo tee /etc/modules-load.d/bonding.conf >/dev/null 2>&1 || true
 
 echo
@@ -23,8 +22,8 @@ echo "[playground] network interfaces on this host:"
 ip -brief link show || true
 
 echo
-echo "[playground] ready. The two extra NICs (segments 192.168.50.0/24 and"
-echo "[playground] 192.168.51.0/24) are up at layer 2 with no IP and no bond."
+echo "[playground] ready. The two practice interfaces bondport0 and"
+echo "[playground] bondport1 have no IP and no bond."
 echo "[playground] Do NOT reconfigure the interface carrying your SSH session."
 echo "[playground] See docs/overview.md for things to try."
 ASTRONA_STUDENT_SCRIPT

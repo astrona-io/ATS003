@@ -1,5 +1,8 @@
 # Overview: PLAYGROUND — Discovering Your Public IP Address (Playground)
 
+The spare interface is a local dummy device named `private0`. It displays a second private address; outbound traffic still uses the management interface.
+
+
 > Declared in [`../config.yaml`](../config.yaml) under `metadata.docs.guide`.
 
 This is a **playground**, not a lab. The environment starts clean, runs

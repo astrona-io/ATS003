@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Checks /opt/course/private_ip holds an RFC1918 address that is actually
 # bound to a real local interface on this host.
 
@@ -29,4 +31,5 @@ fi
 
 echo "PASS: private_ip ($path = '$actual', bound to a local interface)"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Checks that dhcp0 holds a dynamic address from the DHCP pool.
 set -u
 
@@ -21,4 +23,5 @@ if ! echo "$line" | grep -q 'dynamic'; then
 fi
 echo "PASS: lease (dhcp0 holds $addr from DHCP)"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

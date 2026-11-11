@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Checks the /etc/hosts override and that the DNS server itself is unchanged.
 set -u
 
@@ -18,4 +20,5 @@ fi
 
 echo "PASS: hosts-override (/etc/hosts gives 198.51.100.80, the server still gives 203.0.113.10)"
 exit 0
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT

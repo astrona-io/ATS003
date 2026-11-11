@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Checks the system's default resolver (dig with no @server) returns
 # the expected A record for data-001.internal.example.com.
 
@@ -16,4 +18,5 @@ else
   echo "FAIL: system-resolver A record - data-001.internal.example.com = '$actual', expected '$expected'"
   exit 1
 fi
+GRADER_ROOT
 ASTRONA_STUDENT_SCRIPT
