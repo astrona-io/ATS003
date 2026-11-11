@@ -7,8 +7,8 @@
 
 set -u
 
-dns_host="astrona-ats-003-lab-040-dns"
-dns_ip="$(getent hosts "$dns_host" 2>/dev/null | awk '{print $1}' | head -n1)"
+dns_host="192.168.10.53"
+dns_ip="192.168.10.53"
 
 if [[ -z "$dns_ip" ]]; then
   echo "FAIL: direct-server A record - could not resolve $dns_host to an address"

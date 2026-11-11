@@ -1,0 +1,15 @@
+{
+  "initial_failures": {
+    "client/verify-client-points-at-server": "FAIL: client-source - no active"
+  },
+  "solution": [
+    {
+      "vm": "server",
+      "script": "testing/solution-server.sh"
+    },
+    {
+      "vm": "client",
+      "script": "testing/solution-client.sh"
+    }
+  ]
+}

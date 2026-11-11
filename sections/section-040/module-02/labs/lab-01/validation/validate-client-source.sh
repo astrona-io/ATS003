@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Checks the client's chrony.conf points at the internal server
-# (astrona-ats-003-lab-042-server) instead of the public NTP pool.
+# (192.168.10.123) instead of the public NTP pool.
 
 set -u
 
@@ -17,11 +17,11 @@ if [[ -z "$conf" ]]; then
   exit 1
 fi
 
-server_line="$(grep -E '^[[:space:]]*server[[:space:]]+astrona-ats-003-lab-042-server([[:space:]]|$)' "$conf" || true)"
+server_line="$(grep -E '^[[:space:]]*server[[:space:]]+192.168.10.123([[:space:]]|$)' "$conf" || true)"
 public_pool="$(grep -E '^[[:space:]]*(server|pool)[[:space:]]+.*(pool\.ntp\.org|ntp\.ubuntu\.com|debian\.pool\.ntp\.org)' "$conf" || true)"
 
 if [[ -z "$server_line" ]]; then
-  echo "FAIL: client-source - no active 'server astrona-ats-003-lab-042-server' line found in $conf"
+  echo "FAIL: client-source - no active 'server 192.168.10.123' line found in $conf"
   exit 1
 fi
 
@@ -30,5 +30,5 @@ if [[ -n "$public_pool" ]]; then
   exit 1
 fi
 
-echo "PASS: client-source ($conf points at astrona-ats-003-lab-042-server, public pool lines removed)"
+echo "PASS: client-source ($conf points at 192.168.10.123, public pool lines removed)"
 exit 0

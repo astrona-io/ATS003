@@ -24,4 +24,4 @@ On `client`:
    | `dig +short internal.example.com MX` | `10 mail.internal.example.com.` |
    | `dig -x 192.168.10.80 +short` | `data-001.internal.example.com.` |
 
-   `<dns-ip>` is the address of the `dns` machine on the lab network. The check finds it by looking up the name `astrona-ats-003-lab-040-dns`.
+   `<dns-ip>` is the address of the `dns` machine on the lab network. The private network assigns it `192.168.10.53`; the client uses `192.168.10.10`. Bootstrap leaves the client resolver unchanged so configuring it is your task.
