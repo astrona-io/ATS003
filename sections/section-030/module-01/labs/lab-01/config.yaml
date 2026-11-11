@@ -1,49 +1,44 @@
 metadata:
-  name: "ats-003-lab-031"
+  name: ats-003-lab-031
   docs:
-    solution: "solution.md"
-    question: "question.md"
-
+    solution: solution.md
+    question: question.md
 runtime:
-  type: "qemu"
+  type: qemu
   qemu:
   - image:
-      type: "oci"
-      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
-
+      type: oci
+      source: ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-20261111-{ARCH}
+      checksums:
+        amd64: sha256:1cc87d6d68d76379c457e5372d5bfecf6dea00e78231cf0057a28a83b4970b11
+        arm64: sha256:bc72ff645ea1621408d18a09a638da3f077438d2dd3c5ebdd79bef8513a795e0
     cpus: 2
     memoryMB: 2048
     diskSizeGB: 15
     display: false
-
 bootstrap:
   init:
-    - name: "nftables-lab-setup"
-      description: "Resets the ruleset to empty (nftables ships in the base LFCS image) and starts a local listener on port 6001 so the port 6000->6001 redirect is testable end-to-end"
-      type: "folder"
-      source: "bootstrap/"
-
+  - name: prepare-traffic-fixtures
+    type: file
+    source: bootstrap/01-prepare-traffic.sh
+    description: Creates an isolated peer namespace and real HTTP listeners; leaves nftables empty
 validation:
   scripts:
-    - name: "verify-port-5000-drop"
-      description: "Confirms TCP port 5000 is dropped in the inet filter input chain"
-      type: "file"
-      source: "validation/validate-port-5000-drop.sh"
-
-    - name: "verify-port-6000-redirect"
-      description: "Confirms TCP port 6000 is redirected to local port 6001 via the nat table's prerouting chain, and that 6001 has a live listener"
-      type: "file"
-      source: "validation/validate-port-6000-redirect.sh"
-
-    - name: "verify-port-6002-source-restriction"
-      description: "Confirms port 6002 is accepted from 192.168.10.80 and dropped for everyone else, with the accept rule ordered before the catch-all drop"
-      type: "file"
-      source: "validation/validate-port-6002-source-restriction.sh"
-
-    - name: "verify-egress-block"
-      description: "Confirms outgoing traffic to 192.168.10.70 is dropped in the inet filter output chain"
-      type: "file"
-      source: "validation/validate-egress-block-192-168-10-70.sh"
-
+  - name: verify-port-5000-drop
+    description: Sends real traffic through the assigned network path and checks the response or timeout
+    type: file
+    source: validation/validate-port-5000-drop.sh
+  - name: verify-port-6000-redirect
+    description: Sends real traffic through the assigned network path and checks the response or timeout
+    type: file
+    source: validation/validate-port-6000-redirect.sh
+  - name: verify-port-6002-source-restriction
+    description: Sends real traffic through the assigned network path and checks the response or timeout
+    type: file
+    source: validation/validate-port-6002-source-restriction.sh
+  - name: verify-egress-block
+    description: Sends real traffic through the assigned network path and checks the response or timeout
+    type: file
+    source: validation/validate-egress-block-192-168-10-70.sh
 teardown:
   keepCluster: false
