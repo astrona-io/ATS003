@@ -78,3 +78,9 @@ Launch your playground now, and keep it running next to you while you read the p
 The shields are the last line of defence on every Linux ship. On the exam you write nftables rules by hand on a live machine and must prove they work, so you need to know where a rule runs, in what order, and what happens to packets that no rule matched.
 
 nftables is also what runs underneath the higher-level firewall tools. `firewalld`, `ufw` and many container tools all write nftables rules for you. When one of them behaves strangely, reading the raw ruleset with `nft list ruleset` is how you find out why.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Packet Filtering with nftables Lab](labs/lab-01/question.md): Build nftables filter and NAT tables with chains on the right hooks; Drop, redirect and restrict traffic by port and source address; Block outgoing traffic to one host from the output chain.
+- [Host Security and Filtering Capstone Lab](../capstone/labs/lab-01/question.md): Build nftables filter and NAT tables with chains on the right hooks; Drop, redirect and restrict traffic by port and source address; Block outgoing traffic to one host from the output chain.

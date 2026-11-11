@@ -57,3 +57,9 @@ Launch your playground now, and keep it running next to you while you read the p
 Firewall requests, allow lists at a partner company and many cloud settings ask for "your public address". If you hand over the private address from your interface, nothing works, and nobody can see why.
 
 The exam expects you to know which address is which, how to find each one quickly from a terminal, and what a discovered address does and does not prove.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Public IP Discovery Behind NAT Lab](labs/lab-01/question.md): Find the private address on the host's own interface; Find the public address the internet sees after NAT; Write each address to a file in the exact format a script expects.
+- [Core Host Configurations Capstone Lab](../capstone/labs/lab-01/question.md): Add a secondary IPv4 and a static IPv6 address beside the management address; Make both addresses survive a reboot in Netplan or NetworkManager configuration; Map the host name app-srv1 to its new address in /etc/hosts, forward and reverse.

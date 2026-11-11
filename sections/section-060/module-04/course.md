@@ -49,3 +49,9 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Why this matters
 
 When `ss` says a service listens and the firewall looks fine, but clients still time out, only a capture shows whether the packets arrive and whether anything answers. It is the tool that settles arguments between the other tools, and it is already installed on most servers.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Raw Packet Capturing (tcpdump) Lab](labs/lab-01/question.md): Confirm a service is listening on a reachable address with ss; Find and delete the nftables rule that silently drops its port; Prove the service answers end to end with curl.
+- [Connection Recovery and Audit Capstone Lab](../capstone/labs/lab-01/question.md): Confirm a service is listening on a reachable address with ss; Find and delete the nftables rule that silently drops its port; Prove the service answers end to end with curl.

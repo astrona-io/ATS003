@@ -44,3 +44,9 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Why this matters
 
 On Ubuntu, Netplan is the layer that decides what the network looks like after every boot. A wrong indent or a careless `netplan apply` on a remote server can cut you off with no way back. Learning to check with `netplan get` and apply with `netplan try` keeps you in control.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Private And Public Address Audit Lab](labs/lab-01/question.md): Find the private address on the host's own interface; Find the public address the internet sees after NAT.
+- [Connection Recovery and Audit Capstone Lab](../capstone/labs/lab-01/question.md): Confirm a service is listening on a reachable address with ss; Find and delete the nftables rule that silently drops its port; Prove the service answers end to end with curl.

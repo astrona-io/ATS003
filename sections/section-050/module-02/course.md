@@ -50,3 +50,9 @@ Launch your playground now, and keep it running next to you while you read the p
 One backend is one point of failure. A pool behind a load balancer survives a crashed backend and spreads the work, and the exam expects you to build one from memory.
 
 The hard part is not the syntax. It is predicting where each request goes, and knowing that the free NGINX only notices a dead backend when real requests fail. This module makes both visible.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Nginx Upstream Load Balancers Lab](labs/lab-01/question.md): Reverse-proxy every path on one port to a fixed backend path; Spread requests on another port across two backends with an upstream block; Keep the whole NGINX configuration valid and the existing apps untouched.
+- [Application Proxy and SSH Capstone Lab](../capstone/labs/lab-01/question.md): Reverse-proxy every path on one port to a fixed backend path; Spread requests on another port across two backends with an upstream block; Keep the whole NGINX configuration valid and the existing apps untouched.

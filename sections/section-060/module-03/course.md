@@ -51,3 +51,9 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Why this matters
 
 "The service is up but nobody can connect" is one of the most common problems on any server, and on the exam. `ss` tells you in seconds whether anything listens, on which address, and which process owns it. That answer decides whether you look at the application, its bind address, or the firewall next.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Active Socket Diagnostics (ss) Lab](labs/lab-01/question.md): Confirm a service is listening on a reachable address with ss; Find and delete the nftables rule that silently drops its port; Prove the service answers end to end with curl.
+- [Connection Recovery and Audit Capstone Lab](../capstone/labs/lab-01/question.md): Confirm a service is listening on a reachable address with ss; Find and delete the nftables rule that silently drops its port; Prove the service answers end to end with curl.

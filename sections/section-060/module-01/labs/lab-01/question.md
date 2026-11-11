@@ -29,3 +29,17 @@ script expects them.
    ```
    /opt/course/public_ip
    ```
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-01](../../course.md).
+
+The grader checks:
+
+- Confirms /opt/course/private_ip holds an RFC1918 address that is actually bound to a local interface.
+- Confirms /opt/course/public_ip matches a fresh HTTPS IPv4 lookup from this VM; unavailable lookups are infrastructure failures.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.
+
+Record the public IPv4 address observed from inside this VM. Validation compares it with a fresh HTTPS lookup from the same VM. If its egress changes, repeat the lookup; a public-looking address from another machine is insufficient. An unavailable lookup is an infrastructure error, not a successful grade.

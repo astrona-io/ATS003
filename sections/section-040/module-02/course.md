@@ -54,3 +54,9 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Why this matters
 
 An internal NTP server sits between the public pool (or a hardware clock) and the rest of the fleet. Secure connections, Kerberos logins and log correlation on every other machine depend on it. Turning a chrony client into a server is mostly one configuration line, and the exam expects you to write that line, open the firewall, and prove that a client really syncs through it.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [NTP Server Mode and Stratums Lab](labs/lab-01/question.md): Turn on chrony server mode for one subnet with allow; Point a client at the internal server and remove public sources; Prove the client selected the server one stratum below it.
+- [Time and Name Services Capstone Lab](../capstone/labs/lab-01/question.md): Point the system resolver at an internal DNS server; Check A, NS, MX and reverse records with dig, with and without @server.

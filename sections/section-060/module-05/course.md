@@ -50,3 +50,9 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Why this matters
 
 The exam gives you a machine that "does not work" and a clock. Candidates who guess lose time. Candidates who climb the ladder find the fault in minutes, and they can say which layer it was in.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Network Troubleshooting Lab](labs/lab-01/question.md): Climb the ladder from link to firewall and find three faults; Repair the link, the name and the firewall rule in order; Prove the service answers end to end with curl.
+- [Connection Recovery and Audit Capstone Lab](../capstone/labs/lab-01/question.md): Confirm a service is listening on a reachable address with ss; Find and delete the nftables rule that silently drops its port; Prove the service answers end to end with curl.

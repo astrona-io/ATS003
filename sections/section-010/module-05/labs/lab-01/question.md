@@ -19,3 +19,17 @@ You need the call sign from the lease, but the ship must keep its current defaul
 4. **Refuse the directory.** `resolvectl dns dhcp0` must list no server.
 
 The grader reads the Netplan files, `ip` output and `resolvectl`.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-05](../../course.md).
+
+The grader checks:
+
+- Confirms a Netplan file enables dhcp4 for dhcp0 with use-routes false and use-dns false.
+- Confirms dhcp0 holds an address from 10.77.0.100-149 obtained by DHCP.
+- Confirms no default route uses dhcp0 and the management default route is unchanged.
+- Confirms systemd-resolved holds no DNS server for dhcp0.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

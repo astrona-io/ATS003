@@ -60,3 +60,9 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Why this matters
 
 `dig` is how you prove what DNS really says. It shows whether a record exists, which server gave the answer, and whether that server owns the zone. That lets you tell "the record is wrong" apart from "the machine asks the wrong server" apart from "a cache is old". The exam expects you to point a machine at a DNS server and check its records with `dig` quickly and exactly.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [DNS Verification with dig Lab](labs/lab-01/question.md): Point the system resolver at an internal DNS server; Check A, NS, MX and reverse records with dig, with and without @server.
+- [Time and Name Services Capstone Lab](../capstone/labs/lab-01/question.md): Point the system resolver at an internal DNS server; Check A, NS, MX and reverse records with dig, with and without @server.

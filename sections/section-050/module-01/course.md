@@ -52,3 +52,9 @@ Launch your playground now, and keep it running next to you while you read the p
 A reverse proxy gives many internal services one public front door. It holds HTTPS in one place, spreads load over identical backends, and keeps the backend machines off the public network.
 
 The exam asks you to put a proxy in front of an app under time pressure. Most mistakes come from three small things: the trailing slash, a forgotten `Host` header, and a reload without a test. This module trains all three.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Nginx Reverse Proxy Lab](labs/lab-01/question.md): Reverse-proxy every path on one port to a fixed backend path; Spread requests on another port across two backends with an upstream block; Keep the whole NGINX configuration valid and the existing apps untouched.
+- [Application Proxy and SSH Capstone Lab](../capstone/labs/lab-01/question.md): Reverse-proxy every path on one port to a fixed backend path; Spread requests on another port across two backends with an upstream block; Keep the whole NGINX configuration valid and the existing apps untouched.

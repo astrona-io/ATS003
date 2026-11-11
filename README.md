@@ -69,3 +69,8 @@ astrona run --git git@github.com:astrona-io/ATS003.git -c <lab-path>
 ## Support This Project
 
 ATS003 is free training material. If it helps you, consider supporting ongoing work via [Liberapay](https://liberapay.com/Astrona.io).
+
+<!-- validation-links -->
+## Coverage, testing and releases
+
+See the [lesson and lab coverage map](docs/coverage.md), [validation and OCI release guide](docs/validation-and-releases.md), and [authoring guidance](docs/authoring.md). The coverage map lists every registered lab; CI also discovers every playground.

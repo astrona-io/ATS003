@@ -10,3 +10,16 @@ The client is `172.20.10.10/24`. The router connects `172.20.10.1/24` to `172.20
 4. From the client, request `http://172.20.20.20:8080/`. The response must be `172.20.20.1`. A request to port 8081 must time out, while both listeners remain available locally on the server. Reboot only the router and repeat these checks.
 
 Submit after completing all four tasks. The grader checks both the successful request and blocked traffic. Adding a return route on the server without masquerade does not meet the source-translation requirement.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-03](../../course.md).
+
+The grader checks:
+
+- Prove permitted traffic is translated and forbidden traffic is dropped.
+- Check live forwarding and the boot-time firewall loader.
+- Prove both destination listeners are available.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

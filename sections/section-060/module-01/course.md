@@ -48,3 +48,9 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Why this matters
 
 The exam often asks for a network setting that is still there after a reboot. A setting made only with `ip` passes a quick look and then fails the moment the machine restarts. Knowing how to write a profile, activate it and prove it is on disk is what turns a working change into a lasting one.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Private And Public Address Audit Lab](labs/lab-01/question.md): Find the private address on the host's own interface; Find the public address the internet sees after NAT.
+- [Connection Recovery and Audit Capstone Lab](../capstone/labs/lab-01/question.md): Confirm a service is listening on a reachable address with ss; Find and delete the nftables rule that silently drops its port; Prove the service answers end to end with curl.

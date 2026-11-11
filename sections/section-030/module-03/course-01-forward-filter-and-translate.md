@@ -45,3 +45,5 @@ The file replaces the ruleset inside this disposable playground. On a shared hos
 From the client, `curl --max-time 4 http://172.20.20.20:8080/` must return the router's outside address. The same request to port 8081 must time out. Check both listeners locally on the server to distinguish a firewall drop from a stopped service. Finally reboot the router and repeat: a successful live change does not prove that sysctl and nftables reload at boot.
 
 The automated lab test removes the NAT table, then disables forwarding in a separate case. Each must break the allowed request. It restores the solution between cases and repeats the checks after reboot.
+
+Reference: [nftables manual](https://netfilter.org/projects/nftables/manpage.html).

@@ -49,3 +49,9 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Why this matters
 
 Bonding is how a Linux server survives a pulled cable or a failed network card without anyone noticing. The exam asks you to build a bond, put it in the right mode, and prove which member is active. The same habits, reading the kernel's own state file and checking before you trust, help with every network device in this course.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Link Aggregation (Bonding) Lab](labs/lab-01/question.md): Build a bridge br0 and plug a member interface into it; Build an active-backup bond0 over two member interfaces; Declare the bridge and the bond in on-disk configuration so they return after a reboot.
+- [Aggregation and Routing Capstone Lab](../capstone/labs/lab-01/question.md): Add a static route to a partner subnet through a gateway; Prove the route with ip route get and a real ping; Make the route survive a reboot in on-disk configuration.

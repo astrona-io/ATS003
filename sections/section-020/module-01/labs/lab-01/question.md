@@ -17,3 +17,18 @@ The virtual machine has only one real network interface: the management interfac
 3. **Persistence.** Declare both `br0` and `bond0` in on-disk network configuration, either in a file under `/etc/netplan/` (ending in `.yaml`) or as NetworkManager connections, so they come back after a reboot. A bridge or bond that exists only in the kernel, made with `ip link add`, does not count.
 
 Leave the management interface alone.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-01](../../course.md).
+
+The grader checks:
+
+- Confirms br0 exists, is administratively UP, and dummy0 is enslaved to it.
+- Confirms `bridge link show` reports dummy0 as master br0 in forwarding state.
+- Confirms bond0 exists in active-backup mode with both dummy1 and dummy2 enslaved.
+- Confirms /proc/net/bonding/bond0 reports a Currently Active Slave other than None.
+- Confirms br0 and bond0 are defined in persistent Netplan or NetworkManager config, not just live kernel state.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

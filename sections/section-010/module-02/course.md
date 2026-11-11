@@ -57,3 +57,9 @@ Launch your playground now, and keep it running next to you while you read the p
 The hostname is the first thing you see in a shell prompt, a log line or a monitoring screen. A machine with the wrong name, or a name that disappears at the next reboot, confuses every person and tool that reads it.
 
 The exam asks you to set a hostname that lasts, and to know the difference between the name stored on disk and the name the running kernel uses. It also expects you to know that a name alone does not make a machine reachable.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Static Hostname Management Lab](labs/lab-01/question.md): Set the static and live hostname without a reboot; Set a free-form pretty hostname; Point the 127.0.1.1 line in /etc/hosts at the new name.
+- [Core Host Configurations Capstone Lab](../capstone/labs/lab-01/question.md): Add a secondary IPv4 and a static IPv6 address beside the management address; Make both addresses survive a reboot in Netplan or NetworkManager configuration; Map the host name app-srv1 to its new address in /etc/hosts, forward and reverse.

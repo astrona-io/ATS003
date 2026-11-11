@@ -50,3 +50,9 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Why this matters
 
 Every virtual machine host and container platform you will ever manage depends on bridges. The exam asks you to build one, attach a port, and prove it forwards. Knowing where the address goes and how loops form saves you from the two mistakes that take whole networks down.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Software Bridging Lab](labs/lab-01/question.md): Build a bridge br0 and plug a member interface into it; Build an active-backup bond0 over two member interfaces; Declare the bridge and the bond in on-disk configuration so they return after a reboot.
+- [Aggregation and Routing Capstone Lab](../capstone/labs/lab-01/question.md): Add a static route to a partner subnet through a gateway; Prove the route with ip route get and a real ping; Make the route survive a reboot in on-disk configuration.
