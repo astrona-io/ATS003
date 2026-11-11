@@ -56,5 +56,5 @@ The exam asks you to put a proxy in front of an app under time pressure. Most mi
 <!-- curriculum-practice -->
 ## Practice and assessment
 
-- [Nginx Reverse Proxy Lab](labs/lab-01/question.md): Reverse-proxy every path on one port to a fixed backend path; Spread requests on another port across two backends with an upstream block; Keep the whole NGINX configuration valid and the existing apps untouched.
-- [Application Proxy and SSH Capstone Lab](../capstone/labs/lab-01/question.md): Reverse-proxy every path on one port to a fixed backend path; Spread requests on another port across two backends with an upstream block; Keep the whole NGINX configuration valid and the existing apps untouched.
+- [Reverse proxy to a fixed backend path](labs/lab-01/question.md): Route every path on port 8001 to backend 2222 /special; Check different request paths through the proxy; Preserve the existing backend applications.
+- [Reverse proxy and load balancing integration](../capstone/labs/lab-01/question.md): Reverse-proxy every path on one port to a fixed backend path; Spread requests on another port across two backends with an upstream block; Keep the whole NGINX configuration valid and the existing apps untouched.

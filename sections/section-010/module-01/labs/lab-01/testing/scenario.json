@@ -4,17 +4,15 @@
   },
   "solution": [
     {
-      "script": "testing/solution.sh",
-      "vm": "default"
+      "script": "testing/solution.sh"
     }
   ],
   "negative": [
     {
-      "name": "regression",
+      "name": "missing-address",
       "apply": [
         {
-          "script": "testing/negative.sh",
-          "vm": "default"
+          "script": "testing/missing-address.sh"
         }
       ],
       "failures": {
@@ -22,8 +20,7 @@
       },
       "restore": [
         {
-          "script": "testing/restore.sh",
-          "vm": "default"
+          "script": "testing/restore-missing-address.sh"
         }
       ]
     }

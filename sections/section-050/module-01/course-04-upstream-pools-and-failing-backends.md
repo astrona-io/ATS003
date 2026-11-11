@@ -105,31 +105,26 @@ sudo systemctl start backend-b
 > - **Host names looked up once.** A host name in `proxy_pass` or `upstream` is turned into an address at start or reload. A changed backend address goes unnoticed until the next reload.
 > - **Reading a `502` as a backend bug.** It means NGINX could not reach the backend at all. Check that the backend is running and listening on the right port.
 
-## Your mission: Nginx Reverse Proxy Lab
+## Practice: Reverse proxy to a fixed backend path
 
-You can now forward paths to a backend, control the path it sees, and spread requests over an `upstream` pool. The mission asks you to put two new front-end ports in place with NGINX: one that sends every path to one fixed backend page, and one that balances over two apps, without touching the apps that already run.
+Route every path on port 8001 to backend 2222 /special. Check different request paths through the proxy. Preserve the existing backend applications. This lab starts independently; changes in the playground do not carry over.
 
-The mission runs on its own training ship, so first pause your playground. Nothing in it is lost:
+Pause the playground first:
 
-```sh
+```bash
 astrona stop nginx-proxy-playground
 ```
 
-Then start the mission:
+Read the [task](labs/lab-01/question.md), then start the lab:
 
-```sh
+```bash
 astrona run --git ssh://git@github.com/astrona-io/ATS003.git -c sections/section-050/module-01/labs/lab-01
 ```
 
-Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your own first. When you think you are done, send it for grading:
+Use the inspection commands while working. Submit once all tasks are complete; submission ends the environment.
 
-```sh
-astrona submit -c sections/section-050/module-01/labs/lab-01
-```
+Resume the playground afterwards:
 
-When the mission is done, remove it and wake your playground up again:
-
-```sh
-astrona destroy ats-003-lab-051
+```bash
 astrona start nginx-proxy-playground
 ```

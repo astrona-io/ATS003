@@ -37,7 +37,7 @@ You proved the skills in a graded mission, right after the part that taught the 
 
 | Mission | After the part | What you proved |
 | --- | --- | --- |
-| [Nginx Reverse Proxy Lab](./labs/lab-01/README.md) | Upstream Pools And Failing Backends | a fixed-target proxy on one port and a load balancer on another, with the existing apps untouched |
+| [Reverse proxy to a fixed backend path](./labs/lab-01/README.md) | Focused practice | Route every path on port 8001 to backend 2222 /special; Check different request paths through the proxy; Preserve the existing backend applications |
 
 If you skipped it, go back to it now. The exam asks for exactly these skills.
 

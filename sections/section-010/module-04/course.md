@@ -62,5 +62,5 @@ The exam asks you to add entries to `/etc/hosts`, prove that they resolve in bot
 <!-- curriculum-practice -->
 ## Practice and assessment
 
-- [Local Hostname Name Resolution Lab](labs/lab-01/question.md): Add a secondary IPv4 and a static IPv6 address beside the management address; Make both addresses survive a reboot in Netplan or NetworkManager configuration; Map the host name app-srv1 to its new address in /etc/hosts, forward and reverse.
-- [Core Host Configurations Capstone Lab](../capstone/labs/lab-01/question.md): Add a secondary IPv4 and a static IPv6 address beside the management address; Make both addresses survive a reboot in Netplan or NetworkManager configuration; Map the host name app-srv1 to its new address in /etc/hosts, forward and reverse.
+- [Repair local hostname resolution](labs/lab-01/question.md): Find the incorrect app-srv1 mapping in /etc/hosts; Repair forward and reverse NSS lookup results; Keep unrelated host mappings intact.
+- [Addressing and local resolution integration](../capstone/labs/lab-01/question.md): Add a secondary IPv4 and a static IPv6 address beside the management address; Make both addresses survive a reboot in Netplan or NetworkManager configuration; Map the host name app-srv1 to its new address in /etc/hosts, forward and reverse.

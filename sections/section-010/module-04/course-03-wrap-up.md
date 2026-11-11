@@ -26,7 +26,7 @@ You proved the skills of this module in a graded mission:
 
 | Mission | After the part | What you proved |
 | --- | --- | --- |
-| [Local Hostname Name Resolution Lab](./labs/lab-01/README.md) | Write An Entry And Test It | add and persist new addresses, and make `app-srv1` resolve both ways through `/etc/hosts` |
+| [Repair local hostname resolution](./labs/lab-01/README.md) | Focused practice | Find the incorrect app-srv1 mapping in /etc/hosts; Repair forward and reverse NSS lookup results; Keep unrelated host mappings intact |
 
 If you skipped it, go back to it now. The exam asks for exactly these skills.
 

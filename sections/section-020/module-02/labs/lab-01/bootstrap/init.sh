@@ -1,14 +1,7 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
-# Bootstrap init: creates dummy0, dummy1, and dummy2 kernel "dummy" interfaces
-# so this lab's bridge/bond tasks have safe, disposable NICs to enslave.
-#
-# A single default QEMU VM only has one real NIC (the management interface
-# this SSH/console session depends on) — bridging or bonding it would break
-# connectivity to the VM. Dummy interfaces give bridge/bond commands
-# something real to operate on without ever touching that NIC.
-
+# Prepare safe disposable interfaces for the bridge exercise.
 set -eu
 
 # Remove inherited practice topology while preserving management networking.
@@ -38,7 +31,7 @@ done
 PRIMARY_IFACE="$(ip -o -4 route show to default | awk '{print $5}' | head -n1)"
 echo "Detected primary interface: ${PRIMARY_IFACE:-none}"
 
-for IFACE in dummy0 dummy1 dummy2; do
+for IFACE in dummy0; do
   if [[ -n "$PRIMARY_IFACE" && "$IFACE" == "$PRIMARY_IFACE" ]]; then
     echo "Refusing to create $IFACE: name collides with primary interface $PRIMARY_IFACE" >&2
     exit 1

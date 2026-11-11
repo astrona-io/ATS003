@@ -126,31 +126,26 @@ You get roughly a 3 : 1 : 1 split:
 > - **Forgetting the load balancer is one machine.** One NGINX in front of three backends is still a single point of failure.
 > - **Leaving a test weight in place.** A `weight=3` left over from an experiment quietly skews every later test. Reset the pool after each change.
 
-## Your mission: Nginx Upstream Load Balancers Lab
+## Practice: Balance requests across two upstreams
 
-You can now build an `upstream` pool and point a `proxy_pass` at it. The mission asks you to put a load balancer over two existing apps on one port, and a proxy that sends every path to one fixed page of an app on another port, without changing the apps.
+Build an upstream with backends 1111 and 2222. Serve both backends through port 8000. Preserve the existing backend applications. This lab starts independently; changes in the playground do not carry over.
 
-The mission runs on its own training ship, so first pause your playground. Nothing in it is lost:
+Pause the playground first:
 
-```sh
+```bash
 astrona stop nginx-lb-playground
 ```
 
-Then start the mission:
+Read the [task](labs/lab-01/question.md), then start the lab:
 
-```sh
+```bash
 astrona run --git ssh://git@github.com/astrona-io/ATS003.git -c sections/section-050/module-02/labs/lab-01
 ```
 
-Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your own first. When you think you are done, send it for grading:
+Use the inspection commands while working. Submit once all tasks are complete; submission ends the environment.
 
-```sh
-astrona submit -c sections/section-050/module-02/labs/lab-01
-```
+Resume the playground afterwards:
 
-When the mission is done, remove it and wake your playground up again:
-
-```sh
-astrona destroy ats-003-lab-052
+```bash
 astrona start nginx-lb-playground
 ```

@@ -1,4 +1,3 @@
 #!/usr/bin/env bash
 set -euo pipefail
-sudo netplan apply
-sleep 3
+sudo ip link set dummy1 nomaster

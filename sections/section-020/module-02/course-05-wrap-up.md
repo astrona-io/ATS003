@@ -37,7 +37,7 @@ You proved the skills of this module in a graded mission:
 
 | Mission | After the part | What you proved |
 | --- | --- | --- |
-| [Software Bridging Lab](./labs/lab-01/README.md) | Make The Bridge Last | build a bridge and an active-backup bond, and make both persistent |
+| [Build a persistent software bridge](./labs/lab-01/README.md) | Focused practice | Create br0 using only the supplied practice interfaces; Check bridge membership and forwarding state; Persist br0 in Netplan and verify it after reboot |
 
 If you skipped it, go back to it now. The exam asks for exactly these skills.
 

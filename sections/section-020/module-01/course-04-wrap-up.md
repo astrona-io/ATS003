@@ -32,7 +32,7 @@ You proved the skills of this module in a graded mission:
 
 | Mission | After the part | What you proved |
 | --- | --- | --- |
-| [Link Aggregation (Bonding) Lab](./labs/lab-01/README.md) | Make The Bond Last | build an active-backup bond and a bridge, and make both persistent |
+| [Build a persistent active-backup bond](./labs/lab-01/README.md) | Focused practice | Create bond0 using only the supplied practice interfaces; Check active-backup mode and the active member; Persist bond0 in Netplan and verify it after reboot |
 
 If you skipped it, go back to it now. The exam asks for exactly these skills.
 

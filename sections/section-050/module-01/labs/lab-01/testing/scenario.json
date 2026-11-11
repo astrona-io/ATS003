@@ -1,29 +1,26 @@
 {
   "initial_failures": {
-    "default/verify-proxy-8001": "FAIL: GET :8001/"
+    "default/verify-proxy-8001": "FAIL:"
   },
   "solution": [
     {
-      "script": "testing/solution.sh",
-      "vm": "default"
+      "script": "testing/solution.sh"
     }
   ],
   "negative": [
     {
-      "name": "regression",
+      "name": "wrong-routing",
       "apply": [
         {
-          "script": "testing/negative.sh",
-          "vm": "default"
+          "script": "testing/wrong-routing.sh"
         }
       ],
       "failures": {
-        "default/verify-proxy-8001": "FAIL: GET :8001/"
+        "default/verify-proxy-8001": "FAIL:"
       },
       "restore": [
         {
-          "script": "testing/restore.sh",
-          "vm": "default"
+          "script": "testing/restore-wrong-routing.sh"
         }
       ]
     }

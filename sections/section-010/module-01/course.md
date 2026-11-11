@@ -71,5 +71,5 @@ So when a problem later shows up as "the service is unreachable", your first que
 <!-- curriculum-practice -->
 ## Practice and assessment
 
-- [IPv4 & IPv6 Interface Configuration Lab](labs/lab-01/question.md): Add a secondary IPv4 and a static IPv6 address beside the management address; Make both addresses survive a reboot in Netplan or NetworkManager configuration; Map the host name app-srv1 to its new address in /etc/hosts, forward and reverse.
-- [Core Host Configurations Capstone Lab](../capstone/labs/lab-01/question.md): Add a secondary IPv4 and a static IPv6 address beside the management address; Make both addresses survive a reboot in Netplan or NetworkManager configuration; Map the host name app-srv1 to its new address in /etc/hosts, forward and reverse.
+- [IPv4 and IPv6 addressing](labs/lab-01/question.md): Add secondary IPv4 and IPv6 addresses without changing management DHCP; Persist the addresses in network configuration; Verify both addresses after a reboot.
+- [Addressing and local resolution integration](../capstone/labs/lab-01/question.md): Add a secondary IPv4 and a static IPv6 address beside the management address; Make both addresses survive a reboot in Netplan or NetworkManager configuration; Map the host name app-srv1 to its new address in /etc/hosts, forward and reverse.

@@ -11,6 +11,5 @@ network:
 REFERENCE_FILE
 sudo chmod 600 /etc/netplan/99-lab-secondary.yaml
 sudo netplan apply
-printf '%s
-' '192.168.10.71 app-srv1' | sudo tee -a /etc/hosts
+
 sleep 3

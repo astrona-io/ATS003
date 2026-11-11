@@ -1,29 +1,26 @@
 {
   "initial_failures": {
-    "default/verify-secondary-ipv4": "FAIL: secondary"
+    "default/verify-hosts-forward": "FAIL: hosts-forward"
   },
   "solution": [
     {
-      "script": "testing/solution.sh",
-      "vm": "default"
+      "script": "testing/solution.sh"
     }
   ],
   "negative": [
     {
-      "name": "regression",
+      "name": "wrong-address",
       "apply": [
         {
-          "script": "testing/negative.sh",
-          "vm": "default"
+          "script": "testing/wrong-address.sh"
         }
       ],
       "failures": {
-        "default/verify-secondary-ipv4": "FAIL: secondary"
+        "default/verify-hosts-forward": "FAIL: hosts-forward"
       },
       "restore": [
         {
-          "script": "testing/restore.sh",
-          "vm": "default"
+          "script": "testing/restore-wrong-address.sh"
         }
       ]
     }

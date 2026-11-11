@@ -54,5 +54,5 @@ The hard part is not the syntax. It is predicting where each request goes, and k
 <!-- curriculum-practice -->
 ## Practice and assessment
 
-- [Nginx Upstream Load Balancers Lab](labs/lab-01/question.md): Reverse-proxy every path on one port to a fixed backend path; Spread requests on another port across two backends with an upstream block; Keep the whole NGINX configuration valid and the existing apps untouched.
-- [Application Proxy and SSH Capstone Lab](../capstone/labs/lab-01/question.md): Reverse-proxy every path on one port to a fixed backend path; Spread requests on another port across two backends with an upstream block; Keep the whole NGINX configuration valid and the existing apps untouched.
+- [Balance requests across two upstreams](labs/lab-01/question.md): Build an upstream with backends 1111 and 2222; Serve both backends through port 8000; Preserve the existing backend applications.
+- [Reverse proxy and load balancing integration](../capstone/labs/lab-01/question.md): Reverse-proxy every path on one port to a fixed backend path; Spread requests on another port across two backends with an upstream block; Keep the whole NGINX configuration valid and the existing apps untouched.

@@ -31,7 +31,7 @@ You proved the skill in a graded mission, right after the part that taught it:
 
 | Mission | After the part | What you proved |
 | --- | --- | --- |
-| [Nginx Upstream Load Balancers Lab](./labs/lab-01/README.md) | The Pool And Round-Robin | a load balancer over two apps and a fixed-target proxy, with the existing apps untouched |
+| [Balance requests across two upstreams](./labs/lab-01/README.md) | Focused practice | Build an upstream with backends 1111 and 2222; Serve both backends through port 8000; Preserve the existing backend applications |
 
 If you skipped it, go back to it now. The exam asks for exactly these skills.
 

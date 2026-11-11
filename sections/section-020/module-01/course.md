@@ -53,5 +53,4 @@ Bonding is how a Linux server survives a pulled cable or a failed network card w
 <!-- curriculum-practice -->
 ## Practice and assessment
 
-- [Link Aggregation (Bonding) Lab](labs/lab-01/question.md): Build a bridge br0 and plug a member interface into it; Build an active-backup bond0 over two member interfaces; Declare the bridge and the bond in on-disk configuration so they return after a reboot.
-- [Aggregation and Routing Capstone Lab](../capstone/labs/lab-01/question.md): Add a static route to a partner subnet through a gateway; Prove the route with ip route get and a real ping; Make the route survive a reboot in on-disk configuration.
+- [Build a persistent active-backup bond](labs/lab-01/question.md): Create bond0 using only the supplied practice interfaces; Check active-backup mode and the active member; Persist bond0 in Netplan and verify it after reboot.

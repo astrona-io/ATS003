@@ -1,62 +1,37 @@
 metadata:
-  name: "ats-003-lab-014"
+  name: ats-003-lab-014
   docs:
-    solution: "solution.md"
-    question: "question.md"
-
+    solution: solution.md
+    question: question.md
 runtime:
-  type: "qemu"
+  type: qemu
   qemu:
   - image:
-      type: "oci"
-      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-20261111-{ARCH}"
+      type: oci
+      source: ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-20261111-{ARCH}
       checksums:
         amd64: sha256:1cc87d6d68d76379c457e5372d5bfecf6dea00e78231cf0057a28a83b4970b11
         arm64: sha256:bc72ff645ea1621408d18a09a638da3f077438d2dd3c5ebdd79bef8513a795e0
-
     cpus: 2
     memoryMB: 2048
     diskSizeGB: 15
     display: false
-
 bootstrap:
   init:
-    - name: "network-tooling-setup"
-      description: "Confirms the primary interface and ensures Netplan/iproute2 tooling is present, without touching live addressing or /etc/hosts"
-      type: "folder"
-      source: "bootstrap/"
-
+  - name: network-tooling-setup
+    description: Seed an incorrect local hostname mapping; no interface reconfiguration
+      is needed
+    type: folder
+    source: bootstrap/
 validation:
   scripts:
-    - name: "verify-secondary-ipv4"
-      description: "Confirms the secondary IPv4 address 192.168.10.71/24 is live on the primary interface alongside the original address"
-      type: "file"
-      source: "validation/validate-secondary-ipv4.sh"
-
-    - name: "verify-ipv6-address"
-      description: "Confirms the static IPv6 ULA fd00:10::70/64 is bound to the primary interface with global scope"
-      type: "file"
-      source: "validation/validate-ipv6-address.sh"
-
-    - name: "verify-ipv6-reachable"
-      description: "Confirms fd00:10::70 actually answers a ping, not just appears in `ip addr`"
-      type: "file"
-      source: "validation/validate-ipv6-reachable.sh"
-
-    - name: "verify-hosts-forward"
-      description: "Confirms getent hosts app-srv1 resolves to 192.168.10.71"
-      type: "file"
-      source: "validation/validate-hosts-forward.sh"
-
-    - name: "verify-hosts-reverse"
-      description: "Confirms getent hosts 192.168.10.71 resolves back to app-srv1"
-      type: "file"
-      source: "validation/validate-hosts-reverse.sh"
-
-    - name: "verify-persistence"
-      description: "Confirms the secondary IPv4/IPv6 addresses are declared in a persistent Netplan or NetworkManager config, not only applied live"
-      type: "file"
-      source: "validation/validate-persistence.sh"
-
+  - name: verify-hosts-forward
+    description: Confirms getent hosts app-srv1 resolves to 192.168.10.71
+    type: file
+    source: validation/validate-hosts-forward.sh
+  - name: verify-hosts-reverse
+    description: Confirms getent hosts 192.168.10.71 resolves back to app-srv1
+    type: file
+    source: validation/validate-hosts-reverse.sh
 teardown:
   keepCluster: false

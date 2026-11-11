@@ -54,5 +54,4 @@ Every virtual machine host and container platform you will ever manage depends o
 <!-- curriculum-practice -->
 ## Practice and assessment
 
-- [Software Bridging Lab](labs/lab-01/question.md): Build a bridge br0 and plug a member interface into it; Build an active-backup bond0 over two member interfaces; Declare the bridge and the bond in on-disk configuration so they return after a reboot.
-- [Aggregation and Routing Capstone Lab](../capstone/labs/lab-01/question.md): Add a static route to a partner subnet through a gateway; Prove the route with ip route get and a real ping; Make the route survive a reboot in on-disk configuration.
+- [Build a persistent software bridge](labs/lab-01/question.md): Create br0 using only the supplied practice interfaces; Check bridge membership and forwarding state; Persist br0 in Netplan and verify it after reboot.
