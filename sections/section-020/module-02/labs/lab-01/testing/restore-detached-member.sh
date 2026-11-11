@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-sudo ip link set dummy0 down
-sudo ip link set dummy0 master br0
-sudo ip link set dummy0 up
+sudo cp /tmp/lab-topology.saved /etc/netplan/99-lab-bridge.yaml
+sudo netplan apply
 sleep 5

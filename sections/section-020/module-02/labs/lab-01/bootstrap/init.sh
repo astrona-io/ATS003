@@ -4,6 +4,10 @@ sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Prepare safe disposable interfaces for the bridge exercise.
 set -eu
 
+# Keep the prepared Netplan files across reboots. Cloud-init must not try
+# to rename disposable interfaces using their previous boot's MAC addresses.
+printf 'network: {config: disabled}\n' | sudo tee /etc/cloud/cloud.cfg.d/99-lab-network.cfg >/dev/null
+
 # Remove inherited practice topology while preserving management networking.
 sudo python3 - <<'NETPLAN_RESET'
 from pathlib import Path

@@ -13,7 +13,8 @@ try:
  require(nm('connection.autoconnect')=='yes','autoconnect is disabled')
  require(nm('ipv4.never-default')=='yes','practice interface must not become the default route')
  uuid=nm('connection.uuid')
- require(any(uuid in f.read_text() for f in Path('/etc/NetworkManager/system-connections').glob('*') if f.is_file()),'profile is not saved on disk')
+ files = list(Path('/etc/NetworkManager/system-connections').glob('*')) + list(Path('/etc/netplan').glob('*.yaml'))
+ require(any(uuid in f.read_text() for f in files if f.is_file()),'profile is not saved on disk')
 except subprocess.CalledProcessError:
  print('FAIL: profile - lab-static is missing');raise SystemExit(1)
 print('PASS: saved NetworkManager profile')

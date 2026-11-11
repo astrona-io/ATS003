@@ -246,6 +246,10 @@ class Lifecycle:
                     self.ssh(vm, 'uname -a; systemctl --failed --no-pager; '
                              'ip -br address; ip route; sudo nft list ruleset; lsblk -f; sudo journalctl -b -p warning -n 100 --no-pager',
                              'diagnostics-' + vm, 30)
+                    self.ssh(vm, 'sudo cloud-init status --long; sudo cat /run/cloud-init/result.json; '
+                             'sudo ss -lntp; sudo systemctl status ssh ssh.socket --no-pager; '
+                             'sudo journalctl -b -u ssh -u ssh.socket -n 100 --no-pager',
+                             'boot-services-' + vm, 30)
                 except Exception as exc:
                     print(f'Diagnostics unavailable: {exc}', file=sys.stderr)
             self.phase = 'cleanup'
