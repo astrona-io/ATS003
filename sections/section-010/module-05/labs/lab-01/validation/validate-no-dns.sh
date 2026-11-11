@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that resolved holds no DNS server for dhcp0.
 set -u
 
@@ -14,3 +16,4 @@ if echo "$servers" | grep -Eq '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+'; then
 fi
 echo "PASS: dns (no DNS server from the lease)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

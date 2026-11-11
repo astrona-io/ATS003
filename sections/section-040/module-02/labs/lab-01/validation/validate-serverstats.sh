@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that `chronyc serverstats` runs successfully and reports the
 # NTP packet counters, proving chronyd's server side is running and
 # answering the chronyc control socket - the same proof `chronyc
@@ -21,3 +23,4 @@ else
   echo "FAIL: serverstats - unexpected output: $output"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

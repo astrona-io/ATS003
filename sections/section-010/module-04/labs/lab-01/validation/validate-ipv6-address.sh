@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that the static IPv6 ULA fd00:10::70/64 is bound to the host's
 # primary interface with global scope (not stuck tentative/dadfailed).
 
@@ -31,3 +33,4 @@ fi
 
 echo "PASS: ipv6-address ($expected present on $iface, scope global)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

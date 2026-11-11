@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Per-VM OS prep for the ntp-client VM — PLAYGROUND (NTP Server Mode)
 # Points chrony straight at the ntp-server VM and starts it. Because the server
 # has no `allow` line yet, this client's source will sit in the `?` state —
@@ -31,3 +33,4 @@ sudo systemctl restart chrony 2>/dev/null || sudo systemctl restart chronyd 2>/d
 echo "[playground] ntp-client: chrony restarted. Source 192.168.101.10 will be"
 echo "[playground] refused until the server gets an 'allow' line."
 sudo chronyc sources 2>/dev/null || true
+ASTRONA_STUDENT_SCRIPT

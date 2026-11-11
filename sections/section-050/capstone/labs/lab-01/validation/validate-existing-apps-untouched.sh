@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks the pre-existing, off-limits apps on ports 1111 and 2222 (bootstrap
 # apps) still serve their original content, proving their config files
 # were never edited.
@@ -32,3 +34,4 @@ else
 fi
 
 exit "$fail"
+ASTRONA_STUDENT_SCRIPT

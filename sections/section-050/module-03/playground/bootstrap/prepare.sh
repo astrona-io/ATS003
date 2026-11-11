@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — OpenSSH Server Hardening
 # Runs once at startup, as a regular user with passwordless sudo (the LFCS
 # base image, like the graded labs). openssh-server, openssh-client, and
@@ -95,3 +97,4 @@ echo "[playground] 'sudo systemctl reload sshd-test', then test:"
 echo "[playground]   ssh -p 2222 alice@localhost"
 echo "[playground] Do NOT edit /etc/ssh/sshd_config or touch ssh.service on :22 —"
 echo "[playground] that carries your astrona session. See docs/overview.md."
+ASTRONA_STUDENT_SCRIPT

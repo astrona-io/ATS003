@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Shared OS prep for PLAYGROUND — NTP Server Mode and Stratums
 # Runs on BOTH VMs before their per-VM script, as a regular user with
 # passwordless sudo (the LFCS base image, like the graded labs). Environment
@@ -11,3 +13,4 @@ echo "[playground] common prep: enabling chrony..."
 sudo systemctl enable chrony 2>/dev/null || true
 
 echo "[playground] common prep done."
+ASTRONA_STUDENT_SCRIPT

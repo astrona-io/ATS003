@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — OpenSSH Client
 # Runs once at startup, as a regular user with passwordless sudo (the LFCS
 # base image). openssh-server, openssh-client and curl ship in the base image.
@@ -84,3 +86,4 @@ echo "[playground]   station sshd : localhost:2222 (user pilot / pilotpass)"
 echo "[playground]   relay sshd   : localhost:2223 (jump host, user pilot)"
 echo "[playground]   web service  : 127.0.0.1:8081 (loopback only)"
 echo "[playground] Do NOT change the real sshd on port 22. See docs/overview.md."
+ASTRONA_STUDENT_SCRIPT

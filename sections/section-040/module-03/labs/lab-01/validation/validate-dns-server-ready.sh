@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms this VM is actually serving as the internal DNS server:
 # bind9/named is active, and both zones loaded without error.
 
@@ -26,3 +28,4 @@ fi
 
 echo "PASS: dns-server-ready (bind9/named active, both zones valid, answering queries)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

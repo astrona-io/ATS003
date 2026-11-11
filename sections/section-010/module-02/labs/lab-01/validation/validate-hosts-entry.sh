@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks /etc/hosts's 127.0.1.1 local-resolution line was updated to the
 # new hostname, not left stale after the rename.
 
@@ -19,3 +21,4 @@ else
   echo "FAIL: /etc/hosts 127.0.1.1 entry - '$line', expected to contain '$expected'"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

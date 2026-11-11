@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks the reverse (PTR) lookup for 192.168.10.80 resolves back to
 # data-001.internal.example.com.
 
@@ -14,3 +16,4 @@ else
   echo "FAIL: PTR record - 192.168.10.80 = '$actual', expected '$expected'"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

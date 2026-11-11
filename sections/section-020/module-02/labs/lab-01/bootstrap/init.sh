@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap init: creates dummy0, dummy1, and dummy2 kernel "dummy" interfaces
 # so this lab's bridge/bond tasks have safe, disposable NICs to enslave.
 #
@@ -28,3 +30,4 @@ for IFACE in dummy0 dummy1 dummy2; do
 done
 
 ip -br link show
+ASTRONA_STUDENT_SCRIPT

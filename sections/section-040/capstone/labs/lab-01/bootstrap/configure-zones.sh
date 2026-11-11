@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap (dns VM): writes the forward (internal.example.com) and
 # reverse (10.168.192.in-addr.arpa) zone files bind9 serves
 # authoritatively, matching the records the scenario and its guided
@@ -79,3 +81,4 @@ fi
 
 sudo systemctl enable "$bind_service"
 sudo systemctl restart "$bind_service"
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that the secondary IPv4/IPv6 addresses are declared in a
 # persistent config (Netplan or NetworkManager), not only applied live
 # with `ip addr add`, so they survive a reboot.
@@ -42,3 +44,4 @@ else
   echo "FAIL: persistence - ipv4_declared=$ipv4_found ipv6_declared=$ipv6_found (checked /etc/netplan/*.yaml and nmcli con show $iface)"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — Network Troubleshooting Workflow
 # Runs once at startup, as a regular user with passwordless sudo (the LFCS
 # base image). iproute2, nftables, curl, tcpdump and python3 ship in the base
@@ -76,3 +78,4 @@ echo
 echo "[playground] ready. Healthy ship: lab0 10.66.0.10/24, portal on :8443, name portal.lab."
 echo "[playground] Break one rung: sudo break-link | sudo break-name | sudo break-firewall"
 echo "[playground] Put everything back: sudo fix-all"
+ASTRONA_STUDENT_SCRIPT

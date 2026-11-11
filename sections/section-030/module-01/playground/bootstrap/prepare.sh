@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — Packet Filtering with nftables (playground)
 # Runs once when the environment comes up, as a regular user with passwordless
 # sudo (the LFCS base image, like the graded labs). Environment preparation
@@ -49,3 +51,4 @@ echo "[playground] dummy interface for 'ip saddr' experiments. Start a throwaway
 echo "[playground] listener with 'python3 -m http.server 5000' and probe it with"
 echo "[playground] 'curl'. Do NOT add a rule that drops your SSH session on the"
 echo "[playground] management interface. See docs/overview.md."
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: deploys the two pre-existing, off-limits apps that the lab's
 # scenario refers to as running on web-srv1 (192.168.10.60) ports 1111 and
 # 2222. These represent another team's already-live services — the lab
@@ -46,3 +48,4 @@ EOF
 
 sudo nginx -t
 sudo systemctl reload nginx
+ASTRONA_STUDENT_SCRIPT

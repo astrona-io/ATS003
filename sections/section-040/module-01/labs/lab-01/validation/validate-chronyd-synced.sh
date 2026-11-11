@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that chronyd picked up the edited config (reload/restart happened)
 # and is actively disciplining the clock, per `chronyc tracking`.
 
@@ -25,3 +27,4 @@ else
   echo "FAIL: chrony sync - Leap status is '$leap', expected 'Normal'"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

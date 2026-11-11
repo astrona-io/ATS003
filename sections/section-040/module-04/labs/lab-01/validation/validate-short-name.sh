@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that the short name db resolves through the search domain.
 set -u
 
@@ -11,3 +13,4 @@ fi
 
 echo "FAIL: short-name - getent hosts db returned '${answer:-nothing}' instead of 203.0.113.20"
 exit 1
+ASTRONA_STUDENT_SCRIPT

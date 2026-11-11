@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that a Netplan file enables DHCP for dhcp0 and refuses routes and DNS.
 set -u
 
@@ -24,3 +26,4 @@ then
 fi
 echo "PASS: netplan (dhcp0 asks for a lease and refuses routes and DNS)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

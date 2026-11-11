@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — Active Socket Diagnostics (ss)
 # Runs once at startup, as a regular user with passwordless sudo (the LFCS
 # base image, like the graded labs). socat, iproute2 (which has ss), and
@@ -61,3 +63,4 @@ echo "[playground]   UDP  0.0.0.0:5514     (lab-udp)"
 echo "[playground]   UNIX /run/lab-app.sock (lab-unix)"
 echo "[playground]   one ESTABLISHED TCP pair on 127.0.0.1:9000 (lab-estab)"
 echo "[playground] Start here: ss -tlnp   Then see docs/overview.md."
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms this VM is actually acting as the partner-subnet gateway:
 # IP forwarding is on, and dummy0 is up with 10.10.30.1/24 -- the
 # address the target VM's route ultimately reaches.
@@ -24,3 +26,4 @@ fi
 
 echo "PASS: gateway-ready (ip_forward=1, dummy0 10.10.30.1/24 up)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

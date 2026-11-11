@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — firewalld Zones and Services (playground)
 # Runs once when the environment comes up, as a regular user with passwordless
 # sudo (the LFCS base image, like the graded labs). Environment preparation
@@ -53,3 +55,4 @@ echo "[playground] interface experiments. Do NOT remove the ssh service from the
 echo "[playground] zone that holds your SSH interface, set the default zone to"
 echo "[playground] 'drop', or enable panic mode — any of those cuts your"
 echo "[playground] session. See docs/overview.md."
+ASTRONA_STUDENT_SCRIPT

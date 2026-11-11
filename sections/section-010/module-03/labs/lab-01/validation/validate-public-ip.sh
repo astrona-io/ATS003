@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks /opt/course/public_ip holds a plausible public (non-private) IPv4
 # address. Cross-checks against a live HTTP/DNS lookup when outbound network
 # access is available at validation time, but does not hard-fail on network
@@ -56,3 +58,4 @@ fi
 
 echo "PASS: public_ip ($path = '$actual')"
 exit 0
+ASTRONA_STUDENT_SCRIPT

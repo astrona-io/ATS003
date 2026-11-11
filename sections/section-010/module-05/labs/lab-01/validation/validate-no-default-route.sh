@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that dhcp0 carries no default route and some other default route remains.
 set -u
 
@@ -12,3 +14,4 @@ if ! ip -4 route show default | grep -q '^default'; then
 fi
 echo "PASS: routes (no default route on dhcp0, management route intact)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

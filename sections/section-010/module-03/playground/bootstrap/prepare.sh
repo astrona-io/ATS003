@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — Discovering Your Public IP Address
 # Runs once when the environment comes up, as a regular user with passwordless
 # sudo (the LFCS base image, like the graded labs). Environment preparation
@@ -42,3 +44,4 @@ echo "[playground] Internet discovery (curl https://ifconfig.me, the dig myaddr 
 echo "[playground] only works if this environment has outbound egress. If it does not,"
 echo "[playground] those commands time out — the module shows what they return when connected."
 echo "[playground] See docs/overview.md."
+ASTRONA_STUDENT_SCRIPT

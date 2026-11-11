@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the sshd/ssh service is active (real live system state, not a
 # recorded output file).
 
@@ -11,3 +13,4 @@ else
   echo "FAIL: sshd-service - neither the sshd nor ssh unit is active"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

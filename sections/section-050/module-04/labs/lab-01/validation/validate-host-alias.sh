@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks the Host station entry and a real batch-mode login as cadet.
 set -u
 
@@ -23,3 +25,4 @@ fi
 
 echo "FAIL: host-alias - 'ssh -o BatchMode=yes station true' failed (key not installed, host key not trusted, or bad permissions)"
 exit 1
+ASTRONA_STUDENT_SCRIPT

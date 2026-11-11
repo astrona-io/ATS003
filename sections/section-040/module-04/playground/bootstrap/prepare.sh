@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — DNS Client Resolution
 # Runs once at startup, as a regular user with passwordless sudo (the LFCS
 # base image). bind9, bind9utils, dnsutils and systemd-resolved ship in the
@@ -62,3 +64,4 @@ dig +short @10.55.0.53 www.lab.example 2>/dev/null || true
 echo
 echo "[playground] ready. BIND answers for lab.example on 10.55.0.53."
 echo "[playground] systemd-resolved is at its defaults and does not know that server yet."
+ASTRONA_STUDENT_SCRIPT

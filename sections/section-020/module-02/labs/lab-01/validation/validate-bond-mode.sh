@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks bond0 exists in active-backup mode with dummy1 and dummy2 enslaved
 
 set -u
@@ -29,3 +31,4 @@ fi
 
 echo "PASS: bond-mode (bond0 active-backup, dummy1+dummy2 enslaved)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

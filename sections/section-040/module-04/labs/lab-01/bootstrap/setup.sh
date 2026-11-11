@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: creates the dummy interface dns0 and a BIND server for
 # lab.example on 10.55.0.53. systemd-resolved is left at its defaults, without
 # any knowledge of that server.
@@ -51,3 +53,4 @@ sudo systemctl restart named 2>/dev/null || sudo systemctl restart bind9
 sudo systemctl enable --now systemd-resolved 2>/dev/null || true
 sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 sudo rm -f /etc/systemd/resolved.conf.d/10-lab.conf
+ASTRONA_STUDENT_SCRIPT

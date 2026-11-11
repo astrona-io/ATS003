@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that the full merged nginx configuration (existing apps + the
 # student's new file) is syntactically valid.
 
@@ -15,3 +17,4 @@ else
   echo "$out"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

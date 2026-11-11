@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that chrony.conf has an active `allow` directive permitting
 # the internal subnet (192.168.10.0/24) - the single line that turns
 # this chronyd from client-only into also serving time to that subnet.
@@ -27,3 +29,4 @@ else
   echo "FAIL: allow-directive - no active 'allow 192.168.10.0/24' line found in $conf"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

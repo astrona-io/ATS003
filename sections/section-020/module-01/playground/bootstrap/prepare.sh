@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — Link Aggregation with Linux Bonding (playground)
 # Runs once when the environment comes up, as a regular user with passwordless
 # sudo (the LFCS base image, like the graded labs). Environment preparation
@@ -25,3 +27,4 @@ echo "[playground] ready. The two extra NICs (segments 192.168.50.0/24 and"
 echo "[playground] 192.168.51.0/24) are up at layer 2 with no IP and no bond."
 echo "[playground] Do NOT reconfigure the interface carrying your SSH session."
 echo "[playground] See docs/overview.md for things to try."
+ASTRONA_STUDENT_SCRIPT

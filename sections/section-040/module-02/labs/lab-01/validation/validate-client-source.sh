@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks the client's chrony.conf points at the internal server
 # (192.168.10.123) instead of the public NTP pool.
 
@@ -32,3 +34,4 @@ fi
 
 echo "PASS: client-source ($conf points at 192.168.10.123, public pool lines removed)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

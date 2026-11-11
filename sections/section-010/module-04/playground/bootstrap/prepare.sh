@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — Local Hostname Resolution
 # Runs once when the environment comes up, as a regular user with passwordless
 # sudo (the LFCS base image, like the graded labs). Environment preparation
@@ -46,3 +48,4 @@ echo "[playground]   getent hosts db-primary -> 192.168.50.10  (interface-style 
 echo "[playground] /etc/hosts edits take effect immediately and survive a reboot;"
 echo "[playground] the whole VM is discarded on 'astrona destroy'."
 echo "[playground] See docs/overview.md for things to try."
+ASTRONA_STUDENT_SCRIPT

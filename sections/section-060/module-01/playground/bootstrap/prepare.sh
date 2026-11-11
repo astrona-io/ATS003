@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — Persistent Network Managers (NetworkManager / nmcli)
 # Runs once at startup, as a regular user with passwordless sudo (the LFCS
 # base image, like the graded labs). network-manager and iproute2 both ship
@@ -64,3 +66,4 @@ echo "[playground]   sudo nmcli connection add type ethernet con-name lab-static
 echo "[playground]       ifname ${SPARE_DEV:-<dev>} ipv4.method manual ipv4.addresses 192.168.120.50/24"
 echo "[playground]   sudo nmcli connection up lab-static"
 echo "[playground] The management interface is 'unmanaged' — leave it alone. See docs/overview.md."
+ASTRONA_STUDENT_SCRIPT

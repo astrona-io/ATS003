@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms https is allowed in the public zone's runtime (live) configuration.
 
 set -u
@@ -12,3 +14,4 @@ else
   echo "FAIL: https-runtime - https not in runtime services: '$services'"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that no live nftables rule drops tcp port 8443.
 set -u
 
@@ -14,3 +16,4 @@ fi
 
 echo "PASS: firewall (no rule drops tcp dport 8443)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

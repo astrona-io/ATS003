@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks port 8001 reverse-proxies every request through to the 2222 app's
 # /special path (fixed-target proxy_pass, not a client-visible redirect).
 
@@ -33,3 +35,4 @@ else
 fi
 
 exit "$fail"
+ASTRONA_STUDENT_SCRIPT

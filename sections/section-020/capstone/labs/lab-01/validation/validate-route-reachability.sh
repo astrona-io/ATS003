@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Real end-to-end proof the route works: ping the gateway's own dummy0
 # address (10.10.30.1) inside the partner subnet. This only succeeds
 # if the route is correct AND the gateway VM is actually forwarding --
@@ -13,3 +15,4 @@ else
   echo "FAIL: route-reachability - 10.10.30.1 did not reply: $(tail -3 /tmp/validate-route-reachability.log)"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

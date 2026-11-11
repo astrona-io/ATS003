@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that the secondary IPv4 address 192.168.10.71/24 is live on the
 # host's primary interface, in addition to (not instead of) its original
 # address.
@@ -27,3 +29,4 @@ else
   echo "FAIL: secondary-ipv4 - $expected not found on $iface"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

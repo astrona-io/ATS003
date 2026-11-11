@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: seeds a stale 127.0.1.1 entry in /etc/hosts matching the
 # generic pre-rename hostname, so the static-hostname task also has a
 # hosts-file entry that legitimately needs updating.
@@ -10,3 +12,4 @@ if grep -q '^127\.0\.1\.1' /etc/hosts; then
 else
   printf '127.0.1.1\tubuntu-2404-base\n' | sudo tee -a /etc/hosts > /dev/null
 fi
+ASTRONA_STUDENT_SCRIPT

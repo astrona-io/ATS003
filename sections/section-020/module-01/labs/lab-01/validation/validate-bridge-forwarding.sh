@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks `bridge link show` reports dummy0 as a forwarding member of br0
 
 set -u
@@ -22,3 +24,4 @@ fi
 
 echo "PASS: bridge-forwarding (dummy0 master br0, state forwarding)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

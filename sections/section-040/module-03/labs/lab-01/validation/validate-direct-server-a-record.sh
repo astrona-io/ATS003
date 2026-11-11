@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks a direct query against the dns VM's real address (bypassing
 # /etc/resolv.conf entirely) returns the same A record as the system
 # resolver, confirming the record itself -- not the resolver -- is
@@ -25,3 +27,4 @@ else
   echo "FAIL: direct-server A record - @${dns_ip} data-001.internal.example.com = '$actual', expected '$expected'"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

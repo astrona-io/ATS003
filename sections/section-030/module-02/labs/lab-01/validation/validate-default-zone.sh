@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms firewall-cmd --get-default-zone reports public.
 
 set -u
@@ -13,3 +15,4 @@ else
   echo "FAIL: default-zone - default zone = '$actual', expected '$expected'"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

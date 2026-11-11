@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms the Banner directive resolves to /etc/ssh/sshd-banner for both
 # elena and victor via the effective per-connection config, and that the
 # banner file itself exists and is readable.
@@ -29,3 +31,4 @@ if $pass; then
 else
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

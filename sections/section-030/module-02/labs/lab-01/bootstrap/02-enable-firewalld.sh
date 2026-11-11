@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: enables and starts firewalld, and makes sure the primary
 # interface has a sane, correct zone binding before the student's task
 # begins.
@@ -36,3 +38,4 @@ sudo firewall-cmd --zone=public --change-interface="$IFACE"
 sudo firewall-cmd --zone=public --change-interface="$IFACE" --permanent
 
 sudo firewall-cmd --reload
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — Managing Linux Hostnames
 # Runs once when the environment comes up. Environment preparation ONLY: put the
 # three hostname types into three visibly different states so `hostnamectl
@@ -39,3 +41,4 @@ echo "[playground]   pretty    = <unset>"
 echo "[playground] Change them with:  sudo hostnamectl set-hostname <name> [--static|--pretty|--transient]"
 echo "[playground] Static and pretty changes persist across a reboot; the transient value does not."
 echo "[playground] See docs/overview.md for things to try."
+ASTRONA_STUDENT_SCRIPT

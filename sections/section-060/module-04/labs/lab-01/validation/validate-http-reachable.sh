@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that the port 8080 web application is actually reachable end to
 # end (listener up AND not firewalled) by requesting it directly, the same
 # proof used in the lab's own Verification section.
@@ -14,3 +16,4 @@ else
   echo "FAIL: http-reachable - http://127.0.0.1:8080/ returned '$code' instead of a 2xx/3xx status (still blocked or app down)"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

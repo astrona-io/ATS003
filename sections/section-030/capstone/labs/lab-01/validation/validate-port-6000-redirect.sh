@@ -1,31 +1,8 @@
 #!/usr/bin/env bash
-# Checks that TCP port 6000 is redirected to local port 6001 via the
-# nat table's prerouting chain, and that something is actually
-# listening on 6001 so the redirect is functionally meaningful.
-
-set -u
-
-nat_prerouting="$(sudo nft list chain ip nat prerouting 2>/dev/null)"
-
-if [[ -z "$nat_prerouting" ]]; then
-  echo "FAIL: port-6000-redirect - table ip nat, chain prerouting does not exist"
-  exit 1
-fi
-
-if ! echo "$nat_prerouting" | grep -q 'type nat hook prerouting'; then
-  echo "FAIL: port-6000-redirect - chain prerouting is not attached to hook prerouting"
-  exit 1
-fi
-
-if ! echo "$nat_prerouting" | grep -Eq 'tcp dport 6000[[:space:]]+redirect to :?6001'; then
-  echo "FAIL: port-6000-redirect - no 'tcp dport 6000 redirect to :6001' rule found"
-  exit 1
-fi
-
-if ! sudo ss -tulpn 2>/dev/null | grep -q ':6001[[:space:]]'; then
-  echo "FAIL: port-6000-redirect - nothing is listening on local port 6001"
-  exit 1
-fi
-
-echo "PASS: port-6000-redirect (redirect rule present and 6001 has a listener)"
-exit 0
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+set -eu
+fail() { echo "FAIL: $*"; exit 1; }
+[ "$(sudo ip netns exec nft-client curl --noproxy '*' -fsS --max-time 3 http://192.168.10.1:6000/)" = listener-6001 ] || fail 'port 6000 did not reach the port 6001 listener'
+echo 'PASS: expected packet behavior observed'
+ASTRONA_STUDENT_SCRIPT

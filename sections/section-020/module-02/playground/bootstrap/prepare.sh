@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — Software Bridging (playground)
 # Runs once when the environment comes up, as a regular user with passwordless
 # sudo (the LFCS base image, like the graded labs). Environment preparation
@@ -33,3 +35,4 @@ echo "[playground] both DOWN, no IP, no bridge. Bridging both of them together i
 echo "[playground] a deliberate Layer 2 loop — enable STP (stp_state 1) before you"
 echo "[playground] bring the second port up. Do NOT reconfigure the SSH interface."
 echo "[playground] See docs/overview.md for things to try."
+ASTRONA_STUDENT_SCRIPT

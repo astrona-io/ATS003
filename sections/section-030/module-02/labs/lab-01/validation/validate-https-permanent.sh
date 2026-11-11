@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms https is allowed in the public zone's permanent (saved)
 # configuration, so it survives a reload/reboot.
 
@@ -13,3 +15,4 @@ else
   echo "FAIL: https-permanent - https not in permanent services: '$services'"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

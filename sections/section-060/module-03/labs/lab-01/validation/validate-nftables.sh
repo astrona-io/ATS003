@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that the nftables rule dropping traffic to port 8080 (deliberately
 # created at bootstrap) has been removed from the live ruleset.
 
@@ -18,3 +20,4 @@ fi
 
 echo "PASS: nftables (no 'tcp dport 8080 drop' rule remains in the live ruleset)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

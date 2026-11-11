@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that this host is itself synced (chronyd active, Leap status
 # Normal, Stratum 1-15) before it can usefully serve time to anything
 # downstream - a stratum-16 / not-synchronized server has nothing
@@ -28,3 +30,4 @@ else
   echo "FAIL: tracking-synced - Leap status '$leap', Stratum '$stratum' (expected Normal / 1-15)"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

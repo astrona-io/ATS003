@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that the IPv6 ULA fd00:10::70 actually answers a ping, proving
 # it is bound and not just listed in `ip addr`.
 
@@ -13,3 +15,4 @@ else
   echo "FAIL: ipv6-reachable - $target did not respond to ping -c1"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

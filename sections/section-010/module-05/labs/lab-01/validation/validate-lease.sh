@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that dhcp0 holds a dynamic address from the DHCP pool.
 set -u
 
@@ -19,3 +21,4 @@ if ! echo "$line" | grep -q 'dynamic'; then
 fi
 echo "PASS: lease (dhcp0 holds $addr from DHCP)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

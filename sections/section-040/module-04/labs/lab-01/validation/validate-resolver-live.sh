@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that the running resolver knows the lab server.
 set -u
 
@@ -14,3 +16,4 @@ fi
 
 echo "FAIL: resolver-live - resolvectl status does not list 10.55.0.53 (restart systemd-resolved after writing the drop-in)"
 exit 1
+ASTRONA_STUDENT_SCRIPT

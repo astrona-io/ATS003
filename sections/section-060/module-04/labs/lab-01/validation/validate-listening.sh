@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that something is actually listening on TCP port 8080, bound to
 # an address reachable from outside the host (not loopback-only).
 
@@ -18,3 +20,4 @@ fi
 
 echo "PASS: listening (ss -tulpn shows: $output)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

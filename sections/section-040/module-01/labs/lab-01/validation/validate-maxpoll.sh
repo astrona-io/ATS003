@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that all four required sources use maxpoll 10 (2^10 = 1024s, the
 # closest power-of-two chrony can express to the requested 1000s).
 
@@ -36,3 +38,4 @@ else
   echo "FAIL: maxpoll - ${bad[*]}"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that lab0 is up and still has its address.
 set -u
 
@@ -21,3 +23,4 @@ fi
 
 echo "PASS: link (lab0 is up with 10.66.0.10/24)"
 exit 0
+ASTRONA_STUDENT_SCRIPT

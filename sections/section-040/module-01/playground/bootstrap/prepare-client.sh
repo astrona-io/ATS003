@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Per-VM OS prep for the ntp-client VM — PLAYGROUND (NTP Client Time Sync)
 # Gives you a clean slate: chrony is installed and running, but every default
 # source is commented out so `chronyc sources` starts EMPTY. Adding a source
@@ -28,3 +30,4 @@ echo "[playground] ntp-client: chrony restarted with no sources configured."
 echo "[playground] Add one with:  sudo chronyc add server 192.168.100.10 iburst"
 echo "[playground] or persistently by adding a 'server' line to $CONF."
 sudo chronyc sources 2>/dev/null || true
+ASTRONA_STUDENT_SCRIPT

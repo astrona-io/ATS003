@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that the name portal.lab resolves to 10.66.0.10 the way applications ask.
 set -u
 
@@ -11,3 +13,4 @@ fi
 
 echo "FAIL: name - portal.lab resolves to '${answer:-nothing}' instead of 10.66.0.10"
 exit 1
+ASTRONA_STUDENT_SCRIPT

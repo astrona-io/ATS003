@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: deploys a real, minimal web application listening on
 # 0.0.0.0:8080 as a systemd service, so ss/tcpdump have a genuine listener
 # to find (matching the "myapp" process in the lab's scenario/solution).
@@ -28,3 +30,4 @@ EOF
 
 sudo systemctl daemon-reload
 sudo systemctl enable --now myapp.service
+ASTRONA_STUDENT_SCRIPT

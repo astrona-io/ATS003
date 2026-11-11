@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap init: confirms the network-management tooling the scenario
 # expects (netplan.io, iproute2) is present. Both ship in the base LFCS
 # image, so there is nothing to install here.
@@ -13,3 +15,4 @@ set -eu
 
 IFACE=$(ip -o -4 route show to default | awk '{print $5}')
 echo "Detected primary interface: ${IFACE}"
+ASTRONA_STUDENT_SCRIPT

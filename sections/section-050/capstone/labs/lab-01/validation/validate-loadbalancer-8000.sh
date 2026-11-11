@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks port 8000 load-balances traffic across both the 1111 and 2222
 # backends (round robin or random - either satisfies the scenario).
 
@@ -22,3 +24,4 @@ else
   echo "FAIL: :8000 did not reach both backends over 10 requests (seen_1111=$seen_1111, seen_2222=$seen_2222)"
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT
