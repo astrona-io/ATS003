@@ -26,6 +26,22 @@
           "vm": "default"
         }
       ]
+    },
+    {
+      "name": "wrong-public-address",
+      "apply": [
+        {
+          "script": "testing/wrong-public-ip.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-public-ip": "differs from this VM"
+      },
+      "restore": [
+        {
+          "script": "testing/solution.sh"
+        }
+      ]
     }
   ]
 }

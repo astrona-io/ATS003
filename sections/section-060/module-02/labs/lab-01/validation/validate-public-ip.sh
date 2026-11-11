@@ -1,12 +1,7 @@
 #!/usr/bin/env bash
 # Match the account used by astrona ssh, including its home and permissions.
 sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
-# Checks /opt/course/public_ip holds a plausible public (non-private) IPv4
-# address. Cross-checks against a live HTTP/DNS lookup when outbound network
-# access is available at validation time, but does not hard-fail on network
-# issues -- the grading VM's path to the internet may differ from the
-# student's, so an exact live-match is treated as a bonus note, not a
-# requirement.
+# Compare the recorded address with the current VM egress.
 
 set -u
 
@@ -40,22 +35,18 @@ if [[ "$actual" =~ $private_regex ]]; then
   exit 1
 fi
 
-live=""
-if command -v curl >/dev/null 2>&1; then
-  live="$(curl -s -m 5 ifconfig.me 2>/dev/null | tr -d '[:space:]' || true)"
-  if [[ -z "$live" ]]; then
-    live="$(curl -s -m 5 icanhazip.com 2>/dev/null | tr -d '[:space:]' || true)"
-  fi
+live=$(curl -4 --fail --silent --show-error --retry 2 --max-time 10 https://ifconfig.me/ip) || {
+  echo 'INFRASTRUCTURE: public address lookup is unavailable; retry validation when connectivity returns'
+  exit 2
+}
+live=$(printf '%s' "$live" | tr -d '[:space:]')
+if [[ ! "$live" =~ $ipv4_regex ]]; then
+  echo 'INFRASTRUCTURE: public address lookup returned an invalid response'
+  exit 2
 fi
-if [[ -z "$live" ]] && command -v dig >/dev/null 2>&1; then
-  live="$(dig +short +time=3 +tries=1 myip.opendns.com @resolver1.opendns.com 2>/dev/null | tr -d '[:space:]' || true)"
+if [[ "$live" != "$actual" ]]; then
+  echo "FAIL: public_ip - '$actual' differs from this VM's current egress '$live'; repeat the lookup inside the VM"
+  exit 1
 fi
-
-if [[ -n "$live" && "$live" != "$actual" ]]; then
-  echo "PASS: public_ip ($path = '$actual', valid public-looking IPv4; note: live re-check returned '$live' -- may legitimately differ if this VM's NAT egress differs from the student's)"
-  exit 0
-fi
-
-echo "PASS: public_ip ($path = '$actual')"
-exit 0
+echo "PASS: public_ip matches the live VM egress ($actual)"
 ASTRONA_STUDENT_SCRIPT

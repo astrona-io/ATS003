@@ -34,7 +34,7 @@ validation:
       source: "validation/validate-private-ip.sh"
 
     - name: "verify-public-ip"
-      description: "Confirms /opt/course/public_ip holds a plausible non-private IPv4 address, cross-checked against a live lookup when reachable"
+      description: "Confirms /opt/course/public_ip matches a fresh HTTPS IPv4 lookup from this VM; unavailable lookups are infrastructure failures"
       type: "file"
       source: "validation/validate-public-ip.sh"
 

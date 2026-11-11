@@ -6,6 +6,7 @@ network:
   version: 2
   ethernets:
     ${iface}:
+      dhcp4: true
       addresses: [192.168.10.71/24, 'fd00:10::70/64']
 REFERENCE_FILE
 sudo chmod 600 /etc/netplan/99-lab-secondary.yaml

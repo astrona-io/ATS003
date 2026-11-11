@@ -7,5 +7,5 @@ set -eu
 
 sudo mkdir -p /opt/course
 sudo chmod 755 /opt/course
-sudo chown astrona:astrona /opt/course
+sudo chown student:student /opt/course
 ASTRONA_STUDENT_SCRIPT

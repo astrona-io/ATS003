@@ -9,6 +9,7 @@ network:
   version: 2
   ethernets:
     $iface:
+      addresses: [172.20.10.10/24]
       routes:
         - to: 172.20.20.0/24
           via: 172.20.10.1

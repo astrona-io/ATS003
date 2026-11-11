@@ -7,6 +7,7 @@ network:
   version: 2
   ethernets:
     ${iface}:
+      addresses: [10.10.20.5/24]
       routes:
         - to: 10.10.30.0/24
           via: 10.10.20.1
