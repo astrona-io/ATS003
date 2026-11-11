@@ -1,0 +1,34 @@
+{
+  "initial_failures": {
+    "target/verify-route-live": "no route found"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh",
+      "vm": "target"
+    }
+  ],
+  "negative": [
+    {
+      "name": "regression",
+      "apply": [
+        {
+          "script": "testing/negative.sh",
+          "vm": "target"
+        }
+      ],
+      "failures": {
+        "target/verify-route-live": "no route found"
+      },
+      "restore": [
+        {
+          "script": "testing/restore.sh",
+          "vm": "target"
+        }
+      ]
+    }
+  ],
+  "reboot": [
+    "target"
+  ]
+}

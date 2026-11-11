@@ -1,0 +1,28 @@
+{
+  "initial_failures": {
+    "default/verify-port-5000-drop": "FAIL: port 5000 must drop traffic"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh"
+    }
+  ],
+  "negative": [
+    {
+      "name": "shadowed-drop",
+      "apply": [
+        {
+          "script": "testing/early-accept.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-port-5000-drop": "FAIL: port 5000 must drop traffic"
+      },
+      "restore": [
+        {
+          "script": "testing/solution.sh"
+        }
+      ]
+    }
+  ]
+}

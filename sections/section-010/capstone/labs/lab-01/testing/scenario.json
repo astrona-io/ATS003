@@ -1,0 +1,34 @@
+{
+  "initial_failures": {
+    "default/verify-secondary-ipv4": "FAIL: secondary"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh",
+      "vm": "default"
+    }
+  ],
+  "negative": [
+    {
+      "name": "regression",
+      "apply": [
+        {
+          "script": "testing/negative.sh",
+          "vm": "default"
+        }
+      ],
+      "failures": {
+        "default/verify-secondary-ipv4": "FAIL: secondary"
+      },
+      "restore": [
+        {
+          "script": "testing/restore.sh",
+          "vm": "default"
+        }
+      ]
+    }
+  ],
+  "reboot": [
+    "default"
+  ]
+}
