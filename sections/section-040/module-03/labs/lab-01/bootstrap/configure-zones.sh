@@ -90,4 +90,9 @@ fi
 
 sudo systemctl enable "$bind_service"
 sudo systemctl restart "$bind_service"
+# Permit the prepared service when the base image enables firewalld.
+if sudo systemctl is-active --quiet firewalld; then
+  sudo firewall-cmd --permanent --add-service=dns
+  sudo firewall-cmd --add-service=dns
+fi
 ASTRONA_STUDENT_SCRIPT

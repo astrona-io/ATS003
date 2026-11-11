@@ -26,4 +26,8 @@ WantedBy=multi-user.target
 UNIT
 sudo systemctl daemon-reload
 sudo systemctl enable --now lfcs-nat@8080 lfcs-nat@8081
+if sudo systemctl is-active --quiet firewalld; then
+  sudo firewall-cmd --permanent --add-port=8080-8081/tcp
+  sudo firewall-cmd --add-port=8080-8081/tcp
+fi
 ASTRONA_STUDENT_SCRIPT

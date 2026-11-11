@@ -8,4 +8,9 @@ local stratum 10
 driftfile /var/lib/chrony/chrony.drift
 EOF
 sudo systemctl restart chrony
+# Permit the prepared service when the base image enables firewalld.
+if sudo systemctl is-active --quiet firewalld; then
+  sudo firewall-cmd --permanent --add-service=ntp
+  sudo firewall-cmd --add-service=ntp
+fi
 ASTRONA_STUDENT_SCRIPT

@@ -41,4 +41,11 @@ sudo networkctl up dhcpsrv0 >/dev/null 2>&1 || true
 sudo ip link set dhcp0 up 2>/dev/null || true
 
 echo "dhcp lab ready"
+# Both ends are private practice interfaces on this VM.
+if sudo systemctl is-active --quiet firewalld; then
+  for iface in dhcpsrv0 dhcp0; do
+    sudo firewall-cmd --permanent --zone=trusted --add-interface="$iface"
+    sudo firewall-cmd --zone=trusted --add-interface="$iface"
+  done
+fi
 ASTRONA_STUDENT_SCRIPT

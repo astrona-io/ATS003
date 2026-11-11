@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-for tool in nginx curl; do command -v "$tool"; done
+for tool in ssh ssh-keygen; do command -v "$tool"; done
+sudo /usr/sbin/sshd -t
+systemctl is-active --quiet ssh
