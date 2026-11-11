@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-ip -4 route get 1.1.1.1 | awk '{for(i=1;i<=NF;i++)if($i=="src"){print $(i+1);exit}}' > /opt/course/private_ip
-curl -4 --fail --retry 3 --max-time 20 https://ifconfig.me/ip > /opt/course/public_ip
+nmcli -f connection,ipv4 connection show lab-static
+sudo nmcli connection modify lab-static ipv4.addresses 192.168.120.50/24 connection.autoconnect yes ipv4.never-default yes
+sudo nmcli connection up lab-static
+ip -br address show nm0

@@ -52,5 +52,5 @@ The exam often asks for a network setting that is still there after a reboot. A 
 <!-- curriculum-practice -->
 ## Practice and assessment
 
-- [Private And Public Address Audit Lab](labs/lab-01/question.md): Find the private address on the host's own interface; Find the public address the internet sees after NAT.
-- [Connection Recovery and Audit Capstone Lab](../capstone/labs/lab-01/question.md): Confirm a service is listening on a reachable address with ss; Find and delete the nftables rule that silently drops its port; Prove the service answers end to end with curl.
+- [Repair a persistent NetworkManager profile](labs/lab-01/question.md): Diagnose the saved and active settings of lab-static; Correct its address and enable autoconnect; Reactivate the profile and verify it after reboot.
+- [Network troubleshooting capstone](../module-05/labs/lab-01/question.md): Climb the ladder from link to firewall and find three faults; Repair the link, the name and the firewall rule in order; Prove the service answers end to end with curl.

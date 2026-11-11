@@ -48,5 +48,5 @@ On Ubuntu, Netplan is the layer that decides what the network looks like after e
 <!-- curriculum-practice -->
 ## Practice and assessment
 
-- [Private And Public Address Audit Lab](labs/lab-01/question.md): Find the private address on the host's own interface; Find the public address the internet sees after NAT.
-- [Connection Recovery and Audit Capstone Lab](../capstone/labs/lab-01/question.md): Confirm a service is listening on a reachable address with ss; Find and delete the nftables rule that silently drops its port; Prove the service answers end to end with curl.
+- [Repair merged Netplan configuration](labs/lab-01/question.md): Trace an unexpected address to a second Netplan file; Correct the merged configuration and apply it; Verify the sole intended address after reboot.
+- [Network troubleshooting capstone](../module-05/labs/lab-01/question.md): Climb the ladder from link to firewall and find three faults; Repair the link, the name and the firewall rule in order; Prove the service answers end to end with curl.

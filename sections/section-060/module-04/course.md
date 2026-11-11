@@ -53,5 +53,5 @@ When `ss` says a service listens and the firewall looks fine, but clients still 
 <!-- curriculum-practice -->
 ## Practice and assessment
 
-- [Raw Packet Capturing (tcpdump) Lab](labs/lab-01/question.md): Confirm a service is listening on a reachable address with ss; Find and delete the nftables rule that silently drops its port; Prove the service answers end to end with curl.
-- [Connection Recovery and Audit Capstone Lab](../capstone/labs/lab-01/question.md): Confirm a service is listening on a reachable address with ss; Find and delete the nftables rule that silently drops its port; Prove the service answers end to end with curl.
+- [Capture and decode an HTTP conversation](labs/lab-01/question.md): Capture only TCP port 8080 on loopback into a pcap; Identify the handshake, request and successful response; Extract the request path and response token from captured payload.
+- [Network troubleshooting capstone](../module-05/labs/lab-01/question.md): Climb the ladder from link to firewall and find three faults; Repair the link, the name and the firewall rule in order; Prove the service answers end to end with curl.

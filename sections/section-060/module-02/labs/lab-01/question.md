@@ -1,45 +1,24 @@
-# Question
+# Repair merged Netplan configuration
 
-Solve this question on: `terminal`
+The disposable `np0` interface has two IPv4 addresses. An extra YAML file adds an unintended address to its base configuration. The management interface must keep its existing settings.
 
-## Scenario
-
-Before the network team files a firewall change request, they need two
-addresses for this host. The first is the private address it carries on its
-own network interface. The second is the public address the outside world
-sees after NAT (network address translation: a relay station that swaps the
-host's private address for its own public one). Record both where the audit
-script expects them.
+Estimated learner time: 10–15 minutes, plus VM startup and any reboot. This lab starts independently.
 
 ## Tasks
 
-1. **Private address.** Find this host's private IPv4 address. It is the
-   address from the private ranges (RFC 1918) that is bound to its network
-   interface, so it starts with `10.`, `172.16`–`172.31.`, or `192.168.`.
-   Write just the address, with no prefix and no extra text, to:
+1. Compare `ip -br address show np0` with `sudo netplan get ethernets.np0` and inspect the files in `/etc/netplan`.
+2. Keep only `192.168.130.50/24` in the merged `np0` configuration, with DHCP disabled and the `networkd` renderer. Remove or disable the unintended address declaration; a runtime `ip address del` alone is insufficient.
+3. Generate and apply the configuration. Verify that `192.168.130.60/24` is gone.
+4. Reboot and confirm the sole intended address returns without changing the management route.
 
-   ```
-   /opt/course/private_ip
-   ```
-
-2. **Public address.** Find this host's public IPv4 address as the internet
-   sees it. Use an outside HTTP or DNS lookup service; `curl` and `dig` are
-   installed. Write just that address to:
-
-   ```
-   /opt/course/public_ip
-   ```
 <!-- curriculum-links -->
-
 ## Related lessons and assessment
 
-Read [module-02](../../course.md).
+Read [section-060/module-02](../../course.md).
 
 The grader checks:
 
-- Confirms /opt/course/private_ip holds an RFC1918 address that is actually bound to a local interface.
-- Confirms /opt/course/public_ip matches a fresh HTTPS IPv4 lookup from this VM; unavailable lookups are infrastructure failures.
+- Check the merged Netplan address list and renderer.
+- Check the active address list and preserve the management default route.
 
-Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.
-
-Record the public IPv4 address observed from inside this VM. Validation compares it with a fresh HTTPS lookup from the same VM. If its egress changes, repeat the lookup; a public-looking address from another machine is insufficient. An unavailable lookup is an infrastructure error, not a successful grade.
+Inspect your work before submitting. Submission ends this environment.

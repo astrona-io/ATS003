@@ -30,7 +30,7 @@ This module was about tcpdump: the recorder clipped onto an antenna, and the `.p
 
 | Mission | After the part | What you proved |
 | --- | --- | --- |
-| [Raw Packet Capturing (tcpdump) Lab](./labs/lab-01/README.md) | Look Inside And Save The Tape | confirm a reachable listener, remove the firewall rule that blocks it, and prove it answers |
+| [Capture and decode an HTTP conversation](./labs/lab-01/README.md) | Focused practice | Capture only TCP port 8080 on loopback into a pcap; Identify the handshake, request and successful response; Extract the request path and response token from captured payload |
 
 If you skipped it, go back to it now. It is short, and the exam asks for exactly this kind of diagnosis.
 

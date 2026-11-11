@@ -30,7 +30,7 @@ This module was about Netplan: the YAML flight manual on Ubuntu, and the clerk t
 
 | Mission | After the part | What you proved |
 | --- | --- | --- |
-| [Private And Public Address Audit Lab](./labs/lab-01/README.md) | Apply Safely And Merge Files | find the private address on the host's interface and the public address seen after NAT |
+| [Repair merged Netplan configuration](./labs/lab-01/README.md) | Focused practice | Trace an unexpected address to a second Netplan file; Correct the merged configuration and apply it; Verify the sole intended address after reboot |
 
 If you skipped it, go back to it now. It is short, and the exam expects you to read addresses quickly.
 

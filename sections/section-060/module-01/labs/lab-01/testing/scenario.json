@@ -1,47 +1,64 @@
 {
   "initial_failures": {
-    "default/verify-private-ip": "does not exist"
+    "default/verify-profile": "saved address is incorrect",
+    "default/verify-live": "correct address is not active"
   },
   "solution": [
     {
-      "script": "testing/solution.sh",
-      "vm": "default"
+      "script": "testing/solution.sh"
     }
   ],
   "negative": [
     {
-      "name": "regression",
+      "name": "runtime-only",
       "apply": [
         {
-          "script": "testing/negative.sh",
-          "vm": "default"
+          "script": "testing/runtime-only.sh"
         }
       ],
       "failures": {
-        "default/verify-private-ip": "not a private"
+        "default/verify-profile": "saved address is incorrect"
       },
       "restore": [
         {
-          "script": "testing/restore.sh",
-          "vm": "default"
+          "script": "testing/restore-runtime-only.sh"
         }
       ]
     },
     {
-      "name": "wrong-public-address",
+      "name": "saved-only",
       "apply": [
         {
-          "script": "testing/wrong-public-ip.sh"
+          "script": "testing/saved-only.sh"
         }
       ],
       "failures": {
-        "default/verify-public-ip": "differs from this VM"
+        "default/verify-live": "correct address is not active"
       },
       "restore": [
         {
-          "script": "testing/solution.sh"
+          "script": "testing/restore-saved-only.sh"
+        }
+      ]
+    },
+    {
+      "name": "no-autoconnect",
+      "apply": [
+        {
+          "script": "testing/no-autoconnect.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-profile": "autoconnect is disabled"
+      },
+      "restore": [
+        {
+          "script": "testing/restore-no-autoconnect.sh"
         }
       ]
     }
+  ],
+  "reboot": [
+    "default"
   ]
 }

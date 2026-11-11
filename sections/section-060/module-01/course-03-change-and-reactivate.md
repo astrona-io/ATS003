@@ -69,35 +69,19 @@ With `method auto` and nothing answering DHCP, NetworkManager cannot bring the p
 
 ## Autoconnect
 
-`connection.autoconnect` (default `yes`) decides whether NetworkManager brings a profile up on its own. It does so at boot, when the profile's device appears, and after the profile is deactivated. That last case surprises people: with autoconnect on, `nmcli connection down` is often undone within a second.
+`connection.autoconnect yes` permits NetworkManager to activate an eligible saved profile when its device becomes available, including after boot. It does not replace an already active profile.
 
-### Down with autoconnect on, then off
+A manual `nmcli connection down lab-static` blocks that profile from autoconnecting again until it is explicitly activated or the relevant state resets. Do not use a quick down-and-wait check as proof of reboot behavior. Instead, inspect the setting, explicitly activate the profile, and check again after a real reboot:
 
-Take the profile down and check what is active two seconds later:
-
-```sh
-sudo nmcli connection down lab-static
-sleep 2
-nmcli -f NAME,DEVICE,STATE connection show --active
+```bash
+nmcli -g connection.autoconnect connection show lab-static
+sudo nmcli connection modify lab-static connection.autoconnect yes
+sudo nmcli connection up lab-static
 ```
 
-With autoconnect at its default, `lab-static` is likely **back**:
+For an isolated practice interface, `ipv4.never-default yes` prevents that profile from supplying the default route. A `dummy` profile creates a virtual interface for local configuration practice; it does not provide an external network connection. The graded exercise supplies such a device as `nm0`.
 
-```text
-NAME        DEVICE  STATE
-lab-static  enp2s0  activated
-```
-
-Now turn autoconnect off and try again:
-
-```sh
-sudo nmcli connection modify lab-static connection.autoconnect no
-sudo nmcli connection down lab-static
-sleep 2
-nmcli -f NAME,DEVICE,STATE connection show --active
-```
-
-This time it stays down. `nmcli device disconnect enp2s0` is the stronger form: it also blocks autoconnect on that device until you connect it again.
+See the [NetworkManager connection properties](https://networkmanager.dev/docs/api/latest/nm-settings-nmcli.html).
 
 ## Persistence: surviving a reboot
 
@@ -141,34 +125,29 @@ On a real host, the mirror-image mistake is having **two** managers active on on
 > [!WARNING]
 > - **`modify` without `up`.** `nmcli connection modify` changes the saved profile only. The interface does not change until `nmcli connection up` (or `nmcli device reapply`).
 > - **`ipv4.addresses` without `ipv4.method manual`.** Setting an address with `modify` does not switch the method off `auto`. The `ip4` shorthand on `add` does; a later `modify ipv4.addresses` does not.
-> - **Autoconnect undoing a `down`.** With `connection.autoconnect yes`, a deactivated profile often comes straight back. Set it to `no`, or use `nmcli device disconnect`.
+> - **Treating a manual disconnect as a reboot test.** Inspect the saved autoconnect setting and test a real reboot.
 > - **Two managers on one interface.** Check `nmcli device status` for `unmanaged` before you blame NetworkManager.
 
-## Your mission: Private And Public Address Audit Lab
+## Practice: Repair a persistent NetworkManager profile
 
-You can now read which address each interface carries and tell a runtime address from a saved one. The graded mission does not ask you to build a profile: it asks for an address audit. You find the private address the host's own interface carries and the public address the internet sees after NAT (network address translation, the relay station that swaps your call sign for its own), and write each one to a file.
+Diagnose the saved and active settings of lab-static. Correct its address and enable autoconnect. Reactivate the profile and verify it after reboot. This lab starts independently; changes in the playground do not carry over.
 
-The mission runs on its own training ship, so first pause your playground. Nothing in it is lost:
+Pause the playground first:
 
-```sh
+```bash
 astrona stop networkmanager-nmcli-playground
 ```
 
-Then start the mission:
+Read the [task](labs/lab-01/question.md), then start the lab:
 
-```sh
+```bash
 astrona run --git ssh://git@github.com/astrona-io/ATS003.git -c sections/section-060/module-01/labs/lab-01
 ```
 
-Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your own first. When you think you are done, send it for grading:
+Use the inspection commands while working. Submit once all tasks are complete; submission ends the environment.
 
-```sh
-astrona submit -c sections/section-060/module-01/labs/lab-01
-```
+Resume the playground afterwards:
 
-When the mission is done, remove it and wake your playground up again:
-
-```sh
-astrona destroy ats-003-lab-061
+```bash
 astrona start networkmanager-nmcli-playground
 ```

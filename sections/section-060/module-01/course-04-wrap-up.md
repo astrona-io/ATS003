@@ -32,7 +32,7 @@ This module was about NetworkManager: the communications officer that keeps netw
 
 | Mission | After the part | What you proved |
 | --- | --- | --- |
-| [Private And Public Address Audit Lab](./labs/lab-01/README.md) | Change, Reactivate And Keep A Profile | find the private address on the host's interface and the public address seen after NAT |
+| [Repair a persistent NetworkManager profile](./labs/lab-01/README.md) | Focused practice | Diagnose the saved and active settings of lab-static; Correct its address and enable autoconnect; Reactivate the profile and verify it after reboot |
 
 If you skipped it, go back to it now. It is short, and the exam expects you to read addresses quickly.
 

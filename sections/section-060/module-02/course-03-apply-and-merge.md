@@ -49,46 +49,36 @@ The address is live and on disk. `sudo netplan apply` does the same thing **with
 
 ## How multiple files merge
 
-Netplan reads every `*.yaml` in `/etc/netplan/` in filename order and merges them **key by key**. This is why the number at the front of a file name matters.
+Netplan merges mappings from its YAML files. A later scalar value, such as `dhcp4`, replaces an earlier scalar. Sequences, including `addresses`, are combined. A later address list does not remove an earlier address.
 
-### Later files win, one key at a time
-
-When two files set the same leaf key, the one that sorts **later** wins. That is why cloud-init uses `50-` and you use higher numbers to override it.
-
-It is not whole-file replacement. A `99-` file that sets only `addresses` for an interface leaves that interface's `routes` from a `50-` file in place.
-
-### A later file overrides one key
-
-Save this as `/etc/netplan/99-override.yaml`:
+Suppose `/etc/netplan/90-lab.yaml` gives the spare interface `192.168.130.50/24`. This additional file, `/etc/netplan/99-extra.yaml`, adds a second address:
 
 ```yaml
 network:
   version: 2
   ethernets:
     enp2s0:
-      addresses:
-        - 192.168.130.60/24
+      addresses: [192.168.130.60/24]
 ```
 
-Set its permissions and read the merged result for the interface:
+After saving it with mode `600`, inspect the merged configuration before applying it:
 
-```sh
-sudo chmod 600 /etc/netplan/99-override.yaml
+```bash
+sudo chmod 600 /etc/netplan/99-extra.yaml
 sudo netplan get ethernets.enp2s0
+sudo netplan generate
 ```
 
-Expect the address from `99-` and the `nameservers` still from `90-`:
+The merged `addresses` list contains both `.50/24` and `.60/24`. `generate` validates and renders the configuration; it does not apply it to the running interface. To keep only the original address, remove the extra declaration or rename that file so it no longer ends in `.yaml`:
 
-```text
-addresses:
-- 192.168.130.60/24
-dhcp4: false
-nameservers:
-  addresses:
-  - 192.168.130.1
+```bash
+sudo mv /etc/netplan/99-extra.yaml /etc/netplan/99-extra.yaml.disabled
+sudo netplan generate
+sudo netplan apply
+ip -br address show enp2s0
 ```
 
-`99-override.yaml` won for `addresses` only. Everything it did not mention came through from `90-lab.yaml`. Delete the override file when you are done, so the picture stays simple.
+Use your playground's spare interface name. Inspect both `netplan get` and `ip address`: a live deletion alone will be undone at the next apply or reboot. See the [Netplan configuration reference](https://netplan.readthedocs.io/en/stable/netplan-yaml/).
 
 ## Common pitfalls
 
@@ -97,31 +87,26 @@ nameservers:
 > - **File-order surprises.** `50-cloud-init.yaml` can override a lower-numbered file you wrote. Use a higher number and confirm with `netplan get`.
 > - **`dhcp4: true` with no DHCP server.** The interface sits in `configuring` and never gets an address.
 
-## Your mission: Private And Public Address Audit Lab
+## Practice: Repair merged Netplan configuration
 
-You can now write, check and apply the file that gives an interface its address. The graded mission does not ask for a Netplan file: it asks for an address audit. You find the private address the host's own interface carries and the public address the internet sees after NAT (network address translation, the relay station that swaps your call sign for its own), and write each one to a file.
+Trace an unexpected address to a second Netplan file. Correct the merged configuration and apply it. Verify the sole intended address after reboot. This lab starts independently; changes in the playground do not carry over.
 
-The mission runs on its own training ship, so first pause your playground. Nothing in it is lost:
+Pause the playground first:
 
-```sh
+```bash
 astrona stop netplan-yaml-playground
 ```
 
-Then start the mission:
+Read the [task](labs/lab-01/question.md), then start the lab:
 
-```sh
+```bash
 astrona run --git ssh://git@github.com/astrona-io/ATS003.git -c sections/section-060/module-02/labs/lab-01
 ```
 
-Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your own first. When you think you are done, send it for grading:
+Use the inspection commands while working. Submit once all tasks are complete; submission ends the environment.
 
-```sh
-astrona submit -c sections/section-060/module-02/labs/lab-01
-```
+Resume the playground afterwards:
 
-When the mission is done, remove it and wake your playground up again:
-
-```sh
-astrona destroy ats-003-lab-062
+```bash
 astrona start netplan-yaml-playground
 ```

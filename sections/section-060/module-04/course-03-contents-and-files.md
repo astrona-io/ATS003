@@ -84,31 +84,36 @@ A few more options shape what you see, without changing what is captured. They a
 > - **Trusting a payload that looks cut off.** Old tcpdump versions used a short snap length by default. A modern one captures the full packet; if not, use `-s 0`.
 > - **Leaving `.pcap` files lying around.** They can hold passwords, tokens and personal data. Treat them as sensitive.
 
-## Your mission: Raw Packet Capturing (tcpdump) Lab
+## Capture the independent lab fixture
 
-You can now record traffic on an interface, filter it, and read what was said. The graded mission gives you a web service on port 8080 that clients cannot reach: you confirm with `ss` that it listens on a reachable address, find and remove the firewall rule (an nftables rule, part of the ship's shields) that silently drops its traffic, and prove it answers with `curl`. A capture on port 8080 is a good way to see the packets arrive with no answer.
+The lab has a healthy loopback HTTP service and a repeating client. Capture the complete conversations with a port filter; the concurrent ICMP traffic should be excluded. `-s 0` keeps the complete payload and `-U` flushes packets as they arrive. `-Z root` keeps this short privileged capture able to write into the student-owned `/opt/course` directory.
 
-The mission runs on its own training ship, so first pause your playground. Nothing in it is lost:
+```bash
+sudo tcpdump -Z root -i lo -nn -s 0 -U -w /opt/course/http.pcap 'tcp port 8080'
+```
 
-```sh
+After several requests, stop with Ctrl-C. Read the file with `sudo tcpdump -nn -A -r /opt/course/http.pcap`. Find the `GET` line, the `200 OK` response and the token in the response body. Write the URI and token to the two text files requested by the lab. These files record your interpretation; the grader also decodes the capture itself.
+
+## Practice: Capture and decode an HTTP conversation
+
+Capture only TCP port 8080 on loopback into a pcap. Identify the handshake, request and successful response. Extract the request path and response token from captured payload. This lab starts independently; changes in the playground do not carry over.
+
+Pause the playground first:
+
+```bash
 astrona stop tcpdump-capture-playground
 ```
 
-Then start the mission:
+Read the [task](labs/lab-01/question.md), then start the lab:
 
-```sh
+```bash
 astrona run --git ssh://git@github.com/astrona-io/ATS003.git -c sections/section-060/module-04/labs/lab-01
 ```
 
-Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your own first. When you think you are done, send it for grading:
+Use the inspection commands while working. Submit once all tasks are complete; submission ends the environment.
 
-```sh
-astrona submit -c sections/section-060/module-04/labs/lab-01
-```
+Resume the playground afterwards:
 
-When the mission is done, remove it and wake your playground up again:
-
-```sh
-astrona destroy ats-003-lab-064
+```bash
 astrona start tcpdump-capture-playground
 ```
