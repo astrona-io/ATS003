@@ -62,4 +62,3 @@ The exam asks you to set a hostname that lasts, and to know the difference betwe
 ## Practice and assessment
 
 - [Static Hostname Management Lab](labs/lab-01/question.md): Set the static and live hostname without a reboot; Set a free-form pretty hostname; Point the 127.0.1.1 line in /etc/hosts at the new name.
-- [Core Host Configurations Capstone Lab](../capstone/labs/lab-01/question.md): Add a secondary IPv4 and a static IPv6 address beside the management address; Make both addresses survive a reboot in Netplan or NetworkManager configuration; Map the host name app-srv1 to its new address in /etc/hosts, forward and reverse.

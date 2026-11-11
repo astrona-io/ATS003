@@ -1,5 +1,7 @@
 # Question
 
+**Legacy exercise.** Repeats the nftables exercise. The main learning path uses [lab 031](../../../module-01/labs/lab-01/README.md). This ID remains runnable and covered by CI.
+
 Solve this question on: `terminal`
 
 ## Scenario
@@ -55,11 +57,11 @@ sudo ip netns exec nft-client curl --interface 192.168.10.81 --max-time 3 http:/
 ```
 
 The redirect request should reach the 6001 listener. The allowed source should reach 6002; the other source should time out. The grader also tests 5000 and egress traffic, using working control listeners so an absent service cannot masquerade as a firewall drop. Counters and equivalent rule ordering are accepted when the required packet behavior is correct.
-<!-- curriculum-links -->
 
+<!-- curriculum-links -->
 ## Related lessons and assessment
 
-Read [module-01](../../../module-01/course.md), [module-02](../../../module-02/course.md), [module-03](../../../module-03/course.md).
+Read [section-030/module-01](../../../module-01/course.md), [section-030/module-02](../../../module-02/course.md), [section-030/module-03](../../../module-03/course.md).
 
 The grader checks:
 
@@ -68,4 +70,4 @@ The grader checks:
 - Sends real traffic through the assigned network path and checks the response or timeout.
 - Sends real traffic through the assigned network path and checks the response or timeout.
 
-Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.
+Inspect your work before submitting. Submission ends this environment.

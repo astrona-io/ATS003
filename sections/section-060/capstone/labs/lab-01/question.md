@@ -1,5 +1,7 @@
 # Question
 
+**Legacy exercise.** Use the multi-fault troubleshooting capstone after the focused diagnostics labs. The main learning path uses [lab 065](../../../module-05/labs/lab-01/README.md). This ID remains runnable and covered by CI.
+
 Solve this question on: `terminal`
 
 ## Scenario
@@ -25,11 +27,11 @@ Find the cause and make the service reachable again.
 
 3. **Prove it works.** `curl http://127.0.0.1:8080/` must return a real HTTP
    status (2xx or 3xx) end to end.
-<!-- curriculum-links -->
 
+<!-- curriculum-links -->
 ## Related lessons and assessment
 
-Read [module-01](../../../module-01/course.md), [module-02](../../../module-02/course.md), [module-03](../../../module-03/course.md), [module-04](../../../module-04/course.md), [module-05](../../../module-05/course.md).
+Read [section-060/module-01](../../../module-01/course.md), [section-060/module-02](../../../module-02/course.md), [section-060/module-03](../../../module-03/course.md), [section-060/module-04](../../../module-04/course.md), [section-060/module-05](../../../module-05/course.md).
 
 The grader checks:
 
@@ -37,4 +39,4 @@ The grader checks:
 - Confirms the 'tcp dport 8080 drop' rule has been removed from the live nftables ruleset.
 - Confirms the port 8080 web application responds with a real HTTP status code end to end.
 
-Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.
+Inspect your work before submitting. Submission ends this environment.

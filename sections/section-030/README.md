@@ -1,32 +1,21 @@
 # Section 030: Network Security & Packet Filtering (Firewalls)
 
-Astronaut, every ship needs shields. In this section you learn to program the Linux host firewall: the kernel's shield generator, netfilter, and the two consoles that control it. First you write the rules by hand with nftables, then you manage the same protection through firewalld zones and services.
+Secure the host at the packet layer: build nftables tables and rulesets from first principles, then manage the same protections through firewalld zones and service abstractions.
 
-## What you will be able to do
+## Lessons and practice
 
-After this section you can:
+Work through the lessons in order. Each exercise starts independently.
 
-- Build nftables tables, base chains and rules from an empty ruleset, and put each chain on the right hook.
-- Drop a port, allow a port from one source only, block outgoing traffic to one host, and redirect one port to another.
-- Keep a ruleset after a reboot with `/etc/nftables.conf` and `nftables.service`.
-- Read and change firewalld zones, open services and ports, and write rich rules.
-- Make every firewalld change both live now and saved for after a reload.
+1. [Packet Filtering with nftables](module-01/course.md)
+2. [firewalld Zones and Services](module-02/course.md)
+3. [Routed traffic and masquerade](module-03/course.md)
 
-## The modules
+## Required exercises
 
-Each module has a short landing page and a few parts. Read the landing page first, then the parts in order. Each module has its own playground and a graded mission.
+- [Packet Filtering with nftables Lab](module-01/labs/lab-01/question.md): Build nftables filter and NAT tables with chains on the right hooks; Drop, redirect and restrict traffic by port and source address; Block outgoing traffic to one host from the output chain.
+- [firewalld Zones and Services Lab](module-02/labs/lab-01/question.md): Allow a named service and a port in the public zone; Make each change both live now and saved for the next reload.
+- [Routed NAT and Forward Filtering](module-03/labs/lab-01/question.md): Forward permitted requests between two private subnets; Prove source NAT from the destination response; Reject forbidden traffic and survive a router reboot.
 
-1. [Packet Filtering with nftables](./module-01/course.md): the packet path, tables, chains, rules, rule order, port redirects, connection tracking, sets and maps, and persistence.
-2. [firewalld Zones and Services](./module-02/course.md): the firewalld daemon, zones, services and rich rules, and the runtime and permanent split.
+Finish the [section knowledge check](quiz.yaml).
 
-## Check your knowledge
-
-When you have finished both modules, take the [Section 030 knowledge check](./quiz.yaml): short scenario questions on nftables and firewalld.
-
-## The capstone
-
-The section ends with one graded capstone mission with no step-by-step help: build a complete nftables policy on an empty ruleset, with a dropped port, a port redirect, a source-limited port and an outgoing block. Its task is in the [capstone question](./capstone/labs/lab-01/question.md).
-
-## Routed NAT practice
-
-[Module 03](module-03/course.md) connects a client and server through a router. Configure forwarding, source masquerade and a forward-chain policy, then prove the source address seen by the server and test a reboot.
+See [optional and legacy exercises](../../docs/practice-variants.md) for retained older lab IDs.

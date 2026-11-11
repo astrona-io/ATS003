@@ -55,4 +55,3 @@ Almost every administrator task on a remote ship starts with `ssh`. The exam exp
 ## Practice and assessment
 
 - [OpenSSH Client Lab](labs/lab-01/question.md): Create a key pair and install the public key for key login; Write a host alias in the client configuration file; Open a local port forward through an SSH server.
-- [Application Proxy and SSH Capstone Lab](../capstone/labs/lab-01/question.md): Reverse-proxy every path on one port to a fixed backend path; Spread requests on another port across two backends with an upstream block; Keep the whole NGINX configuration valid and the existing apps untouched.

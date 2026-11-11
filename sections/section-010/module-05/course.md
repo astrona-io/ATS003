@@ -52,4 +52,3 @@ Most real ships get their addresses from DHCP, and the exam asks you to configur
 ## Practice and assessment
 
 - [DHCP Client Lab](labs/lab-01/question.md): Turn on a DHCP client for an interface in Netplan; Keep the address from a lease and refuse its routes and DNS servers; Prove the lease with ip, networkctl and resolvectl.
-- [Core Host Configurations Capstone Lab](../capstone/labs/lab-01/question.md): Add a secondary IPv4 and a static IPv6 address beside the management address; Make both addresses survive a reboot in Netplan or NetworkManager configuration; Map the host name app-srv1 to its new address in /etc/hosts, forward and reverse.

@@ -65,4 +65,3 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Practice and assessment
 
 - [DNS Verification with dig Lab](labs/lab-01/question.md): Point the system resolver at an internal DNS server; Check A, NS, MX and reverse records with dig, with and without @server.
-- [Time and Name Services Capstone Lab](../capstone/labs/lab-01/question.md): Point the system resolver at an internal DNS server; Check A, NS, MX and reverse records with dig, with and without @server.

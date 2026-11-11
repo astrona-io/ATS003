@@ -1,30 +1,24 @@
 # Section 050: Application Reverse Proxies (Nginx & SSH)
 
-Astronaut, an app should never face the open galaxy on its own. In this section you build the docking control tower that stands in front of your apps, NGINX, and you tighten the airlock that every administrator uses to come aboard, the OpenSSH server.
+Front application runtimes safely: proxy requests with Nginx, spread load across upstream backend pools, and lock down remote access with OpenSSH server hardening.
 
-## What you will be able to do
+## Lessons and practice
 
-When you finish this section, you can:
+Work through the lessons in order. Each exercise starts independently.
 
-- **Put NGINX in front of an app.** Forward a path to a backend with `proxy_pass`, control the path the backend sees with the trailing slash, pass the client's details on with `proxy_set_header`, and predict which `location` block wins.
-- **Spread requests over several backends.** Build an `upstream` pool, choose round-robin, weights, `least_conn` or hashing, and let NGINX skip and retry a failing backend.
-- **Use the OpenSSH client.** Create keys, install them with `ssh-copy-id`, manage `known_hosts`, write `~/.ssh/config` aliases, and open `-L`, `-R` and `-D` tunnels.
-- **Harden the SSH server.** Read the effective configuration with `sshd -T`, turn off password and root login, limit who may log in, and write a `Match` block for one exception.
+1. [Nginx Reverse Proxy](module-01/course.md)
+2. [Nginx Load Balancers](module-02/course.md)
+3. [OpenSSH Server Hardening](module-03/course.md)
+4. [OpenSSH Client: Keys, Config And Tunnels](module-04/course.md)
 
-## The modules
+## Required exercises
 
-Work through the modules in order. Each one has its own playground and a graded mission.
+- [Reverse proxy to a fixed backend path](module-01/labs/lab-01/question.md): Route every path on port 8001 to backend 2222 /special; Check different request paths through the proxy; Preserve the existing backend applications.
+- [Balance requests across two upstreams](module-02/labs/lab-01/question.md): Build an upstream with backends 1111 and 2222; Serve both backends through port 8000; Preserve the existing backend applications.
+- [OpenSSH Server Hardening Lab](module-03/labs/lab-01/question.md): Turn off X11 forwarding for every user; Allow password login for one user only with a Match block; Prove the effective configuration per user with sshd -T.
+- [OpenSSH Client Lab](module-04/labs/lab-01/question.md): Create a key pair and install the public key for key login; Write a host alias in the client configuration file; Open a local port forward through an SSH server.
+- [Reverse proxy and load balancing integration](capstone/labs/lab-01/question.md): Reverse-proxy every path on one port to a fixed backend path; Spread requests on another port across two backends with an upstream block; Keep the whole NGINX configuration valid and the existing apps untouched.
 
-1. [Nginx Reverse Proxy](./module-01/course.md): turn NGINX into a reverse proxy and read its errors.
-2. [Nginx Load Balancers](./module-02/course.md): share requests over a pool, and survive a failing backend.
-3. [OpenSSH Server Hardening](./module-03/course.md): rewrite the airlock guard's standing orders, safely.
-4. [OpenSSH Client](./module-04/course.md): keys, `ssh-copy-id`, `known_hosts`, `~/.ssh/config`, `ProxyJump` and tunnels.
+Finish the [section knowledge check](quiz.yaml).
 
-## Check yourself and the capstone
-
-- [Section 050 knowledge check](./quiz.yaml): short scenario questions on everything in this section.
-- [Section capstone: Application Proxy and SSH Capstone Lab](./capstone/labs/lab-01/README.md): one integrated reverse proxy and load balancer task with no step-by-step guidance. Start it with:
-
-  ```sh
-  astrona run --git ssh://git@github.com/astrona-io/ATS003.git -c sections/section-050/capstone/labs/lab-01
-  ```
+See [optional and legacy exercises](../../docs/practice-variants.md) for retained older lab IDs.

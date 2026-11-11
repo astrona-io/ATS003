@@ -1,35 +1,23 @@
 # Section 040: Time & Domain Name Services (NTP & DNS)
 
-Astronaut, a fleet only works when every ship agrees on two things: what time it is, and which call sign belongs to which name. This section teaches both. You keep a ship's clock in step with the Network Time Protocol (NTP), the time signal ships use to keep their clocks in step. Then you turn a ship into a time beacon for others. Finally, you check names in the Domain Name System (DNS), the galaxy-wide directory of call signs, with the `dig` probe.
+Keep infrastructure timing and naming correct: configure chrony as an NTP client, run it in server mode across stratums, and verify DNS records and resolvers with dig.
 
-## What you will be able to do
+## Lessons and practice
 
-After this section you can:
+Work through the lessons in order. Each exercise starts independently.
 
-- **Keep a clock in step.** Configure chrony as an NTP client, tune how often it polls, and prove the clock is synchronised.
-- **Serve time to a subnet.** Open a chrony server with `allow`, read stratum numbers, and check from the server which clients asked for the time.
-- **Resolve names on the client.** Read the lookup order in `nsswitch.conf`, find the `systemd-resolved` stub, and set DNS servers and search domains with a drop-in and `resolvectl`.
-- **Check DNS records.** Point a machine at a DNS server, and use `dig` to check address, mail, name server and reverse records, with and without `@server`.
+1. [NTP Client Time Synchronization](module-01/course.md)
+2. [NTP Server Mode and Stratums](module-02/course.md)
+3. [DNS Verification with dig](module-03/course.md)
+4. [DNS Client Resolution](module-04/course.md)
 
-## The modules
+## Required exercises
 
-Each module has a short landing page, a few parts, a graded mission right after the part it tests, and a wrap-up. Each module also has its own playground, a training ship you can explore freely.
+- [NTP Client Time Synchronization Lab](module-01/labs/lab-01/question.md): Replace chrony's time sources with a fixed list of servers; Set minpoll and maxpoll on every source line; Prove the clock is synchronised with chronyc tracking.
+- [NTP Server Mode and Stratums Lab](module-02/labs/lab-01/question.md): Turn on chrony server mode for one subnet with allow; Point a client at the internal server and remove public sources; Prove the client selected the server one stratum below it.
+- [DNS Verification with dig Lab](module-03/labs/lab-01/question.md): Point the system resolver at an internal DNS server; Check A, NS, MX and reverse records with dig, with and without @server.
+- [DNS Client Resolution Lab](module-04/labs/lab-01/question.md): Teach systemd-resolved a DNS server and a search domain with a drop-in; Resolve a short name through a search domain; Override one name in /etc/hosts while DNS keeps its own answer.
 
-1. [NTP Client Time Synchronization](./module-01/course.md): chrony as a client, `server` and `pool` lines, reading `chronyc sources` and `chronyc tracking`, slewing and stepping.
-2. [NTP Server Mode and Stratums](./module-02/course.md): chrony as a server, `allow` and `deny`, stratum, `local stratum`, and the firewall rule for port 123.
-3. [DNS Verification with dig](./module-03/course.md): reading a `dig` answer, `@server`, reverse lookups, `NXDOMAIN` versus `NODATA`, aliases and zone transfers.
-4. [DNS Client Resolution](./module-04/course.md): who answers a name, the `systemd-resolved` stub, `resolvectl`, drop-ins, search domains and `/etc/hosts` overrides.
+Finish the [section knowledge check](quiz.yaml).
 
-## Check your knowledge
-
-- [Section 040 Knowledge Check](./quiz.yaml): multiple-choice questions on all four modules.
-
-## The capstone
-
-The [Time and Name Services Capstone Lab](./capstone/labs/lab-01/question.md) closes the section with one task and no step-by-step guidance: point a client at an internal DNS server and prove its records with `dig`. Start it from your own terminal:
-
-```sh
-astrona run --git ssh://git@github.com/astrona-io/ATS003.git -c sections/section-040/capstone/labs/lab-01
-astrona submit -c sections/section-040/capstone/labs/lab-01
-astrona destroy ats-003-lab-040
-```
+See [optional and legacy exercises](../../docs/practice-variants.md) for retained older lab IDs.

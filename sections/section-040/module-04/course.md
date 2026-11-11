@@ -56,4 +56,3 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Practice and assessment
 
 - [DNS Client Resolution Lab](labs/lab-01/question.md): Teach systemd-resolved a DNS server and a search domain with a drop-in; Resolve a short name through a search domain; Override one name in /etc/hosts while DNS keeps its own answer.
-- [Time and Name Services Capstone Lab](../capstone/labs/lab-01/question.md): Point the system resolver at an internal DNS server; Check A, NS, MX and reverse records with dig, with and without @server.

@@ -57,4 +57,3 @@ Time synchronisation is something other services depend on without saying so, un
 ## Practice and assessment
 
 - [NTP Client Time Synchronization Lab](labs/lab-01/question.md): Replace chrony's time sources with a fixed list of servers; Set minpoll and maxpoll on every source line; Prove the clock is synchronised with chronyc tracking.
-- [Time and Name Services Capstone Lab](../capstone/labs/lab-01/question.md): Point the system resolver at an internal DNS server; Check A, NS, MX and reverse records with dig, with and without @server.

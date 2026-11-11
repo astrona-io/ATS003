@@ -51,24 +51,29 @@ modules:
         title: "Question"
         path: sections/section-010/module-01/labs/lab-01/question.md
       - type: lab
-        title: "IPv4 & IPv6 Interface Configuration Lab"
+        title: IPv4 and IPv6 addressing
         path: sections/section-010/module-01/labs/lab-01
         difficulty: intermediate
-        estimated_duration: 25m
+        estimated_duration: 15m
         topic: addressing
         task_kind: build
-        tags: [ip-addr, ipv4, ipv6, secondary-address, etc-hosts, netplan, persistence]
+        tags:
+        - ip-addr
+        - ipv4
+        - ipv6
+        - netplan
+        - persistence
         learning_goals:
-          - Add a secondary IPv4 and a static IPv6 address beside the management address
-          - Make both addresses survive a reboot in Netplan or NetworkManager configuration
-          - Map the host name app-srv1 to its new address in /etc/hosts, forward and reverse
+        - Add secondary IPv4 and IPv6 addresses without changing management DHCP
+        - Persist the addresses in network configuration
+        - Verify both addresses after a reboot
         resources:
-          - name: "ip-address(8) manual page"
-            url: https://man7.org/linux/man-pages/man8/ip-address.8.html
-          - name: "Netplan YAML configuration reference"
-            url: https://netplan.readthedocs.io/en/stable/netplan-yaml/
-          - name: "hosts(5) manual page"
-            url: https://man7.org/linux/man-pages/man5/hosts.5.html
+        - name: ip-address(8) manual page
+          url: https://man7.org/linux/man-pages/man8/ip-address.8.html
+        - name: Netplan YAML configuration reference
+          url: https://netplan.readthedocs.io/en/stable/netplan-yaml/
+        - name: hosts(5) manual page
+          url: https://man7.org/linux/man-pages/man5/hosts.5.html
       - type: reading
         title: "Wrap-Up: Mission Debrief"
         path: sections/section-010/module-01/course-04-wrap-up.md
@@ -151,24 +156,27 @@ modules:
         title: "Question"
         path: sections/section-010/module-04/labs/lab-01/question.md
       - type: lab
-        title: "Local Hostname Name Resolution Lab"
+        title: Repair local hostname resolution
         path: sections/section-010/module-04/labs/lab-01
         difficulty: intermediate
-        estimated_duration: 25m
+        estimated_duration: 15m
         topic: name-resolution
         task_kind: build
-        tags: [etc-hosts, getent, nsswitch, secondary-address, ipv6, persistence]
+        tags:
+        - etc-hosts
+        - getent
+        - nsswitch
         learning_goals:
-          - Add a secondary IPv4 and a static IPv6 address beside the management address
-          - Make both addresses survive a reboot in Netplan or NetworkManager configuration
-          - Map the host name app-srv1 to its new address in /etc/hosts, forward and reverse
+        - Find the incorrect app-srv1 mapping in /etc/hosts
+        - Repair forward and reverse NSS lookup results
+        - Keep unrelated host mappings intact
         resources:
-          - name: "hosts(5) manual page"
-            url: https://man7.org/linux/man-pages/man5/hosts.5.html
-          - name: "nsswitch.conf(5) manual page"
-            url: https://man7.org/linux/man-pages/man5/nsswitch.conf.5.html
-          - name: "ip-address(8) manual page"
-            url: https://man7.org/linux/man-pages/man8/ip-address.8.html
+        - name: hosts(5) manual page
+          url: https://man7.org/linux/man-pages/man5/hosts.5.html
+        - name: nsswitch.conf(5) manual page
+          url: https://man7.org/linux/man-pages/man5/nsswitch.conf.5.html
+        - name: ip-address(8) manual page
+          url: https://man7.org/linux/man-pages/man8/ip-address.8.html
       - type: reading
         title: "Wrap-Up: Mission Debrief"
         path: sections/section-010/module-04/course-03-wrap-up.md
@@ -215,24 +223,32 @@ modules:
         title: "Question"
         path: sections/section-010/capstone/labs/lab-01/question.md
       - type: lab
-        title: "Core Host Configurations Capstone Lab"
+        title: Addressing and local resolution integration
         path: sections/section-010/capstone/labs/lab-01
         difficulty: advanced
         estimated_duration: 30m
         topic: addressing
         task_kind: build
-        tags: [ip-addr, ipv4, ipv6, secondary-address, etc-hosts, getent, netplan, persistence]
+        tags:
+        - ip-addr
+        - ipv4
+        - ipv6
+        - secondary-address
+        - etc-hosts
+        - getent
+        - netplan
+        - persistence
         learning_goals:
-          - Add a secondary IPv4 and a static IPv6 address beside the management address
-          - Make both addresses survive a reboot in Netplan or NetworkManager configuration
-          - Map the host name app-srv1 to its new address in /etc/hosts, forward and reverse
+        - Add a secondary IPv4 and a static IPv6 address beside the management address
+        - Make both addresses survive a reboot in Netplan or NetworkManager configuration
+        - Map the host name app-srv1 to its new address in /etc/hosts, forward and reverse
         resources:
-          - name: "ip-address(8) manual page"
-            url: https://man7.org/linux/man-pages/man8/ip-address.8.html
-          - name: "Netplan YAML configuration reference"
-            url: https://netplan.readthedocs.io/en/stable/netplan-yaml/
-          - name: "hosts(5) manual page"
-            url: https://man7.org/linux/man-pages/man5/hosts.5.html
+        - name: ip-address(8) manual page
+          url: https://man7.org/linux/man-pages/man8/ip-address.8.html
+        - name: Netplan YAML configuration reference
+          url: https://netplan.readthedocs.io/en/stable/netplan-yaml/
+        - name: hosts(5) manual page
+          url: https://man7.org/linux/man-pages/man5/hosts.5.html
 
   - id: module-020
     title: "Section 020: Link Aggregation & Routing (Bridges, Bonds & Routes)"
@@ -259,24 +275,28 @@ modules:
         title: "Question"
         path: sections/section-020/module-01/labs/lab-01/question.md
       - type: lab
-        title: "Link Aggregation (Bonding) Lab"
+        title: Build a persistent active-backup bond
         path: sections/section-020/module-01/labs/lab-01
         difficulty: intermediate
-        estimated_duration: 25m
+        estimated_duration: 15m
         topic: bonding-bridging
         task_kind: build
-        tags: [bond, active-backup, bridge, dummy-interface, ip-link, netplan, persistence]
+        tags:
+        - bond
+        - ip-link
+        - netplan
+        - persistence
         learning_goals:
-          - Build a bridge br0 and plug a member interface into it
-          - Build an active-backup bond0 over two member interfaces
-          - Declare the bridge and the bond in on-disk configuration so they return after a reboot
+        - Create bond0 using only the supplied practice interfaces
+        - Check active-backup mode and the active member
+        - Persist bond0 in Netplan and verify it after reboot
         resources:
-          - name: "Linux kernel bonding driver guide"
-            url: https://www.kernel.org/doc/html/latest/networking/bonding.html
-          - name: "ip-link(8) manual page"
-            url: https://man7.org/linux/man-pages/man8/ip-link.8.html
-          - name: "Netplan YAML configuration reference"
-            url: https://netplan.readthedocs.io/en/stable/netplan-yaml/
+        - name: Linux kernel bonding driver guide
+          url: https://www.kernel.org/doc/html/latest/networking/bonding.html
+        - name: ip-link(8) manual page
+          url: https://man7.org/linux/man-pages/man8/ip-link.8.html
+        - name: Netplan YAML configuration reference
+          url: https://netplan.readthedocs.io/en/stable/netplan-yaml/
       - type: reading
         title: "Wrap-Up: Mission Debrief"
         path: sections/section-020/module-01/course-04-wrap-up.md
@@ -299,24 +319,28 @@ modules:
         title: "Question"
         path: sections/section-020/module-02/labs/lab-01/question.md
       - type: lab
-        title: "Software Bridging Lab"
+        title: Build a persistent software bridge
         path: sections/section-020/module-02/labs/lab-01
         difficulty: intermediate
-        estimated_duration: 25m
+        estimated_duration: 15m
         topic: bonding-bridging
         task_kind: build
-        tags: [bridge, bond, active-backup, dummy-interface, ip-link, netplan, persistence]
+        tags:
+        - bridge
+        - ip-link
+        - netplan
+        - persistence
         learning_goals:
-          - Build a bridge br0 and plug a member interface into it
-          - Build an active-backup bond0 over two member interfaces
-          - Declare the bridge and the bond in on-disk configuration so they return after a reboot
+        - Create br0 using only the supplied practice interfaces
+        - Check bridge membership and forwarding state
+        - Persist br0 in Netplan and verify it after reboot
         resources:
-          - name: "bridge(8) manual page"
-            url: https://man7.org/linux/man-pages/man8/bridge.8.html
-          - name: "Linux kernel bonding driver guide"
-            url: https://www.kernel.org/doc/html/latest/networking/bonding.html
-          - name: "Netplan YAML configuration reference"
-            url: https://netplan.readthedocs.io/en/stable/netplan-yaml/
+        - name: bridge(8) manual page
+          url: https://man7.org/linux/man-pages/man8/bridge.8.html
+        - name: Linux kernel bonding driver guide
+          url: https://www.kernel.org/doc/html/latest/networking/bonding.html
+        - name: Netplan YAML configuration reference
+          url: https://netplan.readthedocs.io/en/stable/netplan-yaml/
       - type: reading
         title: "Wrap-Up: Mission Debrief"
         path: sections/section-020/module-02/course-05-wrap-up.md
@@ -365,26 +389,6 @@ modules:
         title: "Section 020 Knowledge Check: Aggregation & Routing"
         path: sections/section-020/quiz.yaml
         pass_score: 70
-      - type: reading
-        title: "Question"
-        path: sections/section-020/capstone/labs/lab-01/question.md
-      - type: lab
-        title: "Aggregation and Routing Capstone Lab"
-        path: sections/section-020/capstone/labs/lab-01
-        difficulty: advanced
-        estimated_duration: 20m
-        topic: routing
-        task_kind: build
-        tags: [ip-route, static-route, next-hop, route-get, ping, persistence]
-        learning_goals:
-          - Add a static route to a partner subnet through a gateway
-          - Prove the route with ip route get and a real ping
-          - Make the route survive a reboot in on-disk configuration
-        resources:
-          - name: "ip-route(8) manual page"
-            url: https://man7.org/linux/man-pages/man8/ip-route.8.html
-          - name: "Netplan YAML configuration reference"
-            url: https://netplan.readthedocs.io/en/stable/netplan-yaml/
 
   - id: module-030
     title: "Section 030: Network Security & Packet Filtering (Firewalls)"
@@ -513,28 +517,6 @@ modules:
         title: "Section 030 Knowledge Check: Packet Filtering"
         path: sections/section-030/quiz.yaml
         pass_score: 70
-      - type: reading
-        title: "Question"
-        path: sections/section-030/capstone/labs/lab-01/question.md
-      - type: lab
-        title: "Host Security and Filtering Capstone Lab"
-        path: sections/section-030/capstone/labs/lab-01
-        difficulty: advanced
-        estimated_duration: 30m
-        topic: packet-filtering
-        task_kind: build
-        tags: [nftables, nft-tables, nft-chains, port-redirect, source-filter, egress-filter]
-        learning_goals:
-          - Build nftables filter and NAT tables with chains on the right hooks
-          - Drop, redirect and restrict traffic by port and source address
-          - Block outgoing traffic to one host from the output chain
-        resources:
-          - name: "nftables quick reference"
-            url: https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes
-          - name: "nftables: performing network address translation"
-            url: https://wiki.nftables.org/wiki-nftables/index.php/Performing_Network_Address_Translation_(NAT)
-          - name: "nft(8) manual page (Ubuntu 24.04)"
-            url: https://manpages.ubuntu.com/manpages/noble/man8/nft.8.html
 
   - id: module-040
     title: "Section 040: Time & Domain Name Services (NTP & DNS)"
@@ -691,25 +673,6 @@ modules:
         title: "Section 040 Knowledge Check: Time & Name Services"
         path: sections/section-040/quiz.yaml
         pass_score: 70
-      - type: reading
-        title: "Question"
-        path: sections/section-040/capstone/labs/lab-01/question.md
-      - type: lab
-        title: "Time and Name Services Capstone Lab"
-        path: sections/section-040/capstone/labs/lab-01
-        difficulty: advanced
-        estimated_duration: 20m
-        topic: dns
-        task_kind: build
-        tags: [dig, dns-records, reverse-dns, resolv-conf]
-        learning_goals:
-          - Point the system resolver at an internal DNS server
-          - Check A, NS, MX and reverse records with dig, with and without @server
-        resources:
-          - name: "dig(1) manual page (Ubuntu 24.04)"
-            url: https://manpages.ubuntu.com/manpages/noble/man1/dig.1.html
-          - name: "resolv.conf(5) manual page"
-            url: https://man7.org/linux/man-pages/man5/resolv.conf.5.html
 
   - id: module-050
     title: "Section 050: Application Reverse Proxies (Nginx & SSH)"
@@ -739,22 +702,25 @@ modules:
         title: "Question"
         path: sections/section-050/module-01/labs/lab-01/question.md
       - type: lab
-        title: "Nginx Reverse Proxy Lab"
+        title: Reverse proxy to a fixed backend path
         path: sections/section-050/module-01/labs/lab-01
         difficulty: intermediate
-        estimated_duration: 25m
+        estimated_duration: 15m
         topic: reverse-proxy
         task_kind: build
-        tags: [nginx, reverse-proxy, proxy-pass, upstream, load-balancing, curl]
+        tags:
+        - nginx
+        - reverse-proxy
+        - curl
         learning_goals:
-          - Reverse-proxy every path on one port to a fixed backend path
-          - Spread requests on another port across two backends with an upstream block
-          - Keep the whole NGINX configuration valid and the existing apps untouched
+        - Route every path on port 8001 to backend 2222 /special
+        - Check different request paths through the proxy
+        - Preserve the existing backend applications
         resources:
-          - name: "NGINX ngx_http_proxy_module"
-            url: https://nginx.org/en/docs/http/ngx_http_proxy_module.html
-          - name: "NGINX ngx_http_upstream_module"
-            url: https://nginx.org/en/docs/http/ngx_http_upstream_module.html
+        - name: NGINX ngx_http_proxy_module
+          url: https://nginx.org/en/docs/http/ngx_http_proxy_module.html
+        - name: NGINX ngx_http_upstream_module
+          url: https://nginx.org/en/docs/http/ngx_http_upstream_module.html
       - type: reading
         title: "Wrap-Up: Mission Debrief"
         path: sections/section-050/module-01/course-05-wrap-up.md
@@ -768,24 +734,27 @@ modules:
         title: "Question"
         path: sections/section-050/module-02/labs/lab-01/question.md
       - type: lab
-        title: "Nginx Upstream Load Balancers Lab"
+        title: Balance requests across two upstreams
         path: sections/section-050/module-02/labs/lab-01
         difficulty: intermediate
-        estimated_duration: 25m
+        estimated_duration: 15m
         topic: load-balancing
         task_kind: build
-        tags: [nginx, upstream, load-balancing, reverse-proxy, proxy-pass, curl]
+        tags:
+        - nginx
+        - load-balancing
+        - curl
         learning_goals:
-          - Reverse-proxy every path on one port to a fixed backend path
-          - Spread requests on another port across two backends with an upstream block
-          - Keep the whole NGINX configuration valid and the existing apps untouched
+        - Build an upstream with backends 1111 and 2222
+        - Serve both backends through port 8000
+        - Preserve the existing backend applications
         resources:
-          - name: "NGINX ngx_http_upstream_module"
-            url: https://nginx.org/en/docs/http/ngx_http_upstream_module.html
-          - name: "NGINX: using nginx as an HTTP load balancer"
-            url: https://nginx.org/en/docs/http/load_balancing.html
-          - name: "NGINX ngx_http_proxy_module"
-            url: https://nginx.org/en/docs/http/ngx_http_proxy_module.html
+        - name: NGINX ngx_http_upstream_module
+          url: https://nginx.org/en/docs/http/ngx_http_upstream_module.html
+        - name: 'NGINX: using nginx as an HTTP load balancer'
+          url: https://nginx.org/en/docs/http/load_balancing.html
+        - name: NGINX ngx_http_proxy_module
+          url: https://nginx.org/en/docs/http/ngx_http_proxy_module.html
       - type: reading
         title: "Least Connections And Hashing"
         path: sections/section-050/module-02/course-02-least-connections-and-hashing.md
@@ -874,24 +843,30 @@ modules:
         title: "Question"
         path: sections/section-050/capstone/labs/lab-01/question.md
       - type: lab
-        title: "Application Proxy and SSH Capstone Lab"
+        title: Reverse proxy and load balancing integration
         path: sections/section-050/capstone/labs/lab-01
         difficulty: advanced
         estimated_duration: 30m
         topic: reverse-proxy
         task_kind: build
-        tags: [nginx, reverse-proxy, proxy-pass, upstream, load-balancing, curl]
+        tags:
+        - nginx
+        - reverse-proxy
+        - proxy-pass
+        - upstream
+        - load-balancing
+        - curl
         learning_goals:
-          - Reverse-proxy every path on one port to a fixed backend path
-          - Spread requests on another port across two backends with an upstream block
-          - Keep the whole NGINX configuration valid and the existing apps untouched
+        - Reverse-proxy every path on one port to a fixed backend path
+        - Spread requests on another port across two backends with an upstream block
+        - Keep the whole NGINX configuration valid and the existing apps untouched
         resources:
-          - name: "NGINX ngx_http_proxy_module"
-            url: https://nginx.org/en/docs/http/ngx_http_proxy_module.html
-          - name: "NGINX ngx_http_upstream_module"
-            url: https://nginx.org/en/docs/http/ngx_http_upstream_module.html
-          - name: "NGINX: using nginx as an HTTP load balancer"
-            url: https://nginx.org/en/docs/http/load_balancing.html
+        - name: NGINX ngx_http_proxy_module
+          url: https://nginx.org/en/docs/http/ngx_http_proxy_module.html
+        - name: NGINX ngx_http_upstream_module
+          url: https://nginx.org/en/docs/http/ngx_http_upstream_module.html
+        - name: 'NGINX: using nginx as an HTTP load balancer'
+          url: https://nginx.org/en/docs/http/load_balancing.html
 
   - id: module-060
     title: "Section 060: Persistent Configurations & Diagnostics"
@@ -918,23 +893,28 @@ modules:
         title: "Question"
         path: sections/section-060/module-01/labs/lab-01/question.md
       - type: lab
-        title: "Private And Public Address Audit Lab"
+        title: Repair a persistent NetworkManager profile
         path: sections/section-060/module-01/labs/lab-01
         difficulty: beginner
         estimated_duration: 15m
         topic: addressing
         task_kind: build
-        tags: [ip-addr, private-address, public-address, nat, curl, dig]
+        tags:
+        - nmcli
+        - NetworkManager
+        - persistence
+        - troubleshooting
         learning_goals:
-          - Find the private address on the host's own interface
-          - Find the public address the internet sees after NAT
+        - Diagnose the saved and active settings of lab-static
+        - Correct its address and enable autoconnect
+        - Reactivate the profile and verify it after reboot
         resources:
-          - name: "ip-address(8) manual page"
-            url: https://man7.org/linux/man-pages/man8/ip-address.8.html
-          - name: "curl(1) manual page"
-            url: https://man7.org/linux/man-pages/man1/curl.1.html
-          - name: "dig(1) manual page (Ubuntu 24.04)"
-            url: https://manpages.ubuntu.com/manpages/noble/man1/dig.1.html
+        - name: ip-address(8) manual page
+          url: https://man7.org/linux/man-pages/man8/ip-address.8.html
+        - name: curl(1) manual page
+          url: https://man7.org/linux/man-pages/man1/curl.1.html
+        - name: dig(1) manual page (Ubuntu 24.04)
+          url: https://manpages.ubuntu.com/manpages/noble/man1/dig.1.html
       - type: reading
         title: "Wrap-Up: Mission Debrief"
         path: sections/section-060/module-01/course-04-wrap-up.md
@@ -954,23 +934,29 @@ modules:
         title: "Question"
         path: sections/section-060/module-02/labs/lab-01/question.md
       - type: lab
-        title: "Private And Public Address Audit Lab"
+        title: Repair merged Netplan configuration
         path: sections/section-060/module-02/labs/lab-01
         difficulty: beginner
         estimated_duration: 15m
         topic: addressing
         task_kind: build
-        tags: [ip-addr, private-address, public-address, nat, curl, dig]
+        tags:
+        - netplan
+        - networkd
+        - yaml
+        - persistence
+        - troubleshooting
         learning_goals:
-          - Find the private address on the host's own interface
-          - Find the public address the internet sees after NAT
+        - Trace an unexpected address to a second Netplan file
+        - Correct the merged configuration and apply it
+        - Verify the sole intended address after reboot
         resources:
-          - name: "ip-address(8) manual page"
-            url: https://man7.org/linux/man-pages/man8/ip-address.8.html
-          - name: "curl(1) manual page"
-            url: https://man7.org/linux/man-pages/man1/curl.1.html
-          - name: "dig(1) manual page (Ubuntu 24.04)"
-            url: https://manpages.ubuntu.com/manpages/noble/man1/dig.1.html
+        - name: ip-address(8) manual page
+          url: https://man7.org/linux/man-pages/man8/ip-address.8.html
+        - name: curl(1) manual page
+          url: https://man7.org/linux/man-pages/man1/curl.1.html
+        - name: dig(1) manual page (Ubuntu 24.04)
+          url: https://manpages.ubuntu.com/manpages/noble/man1/dig.1.html
       - type: reading
         title: "Wrap-Up: Mission Debrief"
         path: sections/section-060/module-02/course-04-wrap-up.md
@@ -1025,24 +1011,28 @@ modules:
         title: "Question"
         path: sections/section-060/module-04/labs/lab-01/question.md
       - type: lab
-        title: "Raw Packet Capturing (tcpdump) Lab"
+        title: Capture and decode an HTTP conversation
         path: sections/section-060/module-04/labs/lab-01
         difficulty: intermediate
-        estimated_duration: 20m
+        estimated_duration: 15m
         topic: troubleshooting
         task_kind: troubleshooting
-        tags: [tcpdump, ss, listening-sockets, nftables, curl]
+        tags:
+        - tcpdump
+        - pcap
+        - capture-filter
+        - http
         learning_goals:
-          - Confirm a service is listening on a reachable address with ss
-          - Find and delete the nftables rule that silently drops its port
-          - Prove the service answers end to end with curl
+        - Capture only TCP port 8080 on loopback into a pcap
+        - Identify the handshake, request and successful response
+        - Extract the request path and response token from captured payload
         resources:
-          - name: "tcpdump(1) manual page"
-            url: https://www.tcpdump.org/manpages/tcpdump.1.html
-          - name: "ss(8) manual page"
-            url: https://man7.org/linux/man-pages/man8/ss.8.html
-          - name: "nftables quick reference"
-            url: https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes
+        - name: tcpdump(1) manual page
+          url: https://www.tcpdump.org/manpages/tcpdump.1.html
+        - name: ss(8) manual page
+          url: https://man7.org/linux/man-pages/man8/ss.8.html
+        - name: nftables quick reference
+          url: https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes
       - type: reading
         title: "Wrap-Up: Mission Debrief"
         path: sections/section-060/module-04/course-04-wrap-up.md
@@ -1059,26 +1049,6 @@ modules:
         title: "Prove The Port And Read The Wire"
         path: sections/section-060/module-05/course-03-prove-the-port-and-read-the-wire.md
       - type: reading
-        title: "Question"
-        path: sections/section-060/module-05/labs/lab-01/question.md
-      - type: lab
-        title: "Network Troubleshooting Lab"
-        path: sections/section-060/module-05/labs/lab-01
-        difficulty: intermediate
-        estimated_duration: 30m
-        topic: troubleshooting
-        task_kind: troubleshooting
-        tags: [ip, getent, ss, nftables, curl, troubleshooting]
-        learning_goals:
-          - Climb the ladder from link to firewall and find three faults
-          - Repair the link, the name and the firewall rule in order
-          - Prove the service answers end to end with curl
-        resources:
-          - name: "ip(8) manual page"
-            url: https://man7.org/linux/man-pages/man8/ip.8.html
-          - name: "ss(8) manual page"
-            url: https://man7.org/linux/man-pages/man8/ss.8.html
-      - type: reading
         title: "Wrap-Up: Mission Debrief"
         path: sections/section-060/module-05/course-04-wrap-up.md
       - type: quiz
@@ -1087,26 +1057,30 @@ modules:
         pass_score: 70
       - type: reading
         title: "Question"
-        path: sections/section-060/capstone/labs/lab-01/question.md
+        path: sections/section-060/module-05/labs/lab-01/question.md
       - type: lab
-        title: "Connection Recovery and Audit Capstone Lab"
-        path: sections/section-060/capstone/labs/lab-01
+        title: Network troubleshooting capstone
+        path: sections/section-060/module-05/labs/lab-01
         difficulty: advanced
-        estimated_duration: 20m
+        estimated_duration: 30m
         topic: troubleshooting
         task_kind: troubleshooting
-        tags: [ss, listening-sockets, nftables, tcpdump, curl]
+        tags:
+        - ip
+        - getent
+        - ss
+        - nftables
+        - curl
+        - troubleshooting
         learning_goals:
-          - Confirm a service is listening on a reachable address with ss
-          - Find and delete the nftables rule that silently drops its port
-          - Prove the service answers end to end with curl
+        - Climb the ladder from link to firewall and find three faults
+        - Repair the link, the name and the firewall rule in order
+        - Prove the service answers end to end with curl
         resources:
-          - name: "ss(8) manual page"
-            url: https://man7.org/linux/man-pages/man8/ss.8.html
-          - name: "nftables quick reference"
-            url: https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes
-          - name: "tcpdump(1) manual page"
-            url: https://www.tcpdump.org/manpages/tcpdump.1.html
+        - name: ip(8) manual page
+          url: https://man7.org/linux/man-pages/man8/ip.8.html
+        - name: ss(8) manual page
+          url: https://man7.org/linux/man-pages/man8/ss.8.html
 
   - id: module-090
     title: "LFCS Networking Domain Certification Quiz"

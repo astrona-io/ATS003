@@ -1,27 +1,21 @@
-# Link Aggregation & Routing (Bridges, Bonds & Routes)
+# Section 020: Link Aggregation & Routing (Bridges, Bonds & Routes)
 
-Astronaut, this section is about how your ship joins its antennas together and how it chooses a lane for every signal. You team antennas into a **bond** so one failure does not cut you off, plug antennas into a **bridge** so they share one local lane, and draw **static routes** on the ship's star chart so traffic for each network leaves by the right antenna.
+Build redundant and interconnected links: bond interfaces for uplink aggregation, switch traffic locally with software bridges, and forward packets with multi-interface static routing.
 
-## What you will be able to do
+## Lessons and practice
 
-By the end of this section you can:
+Work through the lessons in order. Each exercise starts independently.
 
-- **Bond interfaces:** build an active-backup bond, read its state, and trigger a failover yourself.
-- **Bridge interfaces:** build a software bridge, attach ports, read what it learned, and stop a loop with the Spanning Tree Protocol.
-- **Route between networks:** add, check, replace and remove static routes, predict which route Linux picks, and troubleshoot a destination you cannot reach.
-- **Make it last:** explain why all of this disappears on reboot when it is built with `ip`, and where it must be written to come back.
+1. [Link Aggregation with Linux Bonding](module-01/course.md)
+2. [Software Bridging](module-02/course.md)
+3. [Multi-Interface Static Routing](module-03/course.md)
 
-## The modules
+## Required exercises
 
-Each module has its own playground and ends with a graded mission.
+- [Build a persistent active-backup bond](module-01/labs/lab-01/question.md): Create bond0 using only the supplied practice interfaces; Check active-backup mode and the active member; Persist bond0 in Netplan and verify it after reboot.
+- [Build a persistent software bridge](module-02/labs/lab-01/question.md): Create br0 using only the supplied practice interfaces; Check bridge membership and forwarding state; Persist br0 in Netplan and verify it after reboot.
+- [Multi-Interface Static Routing Lab](module-03/labs/lab-01/question.md): Add a static route to a partner subnet through a gateway; Prove the route with ip route get and a real ping; Make the route survive a reboot in on-disk configuration.
 
-1. [Link Aggregation with Linux Bonding](./module-01/course.md): teaming two antennas into one link, bonding modes, and failover.
-2. [Software Bridging](./module-02/course.md): a virtual switch inside the kernel, its forwarding database, and loops.
-3. [Multi-Interface Static Routing](./module-03/course.md): reading and drawing the star chart, metrics, and a troubleshooting order.
+Finish the [section knowledge check](quiz.yaml).
 
-## Check yourself and the capstone
-
-When you have finished the modules:
-
-- Take the [Section 020 knowledge check](./quiz.yaml), scenario questions on bonding, bridging and routing.
-- Then take on the [section capstone](./capstone/labs/lab-01/README.md): one static routing task between two machines, with no step-by-step help.
+See [optional and legacy exercises](../../docs/practice-variants.md) for retained older lab IDs.

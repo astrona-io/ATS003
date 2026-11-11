@@ -58,4 +58,3 @@ The exam checks the **effective** configuration, not what you typed. A setting c
 ## Practice and assessment
 
 - [OpenSSH Server Hardening Lab](labs/lab-01/question.md): Turn off X11 forwarding for every user; Allow password login for one user only with a Match block; Prove the effective configuration per user with sshd -T.
-- [Application Proxy and SSH Capstone Lab](../capstone/labs/lab-01/question.md): Reverse-proxy every path on one port to a fixed backend path; Spread requests on another port across two backends with an upstream block; Keep the whole NGINX configuration valid and the existing apps untouched.

@@ -1,5 +1,7 @@
 # Question
 
+**Legacy exercise.** Repeats the DNS query exercise. The main learning path uses [lab 043](../../../module-03/labs/lab-01/README.md). This ID remains runnable and covered by CI.
+
 Solve this question on: `client`
 
 ## Scenario
@@ -25,11 +27,11 @@ On `client`:
    | `dig -x 192.168.10.80 +short` | `data-001.internal.example.com.` |
 
    `<dns-ip>` is the address of the `dns` machine on the lab network. The private network assigns it `192.168.10.53`; the client uses `192.168.10.10`. Bootstrap leaves the client resolver unchanged so configuring it is your task.
-<!-- curriculum-links -->
 
+<!-- curriculum-links -->
 ## Related lessons and assessment
 
-Read [module-01](../../../module-01/course.md), [module-02](../../../module-02/course.md), [module-03](../../../module-03/course.md), [module-04](../../../module-04/course.md).
+Read [section-040/module-01](../../../module-01/course.md), [section-040/module-02](../../../module-02/course.md), [section-040/module-03](../../../module-03/course.md), [section-040/module-04](../../../module-04/course.md).
 
 The grader checks:
 
@@ -40,4 +42,4 @@ The grader checks:
 - Confirms the reverse (PTR) lookup for 192.168.10.80 resolves to data-001.internal.example.com.
 - Confirms bind9 is actually running and the zones loaded cleanly on the dns VM.
 
-Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.
+Inspect your work before submitting. Submission ends this environment.

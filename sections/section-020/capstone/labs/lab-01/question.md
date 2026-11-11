@@ -1,5 +1,7 @@
 # Question
 
+**Legacy exercise.** Repeats the static routing exercise. The main learning path uses [lab 023](../../../module-03/labs/lab-01/README.md). This ID remains runnable and covered by CI.
+
 Solve this question on: `target`
 
 ## Scenario
@@ -20,11 +22,11 @@ Do all the work on `target`. You do not need to change anything on `gateway`.
    - `ping 10.10.30.1` gets replies, because the gateway forwards them.
 
 2. **Persistence.** Declare that same route, destination `10.10.30.0/24` with gateway `10.10.20.1`, in on-disk network configuration, so it comes back after a reboot. Any of these counts: a file under `/etc/netplan/`, a `systemd-networkd` `.network` file, a NetworkManager connection, or a legacy `route-` file. A route added only with `ip route add` does not count.
-<!-- curriculum-links -->
 
+<!-- curriculum-links -->
 ## Related lessons and assessment
 
-Read [module-01](../../../module-01/course.md), [module-02](../../../module-02/course.md), [module-03](../../../module-03/course.md).
+Read [section-020/module-01](../../../module-01/course.md), [section-020/module-02](../../../module-02/course.md), [section-020/module-03](../../../module-03/course.md).
 
 The grader checks:
 
@@ -34,4 +36,4 @@ The grader checks:
 - Real end-to-end proof: pings 10.10.30.1 (the gateway's own address in the partner subnet) through the route — only passes if the gateway is actually forwarding.
 - Confirms this VM is actually able to act as a gateway: IP forwarding on, dummy0 up with 10.10.30.1/24.
 
-Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.
+Inspect your work before submitting. Submission ends this environment.

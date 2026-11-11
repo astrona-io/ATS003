@@ -57,4 +57,3 @@ A machine with more than one network is only useful if its traffic leaves by the
 ## Practice and assessment
 
 - [Multi-Interface Static Routing Lab](labs/lab-01/question.md): Add a static route to a partner subnet through a gateway; Prove the route with ip route get and a real ping; Make the route survive a reboot in on-disk configuration.
-- [Aggregation and Routing Capstone Lab](../capstone/labs/lab-01/question.md): Add a static route to a partner subnet through a gateway; Prove the route with ip route get and a real ping; Make the route survive a reboot in on-disk configuration.

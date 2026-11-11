@@ -1,33 +1,26 @@
-# Core Host Configuration (Addressing & Hostnames)
+# Section 010: Core Host Configuration (Addressing & Hostnames)
 
-Astronaut, before your ship can talk to anyone, it needs a call sign and a name. Every machine in your network must be clearly identifiable: it needs the right addresses on its network interfaces, a hostname that lasts, and a way to turn names into addresses.
+Make every host uniquely identifiable at Layer 3: assign static and secondary IPv4/IPv6 addresses, manage the systemd hostname, and resolve names locally with /etc/hosts.
 
-This section teaches those basics on a live Ubuntu 24.04 machine, from the terminal, the way the exam asks for them.
+## Lessons and practice
 
-## What you will be able to do
+Work through the lessons in order. Each exercise starts independently.
 
-After this section you can:
+1. [Network Interfaces and IPv4 & IPv6 Addressing](module-01/course.md)
+2. [Managing Linux Hostnames](module-02/course.md)
+3. [Discovering Your Public IP Address](module-03/course.md)
+4. [Local Hostname Resolution](module-04/course.md)
+5. [Dynamic Addressing with DHCP](module-05/course.md)
 
-- **Read and set addresses.** List the interfaces on a machine, read their state, and add IPv4 and IPv6 addresses, both for now and so they survive a reboot.
-- **Manage hostnames.** Read and set the static, transient and pretty hostnames with `hostnamectl`.
-- **Find your public address.** Tell a private address from a public one, and ask an outside service which address the internet sees after NAT (network address translation).
-- **Get an address from DHCP.** Walk through the four DHCP messages, turn on a DHCP client in Netplan, and refuse the routes or DNS servers of a lease.
-- **Resolve names locally.** Add entries to `/etc/hosts`, read the lookup order in `/etc/nsswitch.conf`, and test resolution with `getent`.
+## Required exercises
 
-## The modules
+- [IPv4 and IPv6 addressing](module-01/labs/lab-01/question.md): Add secondary IPv4 and IPv6 addresses without changing management DHCP; Persist the addresses in network configuration; Verify both addresses after a reboot.
+- [Static Hostname Management Lab](module-02/labs/lab-01/question.md): Set the static and live hostname without a reboot; Set a free-form pretty hostname; Point the 127.0.1.1 line in /etc/hosts at the new name.
+- [Public IP Discovery Behind NAT Lab](module-03/labs/lab-01/question.md): Find the private address on the host's own interface; Find the public address the internet sees after NAT; Write each address to a file in the exact format a script expects.
+- [Repair local hostname resolution](module-04/labs/lab-01/question.md): Find the incorrect app-srv1 mapping in /etc/hosts; Repair forward and reverse NSS lookup results; Keep unrelated host mappings intact.
+- [DHCP Client Lab](module-05/labs/lab-01/question.md): Turn on a DHCP client for an interface in Netplan; Keep the address from a lease and refuse its routes and DNS servers; Prove the lease with ip, networkctl and resolvectl.
+- [Addressing and local resolution integration](capstone/labs/lab-01/question.md): Add a secondary IPv4 and a static IPv6 address beside the management address; Make both addresses survive a reboot in Netplan or NetworkManager configuration; Map the host name app-srv1 to its new address in /etc/hosts, forward and reverse.
 
-Work through the modules in order. Each module has its own playground, a few short parts and a graded mission.
+Finish the [section knowledge check](quiz.yaml).
 
-1. [Network Interfaces and IPv4 & IPv6 Addressing](./module-01/course.md): interfaces, link state, IPv4 and IPv6 addresses, prefix lengths, the default gateway, and runtime against persistent configuration.
-2. [Managing Linux Hostnames](./module-02/course.md): the static, transient and pretty hostnames, and which ones survive a reboot.
-3. [Discovering Your Public IP Address](./module-03/course.md): private ranges, NAT, and asking an outside service for your public egress address.
-4. [Local Hostname Resolution](./module-04/course.md): `/etc/hosts`, the Name Service Switch, `getent`, and when to use DNS instead.
-5. [Dynamic Addressing with DHCP](./module-05/course.md): the Discover, Offer, Request, Acknowledge exchange, `dhcp4: true` in Netplan, `dhcp4-overrides`, and renewing leases.
-
-## Check your knowledge
-
-When you have finished the modules, take the [section knowledge check](./quiz.yaml): a short multiple-choice quiz on the whole section.
-
-## The capstone
-
-The section ends with one graded capstone mission, with no step-by-step guidance: the [Core Host Configurations Capstone Lab](./capstone/labs/lab-01/README.md). It brings addressing, persistent configuration and local name resolution together in one task.
+See [optional and legacy exercises](../../docs/practice-variants.md) for retained older lab IDs.

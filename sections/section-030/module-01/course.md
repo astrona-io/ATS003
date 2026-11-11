@@ -83,4 +83,3 @@ nftables is also what runs underneath the higher-level firewall tools. `firewall
 ## Practice and assessment
 
 - [Packet Filtering with nftables Lab](labs/lab-01/question.md): Build nftables filter and NAT tables with chains on the right hooks; Drop, redirect and restrict traffic by port and source address; Block outgoing traffic to one host from the output chain.
-- [Host Security and Filtering Capstone Lab](../capstone/labs/lab-01/question.md): Build nftables filter and NAT tables with chains on the right hooks; Drop, redirect and restrict traffic by port and source address; Block outgoing traffic to one host from the output chain.

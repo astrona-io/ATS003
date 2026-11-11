@@ -68,4 +68,3 @@ On many Linux ships, firewalld already owns the shields when you arrive. On the 
 ## Practice and assessment
 
 - [firewalld Zones and Services Lab](labs/lab-01/question.md): Allow a named service and a port in the public zone; Make each change both live now and saved for the next reload.
-- [Host Security and Filtering Capstone Lab](../capstone/labs/lab-01/question.md): Build nftables filter and NAT tables with chains on the right hooks; Drop, redirect and restrict traffic by port and source address; Block outgoing traffic to one host from the output chain.
