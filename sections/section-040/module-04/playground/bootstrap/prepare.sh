@@ -1,10 +1,21 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — DNS Client Resolution
 # Runs once at startup, as a regular user with passwordless sudo (the LFCS
 # base image). bind9, bind9utils, dnsutils and systemd-resolved ship in the
 # base image. A BIND server answers for lab.example on the dummy interface
 # dns0 (10.55.0.53). The resolver is deliberately NOT pointed at it.
 set -euo pipefail
+
+missing=()
+for package in bind9 dnsutils; do
+  dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed' || missing+=("$package")
+done
+if [ "${#missing[@]}" -gt 0 ]; then
+  sudo apt-get update -y
+  sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+fi
 
 echo "[playground] dns-resolver-playground: preparing..."
 
@@ -62,3 +73,4 @@ dig +short @10.55.0.53 www.lab.example 2>/dev/null || true
 echo
 echo "[playground] ready. BIND answers for lab.example on 10.55.0.53."
 echo "[playground] systemd-resolved is at its defaults and does not know that server yet."
+ASTRONA_STUDENT_SCRIPT

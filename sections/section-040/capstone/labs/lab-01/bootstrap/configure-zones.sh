@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap (dns VM): writes the forward (internal.example.com) and
 # reverse (10.168.192.in-addr.arpa) zone files bind9 serves
 # authoritatively, matching the records the scenario and its guided
@@ -8,6 +10,15 @@
 # mail.internal.example.com, and a PTR record back to data-001.
 
 set -eu
+
+missing=()
+for package in bind9 dnsutils; do
+  dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed' || missing+=("$package")
+done
+if [ "${#missing[@]}" -gt 0 ]; then
+  sudo apt-get update -y
+  sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+fi
 
 sudo mkdir -p /etc/bind/zones
 
@@ -79,3 +90,9 @@ fi
 
 sudo systemctl enable "$bind_service"
 sudo systemctl restart "$bind_service"
+# Permit the prepared service when the base image enables firewalld.
+if sudo systemctl is-active --quiet firewalld; then
+  sudo firewall-cmd --permanent --add-service=dns
+  sudo firewall-cmd --add-service=dns
+fi
+ASTRONA_STUDENT_SCRIPT

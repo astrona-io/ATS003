@@ -1,5 +1,8 @@
 # Overview: PLAYGROUND — Link Aggregation with Linux Bonding (Playground)
 
+The members `bondport0` and `bondport1` are local dummy devices. Use them to inspect bond membership, link state and mode changes. They have no remote peer, so use the graded bonding lab for connectivity checks. The devices are recreated after reboot; any bond built with `ip` is temporary.
+
+
 > Declared in [`../config.yaml`](../config.yaml) under `metadata.docs.guide`.
 
 This is a **playground**, not a lab. The environment starts clean, runs
@@ -10,13 +13,7 @@ and no pass/fail. Explore, break things, `astrona destroy`, start over.
 
 - A single qemu VM — a plain Ubuntu 24.04 server host. Reach it with
   `astrona ssh linux-bonding-playground`.
-- Three network interfaces:
-  - the **management interface** carrying your SSH session — leave it alone;
-  - **two extra member NICs** with no IP and no configuration, one on the
-    `192.168.50.0/24` segment and one on `192.168.51.0/24`. These are the
-    interfaces you practise bonding with. Find their kernel names with
-    `ip -brief link show` (they are the ones that are not `lo` and not your
-    SSH interface).
+- The management interface and two unaddressed dummy interfaces, `bondport0` and `bondport1`.
 - Tools installed: `iproute2` (`ip`), `ethtool`, `kmod`, `ifenslave`.
 - The `bonding` kernel module is loaded but **no bond interface exists yet** —
   `cat /proc/net/bonding/bond0` fails until you create `bond0` yourself.

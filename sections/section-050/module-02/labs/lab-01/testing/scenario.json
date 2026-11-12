@@ -1,0 +1,31 @@
+{
+  "initial_failures": {
+    "default/verify-loadbalancer-8000": "FAIL:"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh"
+    }
+  ],
+  "negative": [
+    {
+      "name": "wrong-routing",
+      "apply": [
+        {
+          "script": "testing/wrong-routing.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-loadbalancer-8000": "FAIL:"
+      },
+      "restore": [
+        {
+          "script": "testing/restore-wrong-routing.sh"
+        }
+      ]
+    }
+  ],
+  "reboot": [
+    "default"
+  ]
+}

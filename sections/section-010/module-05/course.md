@@ -47,3 +47,8 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Why this matters
 
 Most real ships get their addresses from DHCP, and the exam asks you to configure both static and dynamic addressing. A dynamic address that also installs the wrong default route can cut a machine off, so you must know what a lease changes.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [DHCP Client Lab](labs/lab-01/question.md): Turn on a DHCP client for an interface in Netplan; Keep the address from a lease and refuse its routes and DNS servers; Prove the lease with ip, networkctl and resolvectl.

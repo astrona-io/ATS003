@@ -1,5 +1,7 @@
 # Host Security and Filtering Capstone Lab
 
+**Legacy exercise.** Repeats the nftables exercise. The main learning path uses [lab 031](../../../module-01/labs/lab-01/README.md). This ID remains runnable and covered by CI.
+
 The Section 030 capstone: a graded mission with no step-by-step help. On one training ship (an Ubuntu 24.04 virtual machine) with an empty nftables ruleset, you build a complete policy: a dropped port, a port redirect, a port limited to one source, and a block on outgoing traffic to one host.
 
 ## Start the mission

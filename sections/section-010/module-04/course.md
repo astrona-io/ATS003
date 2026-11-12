@@ -58,3 +58,9 @@ Launch your playground now, and keep it running next to you while you read the p
 Many problems that look like "the network is down" are really "the name does not resolve", or "it resolves to the wrong address". Knowing where Linux looks first, and how to test resolution on its own, lets you tell those cases apart in seconds.
 
 The exam asks you to add entries to `/etc/hosts`, prove that they resolve in both directions, and know when a local entry is the wrong tool.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Repair local hostname resolution](labs/lab-01/question.md): Find the incorrect app-srv1 mapping in /etc/hosts; Repair forward and reverse NSS lookup results; Keep unrelated host mappings intact.
+- [Addressing and local resolution integration](../capstone/labs/lab-01/question.md): Add a secondary IPv4 and a static IPv6 address beside the management address; Make both addresses survive a reboot in Netplan or NetworkManager configuration; Map the host name app-srv1 to its new address in /etc/hosts, forward and reverse.

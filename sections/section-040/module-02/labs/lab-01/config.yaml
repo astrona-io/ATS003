@@ -1,76 +1,88 @@
 metadata:
-  name: "ats-003-lab-042"
+  name: ats-003-lab-042
   docs:
-    solution: "solution.md"
-    question: "question.md"
-
+    solution: solution.md
+    question: question.md
 runtime:
-  type: "qemu"
+  type: qemu
   qemu:
-  - name: "server"
+  - name: server
     image:
-      type: "oci"
-      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
-
+      type: oci
+      source: ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-20261111-{ARCH}
+      checksums:
+        amd64: sha256:1cc87d6d68d76379c457e5372d5bfecf6dea00e78231cf0057a28a83b4970b11
+        arm64: sha256:bc72ff645ea1621408d18a09a638da3f077438d2dd3c5ebdd79bef8513a795e0
     cpus: 2
     memoryMB: 2048
     diskSizeGB: 15
     display: false
-
-  - name: "client"
+    validation:
+      scripts:
+      - name: verify-allow-directive
+        description: Confirms chrony.conf on the server has an active 'allow 192.168.10.0/24' directive
+          enabling server mode for the subnet
+        type: file
+        source: validation/validate-allow-directive.sh
+      - name: verify-listening-udp123
+        description: Confirms chronyd on the server is listening on UDP/123 so subnet clients can actually
+          reach it
+        type: file
+        source: validation/validate-listening-udp123.sh
+      - name: verify-serverstats
+        description: Confirms 'chronyc serverstats' on the server runs and reports NTP packet counters,
+          proving server mode is active
+        type: file
+        source: validation/validate-serverstats.sh
+      - name: verify-tracking-synced
+        description: 'Confirms the server itself is synced (Leap status: Normal, Stratum 1-15) before
+          serving time downstream'
+        type: file
+        source: validation/validate-tracking-synced.sh
+    networks:
+    - name: service-net
+      ipv4: 192.168.10.123
+    bootstrap:
+      init:
+      - name: isolated-training-clock
+        type: file
+        source: bootstrap/server-clock.sh
+  - name: client
     image:
-      type: "oci"
-      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
-
+      type: oci
+      source: ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-20261111-{ARCH}
+      checksums:
+        amd64: sha256:1cc87d6d68d76379c457e5372d5bfecf6dea00e78231cf0057a28a83b4970b11
+        arm64: sha256:bc72ff645ea1621408d18a09a638da3f077438d2dd3c5ebdd79bef8513a795e0
     cpus: 2
     memoryMB: 2048
     diskSizeGB: 15
     display: false
-
+    validation:
+      scripts:
+      - name: verify-client-points-at-server
+        description: Confirms the client's chrony.conf points at the internal server (192.168.10.123)
+          instead of the public pool
+        type: file
+        source: validation/validate-client-source.sh
+      - name: verify-client-synced-via-server
+        description: 'Confirms the client is actually synced through the internal server end to end: it''s
+          the selected source, Leap status Normal, stratum one hop above the server'
+        type: file
+        source: validation/validate-client-synced.sh
+    networks:
+    - name: service-net
+      ipv4: 192.168.10.10
+  networks:
+  - name: service-net
+    cidr: 192.168.10.0/24
 bootstrap:
   init:
-    - name: "chrony-install"
-      description: "Enables/starts chronyd on both VMs, giving each a default chrony.conf to edit — server mode on the server VM, pointing at the internal server on the client VM (chrony ships in the base LFCS image)"
-      type: "folder"
-      source: "bootstrap/"
-
-validation:
-  scripts:
-    - name: "verify-allow-directive"
-      description: "Confirms chrony.conf on the server has an active 'allow 192.168.10.0/24' directive enabling server mode for the subnet"
-      type: "file"
-      source: "validation/validate-allow-directive.sh"
-      vm: "server"
-
-    - name: "verify-listening-udp123"
-      description: "Confirms chronyd on the server is listening on UDP/123 so subnet clients can actually reach it"
-      type: "file"
-      source: "validation/validate-listening-udp123.sh"
-      vm: "server"
-
-    - name: "verify-serverstats"
-      description: "Confirms 'chronyc serverstats' on the server runs and reports NTP packet counters, proving server mode is active"
-      type: "file"
-      source: "validation/validate-serverstats.sh"
-      vm: "server"
-
-    - name: "verify-tracking-synced"
-      description: "Confirms the server itself is synced (Leap status: Normal, Stratum 1-15) before serving time downstream"
-      type: "file"
-      source: "validation/validate-tracking-synced.sh"
-      vm: "server"
-
-    - name: "verify-client-points-at-server"
-      description: "Confirms the client's chrony.conf points at the internal server (astrona-ats-003-lab-042-server) instead of the public pool"
-      type: "file"
-      source: "validation/validate-client-source.sh"
-      vm: "client"
-
-    - name: "verify-client-synced-via-server"
-      description: "Confirms the client is actually synced through the internal server end to end: it's the selected source, Leap status Normal, stratum one hop above the server"
-      type: "file"
-      source: "validation/validate-client-synced.sh"
-      vm: "client"
-
+  - name: chrony-install
+    description: Enables/starts chronyd on both VMs, giving each a default chrony.conf to edit — server
+      mode on the server VM, pointing at the internal server on the client VM (chrony ships in the base
+      LFCS image)
+    type: file
+    source: bootstrap/install-chrony.sh
 teardown:
   keepCluster: false

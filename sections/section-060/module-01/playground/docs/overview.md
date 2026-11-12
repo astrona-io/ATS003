@@ -1,5 +1,8 @@
 # Overview: PLAYGROUND — Persistent Network Managers (Playground)
 
+The spare interface is a persistent dummy device named `nm0`. Configure it with NetworkManager while leaving the management interface unmanaged.
+
+
 > Declared in [`../config.yaml`](../config.yaml) under `metadata.docs.guide`.
 
 This is a **playground**, not a lab. The environment starts clean, runs

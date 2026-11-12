@@ -49,3 +49,8 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Why this matters
 
 Bonding is how a Linux server survives a pulled cable or a failed network card without anyone noticing. The exam asks you to build a bond, put it in the right mode, and prove which member is active. The same habits, reading the kernel's own state file and checking before you trust, help with every network device in this course.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Build a persistent active-backup bond](labs/lab-01/question.md): Create bond0 using only the supplied practice interfaces; Check active-backup mode and the active member; Persist bond0 in Netplan and verify it after reboot.

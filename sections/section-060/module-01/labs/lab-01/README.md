@@ -1,27 +1,10 @@
-# Private And Public Address Audit Lab
+# Repair a persistent NetworkManager profile
 
-A graded mission on one Ubuntu 24.04 virtual machine. You find the private address the host's own interface carries and the public address the internet sees after NAT (network address translation), and write each one to a file under `/opt/course`.
+NetworkManager manages only the disposable `nm0` interface. Its saved `lab-static` profile has the wrong address and does not autoconnect. The management NIC belongs to the existing network service.
 
-## Start the lab
-
-Start the lab from your own terminal:
+Read the [task](question.md) and the [worked solution](solution.md).
 
 ```bash
-astrona run --git git@github.com:astrona-io/ATS003.git -c sections/section-060/module-01/labs/lab-01
-```
-
-Open a terminal on the lab machine with `astrona ssh ats-003-lab-061`, then read the task in [`question.md`](./question.md).
-
-## Grade and clean up
-
-Grading runs from your own terminal, not inside the lab machine:
-
-```bash
-astrona submit -c sections/section-060/module-01/labs/lab-01
-```
-
-When you are done, remove the lab. The command takes the lab's name, not its folder path:
-
-```bash
-astrona destroy ats-003-lab-061
+astrona run --git ssh://git@github.com/astrona-io/ATS003.git -c sections/section-060/module-01/labs/lab-01
+astrona ssh ats-003-lab-061
 ```

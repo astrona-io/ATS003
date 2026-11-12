@@ -1,0 +1,31 @@
+{
+  "initial_failures": {
+    "default/verify-key-pair": "is missing"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh",
+      "vm": "default"
+    }
+  ],
+  "negative": [
+    {
+      "name": "regression",
+      "apply": [
+        {
+          "script": "testing/negative.sh",
+          "vm": "default"
+        }
+      ],
+      "failures": {
+        "default/verify-key-pair": "group and others"
+      },
+      "restore": [
+        {
+          "script": "testing/restore.sh",
+          "vm": "default"
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 # Question
 
+**Legacy exercise.** Repeats the nftables exercise. The main learning path uses [lab 031](../../../module-01/labs/lab-01/README.md). This ID remains runnable and covered by CI.
+
 Solve this question on: `terminal`
 
 ## Scenario
@@ -43,3 +45,29 @@ shows it.
   In the port 6002 accept rule, write the port match before the source
   address match.
 - The rules only need to be live. They do not need to survive a reboot.
+
+## Observe packets through the rules
+
+Bootstrap creates a private client network namespace named `nft-client`, connected to this VM at `192.168.10.1`. Its source addresses are `192.168.10.80` (allowed), `192.168.10.81` (denied), and `192.168.10.70` (blocked egress destination). The management network stays separate.
+
+```sh
+sudo ip netns exec nft-client curl --max-time 3 http://192.168.10.1:6000/
+sudo ip netns exec nft-client curl --interface 192.168.10.80 --max-time 3 http://192.168.10.1:6002/
+sudo ip netns exec nft-client curl --interface 192.168.10.81 --max-time 3 http://192.168.10.1:6002/
+```
+
+The redirect request should reach the 6001 listener. The allowed source should reach 6002; the other source should time out. The grader also tests 5000 and egress traffic, using working control listeners so an absent service cannot masquerade as a firewall drop. Counters and equivalent rule ordering are accepted when the required packet behavior is correct.
+
+<!-- curriculum-links -->
+## Related lessons and assessment
+
+Read [section-030/module-01](../../../module-01/course.md), [section-030/module-02](../../../module-02/course.md), [section-030/module-03](../../../module-03/course.md).
+
+The grader checks:
+
+- Sends real traffic through the assigned network path and checks the response or timeout.
+- Sends real traffic through the assigned network path and checks the response or timeout.
+- Sends real traffic through the assigned network path and checks the response or timeout.
+- Sends real traffic through the assigned network path and checks the response or timeout.
+
+Inspect your work before submitting. Submission ends this environment.

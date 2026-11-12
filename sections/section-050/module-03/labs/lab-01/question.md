@@ -19,3 +19,18 @@ Harden `sshd` as described below. Do not lock out the administrator account you 
 4. **A working end state.** The `ssh` service (or `sshd`) stays active. A real password login over SSH as `elena` succeeds, and one as `victor` is rejected.
 
 The grader reads the effective values with `sshd -T` and `sshd -T -C`, and tries real password logins as `elena` and `victor` on `localhost`.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-03](../../course.md).
+
+The grader checks:
+
+- Confirms the sshd/ssh service is active.
+- Confirms X11Forwarding is disabled in the effective sshd config (sshd -T).
+- Confirms PasswordAuthentication resolves to yes for elena and no for victor via sshd -T -C.
+- Confirms Banner resolves to /etc/ssh/sshd-banner for elena and victor via sshd -T -C, and the file exists.
+- Confirms real SSH login behavior: elena authenticates with a password, victor is rejected.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

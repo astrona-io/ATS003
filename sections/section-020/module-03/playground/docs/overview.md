@@ -1,5 +1,8 @@
 # Overview: PLAYGROUND — Multi-Interface Static Routing (Playground)
 
+The interfaces `route0` and `route1` are local dummy devices. They support the route-table exercises below but have no remote router. Use the static-routing lab or the NAT workshop to test real forwarding between VMs.
+
+
 > Declared in [`../config.yaml`](../config.yaml) under `metadata.docs.guide`.
 
 This is a **playground**, not a lab. The environment starts clean, runs

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — Nginx Reverse Proxy
 # Runs once at startup, as a regular user with passwordless sudo (the LFCS
 # base image, like the graded labs). Environment preparation ONLY: nginx,
@@ -7,6 +9,15 @@
 # blocks and see exactly what nginx forwards. Nginx is left serving its stock
 # default page — the `location` / `proxy_pass` config is yours to write.
 set -euo pipefail
+
+missing=()
+for package in nginx; do
+  dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed' || missing+=("$package")
+done
+if [ "${#missing[@]}" -gt 0 ]; then
+  sudo apt-get update -y
+  sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+fi
 
 echo "[playground] nginx-proxy-playground: preparing backends..."
 
@@ -96,3 +107,4 @@ echo "[playground] (backend-b). Add proxy config under /etc/nginx/ (e.g. edit"
 echo "[playground] sites-available/default or drop a file in conf.d/), run"
 echo "[playground] 'sudo nginx -t' then 'sudo systemctl reload nginx', and curl"
 echo "[playground] localhost to see what each backend received. See docs/overview.md."
+ASTRONA_STUDENT_SCRIPT

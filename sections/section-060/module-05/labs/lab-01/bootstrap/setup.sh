@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: creates lab0 and the portal service, then breaks three rungs of
 # the troubleshooting ladder: link down, wrong name entry, firewall drop.
 set -eu
@@ -37,3 +39,4 @@ sudo nft add rule inet lab_shield output tcp dport 8443 drop
 
 # Fault 1: the antenna is switched off.
 sudo ip link set lab0 down
+ASTRONA_STUDENT_SCRIPT

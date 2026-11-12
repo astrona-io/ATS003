@@ -1,20 +1,15 @@
 #!/usr/bin/env bash
-# Checks that TCP port 5000 is dropped in the inet filter input chain
-# (live nftables state, not an artificial output file).
-
-set -u
-
-input_chain="$(sudo nft list chain inet filter input 2>/dev/null)"
-
-if [[ -z "$input_chain" ]]; then
-  echo "FAIL: port-5000-drop - table inet filter, chain input does not exist"
-  exit 1
-fi
-
-if echo "$input_chain" | grep -Eq 'tcp dport 5000[[:space:]]+drop'; then
-  echo "PASS: port-5000-drop (tcp dport 5000 drop found in inet filter input)"
-  exit 0
-else
-  echo "FAIL: port-5000-drop - no 'tcp dport 5000 drop' rule found in inet filter input"
-  exit 1
-fi
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
+set -eu
+fail() { echo "FAIL: $*"; exit 1; }
+sudo ss -ltn | grep -Eq ':5000[[:space:]]' || fail 'port 5000 listener unavailable'
+[ "$(sudo ip netns exec nft-client curl --noproxy '*' -fsS --max-time 3 http://192.168.10.1:6001/)" = listener-6001 ] || fail 'control traffic to port 6001 failed'
+status=0
+sudo ip netns exec nft-client curl --noproxy '*' -fsS --max-time 2 http://192.168.10.1:5000/ >/dev/null 2>&1 || status=$?
+[ "$status" -eq 28 ] || fail "port 5000 must drop traffic (curl exit $status)"
+echo 'PASS: expected packet behavior observed'
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

@@ -52,3 +52,8 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Why this matters
 
 Time synchronisation is something other services depend on without saying so, until they break. A secure web connection fails because a certificate is "not yet valid". A Kerberos login ticket is refused because the clocks are too far apart. Log lines from two machines cannot be put in order. Getting NTP right on every machine is basic infrastructure work, and the exam expects you to do it quickly from a terminal.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [NTP Client Time Synchronization Lab](labs/lab-01/question.md): Replace chrony's time sources with a fixed list of servers; Set minpoll and maxpoll on every source line; Prove the clock is synchronised with chronyc tracking.

@@ -1,44 +1,37 @@
 metadata:
-  name: "ats-003-lab-064"
+  name: ats-003-lab-064
   docs:
-    solution: "solution.md"
-    question: "question.md"
-
+    solution: solution.md
+    question: question.md
 runtime:
-  type: "qemu"
+  type: qemu
   qemu:
   - image:
-      type: "oci"
-      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
-
+      type: oci
+      source: ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-20261111-{ARCH}
+      checksums:
+        amd64: sha256:1cc87d6d68d76379c457e5372d5bfecf6dea00e78231cf0057a28a83b4970b11
+        arm64: sha256:bc72ff645ea1621408d18a09a638da3f077438d2dd3c5ebdd79bef8513a795e0
     cpus: 2
     memoryMB: 2048
     diskSizeGB: 15
     display: false
-
 bootstrap:
   init:
-    - name: "network-troubleshooting-lab-setup"
-      description: "Deploys a systemd-managed web app ('myapp') listening on 0.0.0.0:8080, then deliberately adds an nftables 'tcp dport 8080 drop' rule so the lab's unreachable-port scenario is reproducible (tcpdump/iproute2/nftables ship in the base LFCS image)"
-      type: "folder"
-      source: "bootstrap/"
-
+  - name: prepare-lab
+    description: Prepare the independent starting state
+    type: folder
+    source: bootstrap/
 validation:
   scripts:
-    - name: "verify-listening"
-      description: "Confirms something is listening on TCP port 8080 on a remotely reachable address (via 'ss -tulpn')"
-      type: "file"
-      source: "validation/validate-listening.sh"
-
-    - name: "verify-nftables"
-      description: "Confirms the 'tcp dport 8080 drop' rule has been removed from the live nftables ruleset"
-      type: "file"
-      source: "validation/validate-nftables.sh"
-
-    - name: "verify-http-reachable"
-      description: "Confirms the port 8080 web application responds with a real HTTP status code end to end"
-      type: "file"
-      source: "validation/validate-http-reachable.sh"
-
+  - name: verify-capture
+    description: Decode a filtered pcap and verify the TCP handshake, HTTP request,
+      response and this VM body
+    type: file
+    source: validation/verify-capture.sh
+  - name: verify-evidence
+    description: Check the request path and response token read from the capture
+    type: file
+    source: validation/verify-evidence.sh
 teardown:
   keepCluster: false

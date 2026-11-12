@@ -63,3 +63,8 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Why this matters
 
 On many Linux ships, firewalld already owns the shields when you arrive. On the exam you open services and ports in the right zone and must make the change both live now and saved for after a reload. Mixing those two up is the most common firewalld mistake, and this module trains you to avoid it.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [firewalld Zones and Services Lab](labs/lab-01/question.md): Allow a named service and a port in the public zone; Make each change both live now and saved for the next reload.

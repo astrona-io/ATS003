@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Checks that all four required sources use minpoll 4 (16s, the closest
 # power-of-two chrony can express to the requested 20s "connection retry").
 
@@ -36,3 +40,5 @@ else
   echo "FAIL: minpoll - ${bad[*]}"
   exit 1
 fi
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

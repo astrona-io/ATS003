@@ -1,4 +1,4 @@
-# Network Troubleshooting Lab
+# Network troubleshooting capstone
 
 A graded mission on one Ubuntu 24.04 virtual machine. The web service `portal` is running, but clients cannot reach it at `http://portal.lab:8443/`. Several rungs of the troubleshooting ladder are broken. You find each one in order, fix it and prove the portal answers.
 

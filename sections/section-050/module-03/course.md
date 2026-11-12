@@ -53,3 +53,8 @@ Launch your playground now, and keep it running next to you while you read the p
 The SSH airlock is how every administrator gets aboard, so it is also the first door an attacker tries. A few lines in `sshd_config` turn password guessing into wasted effort.
 
 The exam checks the **effective** configuration, not what you typed. A setting can sit in the file and still do nothing, because another value won first. This module trains you to prove every change with `sshd -T`.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [OpenSSH Server Hardening Lab](labs/lab-01/question.md): Turn off X11 forwarding for every user; Allow password login for one user only with a Match block; Prove the effective configuration per user with sshd -T.

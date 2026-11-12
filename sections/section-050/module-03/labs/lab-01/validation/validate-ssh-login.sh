@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms real SSH login behavior matches the hardened config end-to-end:
 # elena can still authenticate with a password, victor cannot. This checks
 # actual connectivity (ssh -p / live login), not just the config file.
@@ -33,3 +35,4 @@ if $pass; then
 else
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

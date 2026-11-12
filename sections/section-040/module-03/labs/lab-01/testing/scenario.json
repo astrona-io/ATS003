@@ -1,0 +1,31 @@
+{
+  "initial_failures": {
+    "client/verify-system-resolver-a-record": "FAIL: system-resolver A record"
+  },
+  "solution": [
+    {
+      "vm": "client",
+      "script": "testing/solution-client.sh"
+    }
+  ],
+  "negative": [
+    {
+      "name": "wrong-resolver",
+      "apply": [
+        {
+          "vm": "client",
+          "script": "testing/wrong-resolver.sh"
+        }
+      ],
+      "failures": {
+        "client/verify-system-resolver-a-record": "FAIL: system-resolver A record"
+      },
+      "restore": [
+        {
+          "vm": "client",
+          "script": "testing/solution-client.sh"
+        }
+      ]
+    }
+  ]
+}

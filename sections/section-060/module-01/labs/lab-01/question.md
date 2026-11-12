@@ -1,31 +1,24 @@
-# Question
+# Repair a persistent NetworkManager profile
 
-Solve this question on: `terminal`
+NetworkManager manages only the disposable `nm0` interface. Its saved `lab-static` profile has the wrong address and does not autoconnect. The management NIC belongs to the existing network service.
 
-## Scenario
-
-Before the network team files a firewall change request, they need two
-addresses for this host. The first is the private address it carries on its
-own network interface. The second is the public address the outside world
-sees after NAT (network address translation: a relay station that swaps the
-host's private address for its own public one). Record both where the audit
-script expects them.
+Estimated learner time: 10–15 minutes, plus VM startup and any reboot. This lab starts independently.
 
 ## Tasks
 
-1. **Private address.** Find this host's private IPv4 address. It is the
-   address from the private ranges (RFC 1918) that is bound to its network
-   interface, so it starts with `10.`, `172.16`–`172.31.`, or `192.168.`.
-   Write just the address, with no prefix and no extra text, to:
+1. Compare `nmcli connection show lab-static`, active connections and `ip -br address show nm0`.
+2. Repair the existing persistent profile: manual IPv4 `192.168.120.50/24`, autoconnect enabled and `ipv4.never-default yes`.
+3. Activate the corrected profile and verify that the old `192.168.120.99/24` address is gone.
+4. Reboot and confirm `lab-static` is active again. Keep the management interface and default route unchanged.
 
-   ```
-   /opt/course/private_ip
-   ```
+<!-- curriculum-links -->
+## Related lessons and assessment
 
-2. **Public address.** Find this host's public IPv4 address as the internet
-   sees it. Use an outside HTTP or DNS lookup service; `curl` and `dig` are
-   installed. Write just that address to:
+Read [section-060/module-01](../../course.md).
 
-   ```
-   /opt/course/public_ip
-   ```
+The grader checks:
+
+- Check the saved NetworkManager address, interface, autoconnect and default-route policy.
+- Check the active address and profile without changing management routing.
+
+Inspect your work before submitting. Submission ends this environment.

@@ -1,4 +1,4 @@
-# Question
+# Network troubleshooting capstone
 
 Solve this question on: `terminal`
 
@@ -17,3 +17,17 @@ Do not touch the management interface that carries your own session.
 3. **Leave the service alone.** `portal.service` must still be running.
 
 The grader checks `lab0` with `ip`, the name with `getent`, the live ruleset with `nft list ruleset`, and a real `curl` request.
+
+<!-- curriculum-links -->
+## Related lessons and assessment
+
+Read [section-060/module-01](../../../module-01/course.md), [section-060/module-02](../../../module-02/course.md), [section-060/module-03](../../../module-03/course.md), [section-060/module-04](../../../module-04/course.md), [section-060/module-05](../../course.md).
+
+The grader checks:
+
+- Confirms lab0 is administratively up and still has 10.66.0.10/24.
+- Confirms getent resolves portal.lab to 10.66.0.10.
+- Confirms no live nftables rule drops tcp port 8443.
+- Confirms curl gets a 2xx or 3xx answer from http://portal.lab:8443/ and the portal service was left running.
+
+Inspect your work before submitting. Submission ends this environment.

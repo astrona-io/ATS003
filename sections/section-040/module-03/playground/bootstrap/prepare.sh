@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — DNS Verification with dig
 # Runs once at startup, as a regular user with passwordless sudo (the LFCS
 # base image, like the graded labs). Environment preparation ONLY: bind9,
@@ -9,6 +11,15 @@
 # nothing to solve — the zone is deliberately fully populated so you can
 # query it, not build it.
 set -euo pipefail
+
+missing=()
+for package in bind9 dnsutils; do
+  dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed' || missing+=("$package")
+done
+if [ "${#missing[@]}" -gt 0 ]; then
+  sudo apt-get update -y
+  sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+fi
 
 echo "[playground] dns-dig-playground: configuring local BIND server..."
 
@@ -106,3 +117,4 @@ echo "[playground] ready. A local BIND server answers for lab.example (and its"
 echo "[playground] reverse zone) on 127.0.0.1. Try: dig lab.example ANY,"
 echo "[playground] dig www.lab.example, dig -x 203.0.113.10, dig lab.example AXFR."
 echo "[playground] There is no internet DNS here — query 127.0.0.1. See docs/overview.md."
+ASTRONA_STUDENT_SCRIPT

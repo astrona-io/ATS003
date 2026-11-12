@@ -1,54 +1,44 @@
 metadata:
-  name: "ats-003-lab-021"
+  name: ats-003-lab-021
   docs:
-    solution: "solution.md"
-    question: "question.md"
-
+    solution: solution.md
+    question: question.md
 runtime:
-  type: "qemu"
+  type: qemu
   qemu:
   - image:
-      type: "oci"
-      source: "ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-{ARCH}"
-
+      type: oci
+      source: ghcr.io/astrona-io/ubuntu-qcow2-image:24.04-lfcs-20261111-{ARCH}
+      checksums:
+        amd64: sha256:1cc87d6d68d76379c457e5372d5bfecf6dea00e78231cf0057a28a83b4970b11
+        arm64: sha256:bc72ff645ea1621408d18a09a638da3f077438d2dd3c5ebdd79bef8513a795e0
     cpus: 2
     memoryMB: 2048
     diskSizeGB: 15
     display: false
-
 bootstrap:
   init:
-    - name: "dummy-interfaces-setup"
-      description: "Creates dummy0, dummy1, and dummy2 local kernel dummy interfaces so the bridge/bond tasks have safe, disposable NICs to operate on without touching the VM's primary/management interface"
-      type: "folder"
-      source: "bootstrap/"
-
+  - name: dummy-interfaces-setup
+    description: Prepare dummy1, dummy2 for bond practice without changing the management
+      interface
+    type: folder
+    source: bootstrap/
 validation:
   scripts:
-    - name: "verify-bridge-master"
-      description: "Confirms br0 exists, is administratively UP, and dummy0 is enslaved to it"
-      type: "file"
-      source: "validation/validate-bridge.sh"
-
-    - name: "verify-bridge-forwarding"
-      description: "Confirms `bridge link show` reports dummy0 as master br0 in forwarding state"
-      type: "file"
-      source: "validation/validate-bridge-forwarding.sh"
-
-    - name: "verify-bond-mode"
-      description: "Confirms bond0 exists in active-backup mode with both dummy1 and dummy2 enslaved"
-      type: "file"
-      source: "validation/validate-bond-mode.sh"
-
-    - name: "verify-bond-active-slave"
-      description: "Confirms /proc/net/bonding/bond0 reports a Currently Active Slave other than None"
-      type: "file"
-      source: "validation/validate-bond-active-slave.sh"
-
-    - name: "verify-persistence"
-      description: "Confirms br0 and bond0 are defined in persistent Netplan or NetworkManager config, not just live kernel state"
-      type: "file"
-      source: "validation/validate-persistence.sh"
-
+  - name: verify-bond-mode
+    description: Confirms bond0 exists in active-backup mode with both dummy1 and
+      dummy2 enslaved
+    type: file
+    source: validation/validate-bond-mode.sh
+  - name: verify-bond-active-slave
+    description: Confirms /proc/net/bonding/bond0 reports a Currently Active Slave
+      other than None
+    type: file
+    source: validation/validate-bond-active-slave.sh
+  - name: verify-persistence
+    description: Check the bond0 Netplan declaration; lifecycle CI also reboots and
+      checks live state
+    type: file
+    source: validation/validate-persistence.sh
 teardown:
   keepCluster: false

@@ -1,0 +1,64 @@
+{
+  "initial_failures": {
+    "default/verify-profile": "saved address is incorrect",
+    "default/verify-live": "correct address is not active"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh"
+    }
+  ],
+  "negative": [
+    {
+      "name": "runtime-only",
+      "apply": [
+        {
+          "script": "testing/runtime-only.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-profile": "saved address is incorrect"
+      },
+      "restore": [
+        {
+          "script": "testing/restore-runtime-only.sh"
+        }
+      ]
+    },
+    {
+      "name": "saved-only",
+      "apply": [
+        {
+          "script": "testing/saved-only.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-live": "correct address is not active"
+      },
+      "restore": [
+        {
+          "script": "testing/restore-saved-only.sh"
+        }
+      ]
+    },
+    {
+      "name": "no-autoconnect",
+      "apply": [
+        {
+          "script": "testing/no-autoconnect.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-profile": "autoconnect is disabled"
+      },
+      "restore": [
+        {
+          "script": "testing/restore-no-autoconnect.sh"
+        }
+      ]
+    }
+  ],
+  "reboot": [
+    "default"
+  ]
+}

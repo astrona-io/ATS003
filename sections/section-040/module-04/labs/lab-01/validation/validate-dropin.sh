@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Checks the resolved.conf drop-in for the server and the search domain.
 set -u
 
@@ -22,3 +26,5 @@ fi
 
 echo "PASS: dropin (DNS=10.55.0.53 and Domains=lab.example are set)"
 exit 0
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

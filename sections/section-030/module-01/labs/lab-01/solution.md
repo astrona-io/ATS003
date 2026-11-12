@@ -183,3 +183,15 @@ then `sudo systemctl enable nftables`. That is not needed to pass this lab.
   `sudo ss -tulpn | grep 6001` still shows a listener.
 - **Everything is wrong and you want a clean start.** `sudo nft flush
   ruleset` empties the ruleset; then start again from Step 2.
+
+## Observe packets through the rules
+
+Bootstrap creates a private client network namespace named `nft-client`, connected to this VM at `192.168.10.1`. Its source addresses are `192.168.10.80` (allowed), `192.168.10.81` (denied), and `192.168.10.70` (blocked egress destination). The management network stays separate.
+
+```sh
+sudo ip netns exec nft-client curl --max-time 3 http://192.168.10.1:6000/
+sudo ip netns exec nft-client curl --interface 192.168.10.80 --max-time 3 http://192.168.10.1:6002/
+sudo ip netns exec nft-client curl --interface 192.168.10.81 --max-time 3 http://192.168.10.1:6002/
+```
+
+The redirect request should reach the 6001 listener. The allowed source should reach 6002; the other source should time out. The grader also tests 5000 and egress traffic, using working control listeners so an absent service cannot masquerade as a firewall drop. Counters and equivalent rule ordering are accepted when the required packet behavior is correct.

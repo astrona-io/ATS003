@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — Netplan YAML Configurations
 # Runs once at startup, as a regular user with passwordless sudo (the LFCS
 # base image, like the graded labs). netplan.io and iproute2 both ship in the
@@ -51,3 +53,4 @@ echo "[playground]         addresses: [192.168.130.50/24]"
 echo "[playground]"
 echo "[playground] then: sudo netplan generate | netplan try | netplan apply."
 echo "[playground] Do NOT edit the management interface's netplan file. See docs/overview.md."
+ASTRONA_STUDENT_SCRIPT

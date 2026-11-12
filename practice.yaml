@@ -1,0 +1,125 @@
+# Exercises outside the ordered course. Paths and runtime IDs stay usable.
+labs:
+- type: lab
+  title: Aggregation and Routing Capstone Lab
+  path: sections/section-020/capstone/labs/lab-01
+  difficulty: advanced
+  estimated_duration: 20m
+  topic: routing
+  task_kind: build
+  tags:
+  - ip-route
+  - static-route
+  - next-hop
+  - route-get
+  - ping
+  - persistence
+  learning_goals:
+  - Add a static route to a partner subnet through a gateway
+  - Prove the route with ip route get and a real ping
+  - Make the route survive a reboot in on-disk configuration
+  resources:
+  - name: ip-route(8) manual page
+    url: https://man7.org/linux/man-pages/man8/ip-route.8.html
+  - name: Netplan YAML configuration reference
+    url: https://netplan.readthedocs.io/en/stable/netplan-yaml/
+  status: retired
+  reason: Repeats the static routing exercise.
+  replacement: sections/section-020/module-03/labs/lab-01
+  lessons:
+  - sections/section-020/module-01/course.md
+  - sections/section-020/module-02/course.md
+  - sections/section-020/module-03/course.md
+- type: lab
+  title: Host Security and Filtering Capstone Lab
+  path: sections/section-030/capstone/labs/lab-01
+  difficulty: advanced
+  estimated_duration: 30m
+  topic: packet-filtering
+  task_kind: build
+  tags:
+  - nftables
+  - nft-tables
+  - nft-chains
+  - port-redirect
+  - source-filter
+  - egress-filter
+  learning_goals:
+  - Build nftables filter and NAT tables with chains on the right hooks
+  - Drop, redirect and restrict traffic by port and source address
+  - Block outgoing traffic to one host from the output chain
+  resources:
+  - name: nftables quick reference
+    url: https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes
+  - name: 'nftables: performing network address translation'
+    url: https://wiki.nftables.org/wiki-nftables/index.php/Performing_Network_Address_Translation_(NAT)
+  - name: nft(8) manual page (Ubuntu 24.04)
+    url: https://manpages.ubuntu.com/manpages/noble/man8/nft.8.html
+  status: retired
+  reason: Repeats the nftables exercise.
+  replacement: sections/section-030/module-01/labs/lab-01
+  lessons:
+  - sections/section-030/module-01/course.md
+  - sections/section-030/module-02/course.md
+  - sections/section-030/module-03/course.md
+- type: lab
+  title: Time and Name Services Capstone Lab
+  path: sections/section-040/capstone/labs/lab-01
+  difficulty: advanced
+  estimated_duration: 20m
+  topic: dns
+  task_kind: build
+  tags:
+  - dig
+  - dns-records
+  - reverse-dns
+  - resolv-conf
+  learning_goals:
+  - Point the system resolver at an internal DNS server
+  - Check A, NS, MX and reverse records with dig, with and without @server
+  resources:
+  - name: dig(1) manual page (Ubuntu 24.04)
+    url: https://manpages.ubuntu.com/manpages/noble/man1/dig.1.html
+  - name: resolv.conf(5) manual page
+    url: https://man7.org/linux/man-pages/man5/resolv.conf.5.html
+  status: retired
+  reason: Repeats the DNS query exercise.
+  replacement: sections/section-040/module-03/labs/lab-01
+  lessons:
+  - sections/section-040/module-01/course.md
+  - sections/section-040/module-02/course.md
+  - sections/section-040/module-03/course.md
+  - sections/section-040/module-04/course.md
+- type: lab
+  title: Connection Recovery and Audit Capstone Lab
+  path: sections/section-060/capstone/labs/lab-01
+  difficulty: advanced
+  estimated_duration: 20m
+  topic: troubleshooting
+  task_kind: troubleshooting
+  tags:
+  - ss
+  - listening-sockets
+  - nftables
+  - tcpdump
+  - curl
+  learning_goals:
+  - Confirm a service is listening on a reachable address with ss
+  - Find and delete the nftables rule that silently drops its port
+  - Prove the service answers end to end with curl
+  resources:
+  - name: ss(8) manual page
+    url: https://man7.org/linux/man-pages/man8/ss.8.html
+  - name: nftables quick reference
+    url: https://wiki.nftables.org/wiki-nftables/index.php/Quick_reference-nftables_in_10_minutes
+  - name: tcpdump(1) manual page
+    url: https://www.tcpdump.org/manpages/tcpdump.1.html
+  status: retired
+  reason: Use the multi-fault troubleshooting capstone after the focused diagnostics labs.
+  replacement: sections/section-060/module-05/labs/lab-01
+  lessons:
+  - sections/section-060/module-01/course.md
+  - sections/section-060/module-02/course.md
+  - sections/section-060/module-03/course.md
+  - sections/section-060/module-04/course.md
+  - sections/section-060/module-05/course.md

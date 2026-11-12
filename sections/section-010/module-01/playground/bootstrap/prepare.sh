@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — Network Interfaces and IPv4 & IPv6 Addressing
 # Runs once when the environment comes up, as a regular user with passwordless
 # sudo (the LFCS base image, like the graded labs). Environment preparation
@@ -47,3 +49,4 @@ echo "[playground]   lo       — loopback (127.0.0.1/8 and ::1/128)"
 echo "[playground] Everything set here is runtime-only and disappears on reboot."
 echo "[playground] Do NOT reconfigure the interface that carries your SSH session."
 echo "[playground] See docs/overview.md for things to try."
+ASTRONA_STUDENT_SCRIPT

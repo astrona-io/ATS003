@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: deliberately blocks tcp/8080 with an nftables rule so the
 # student has a real, reproducible firewall problem to diagnose and fix.
 # This mirrors the lab scenario exactly: the app is listening correctly,
@@ -22,3 +24,4 @@ fi
 # Persist the (broken) ruleset, exactly like a real misconfiguration would
 # survive a reboot until the student fixes and re-persists it.
 sudo nft list ruleset | sudo tee /etc/nftables.conf > /dev/null
+ASTRONA_STUDENT_SCRIPT

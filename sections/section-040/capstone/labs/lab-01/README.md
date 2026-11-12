@@ -1,4 +1,6 @@
 ---
+
+**Legacy exercise.** Repeats the DNS query exercise. The main learning path uses [lab 043](../../../module-03/labs/lab-01/README.md). This ID remains runnable and covered by CI.
 estimated_duration: 20m
 ---
 

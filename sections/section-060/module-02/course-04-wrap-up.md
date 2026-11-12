@@ -23,16 +23,16 @@ This module was about Netplan: the YAML flight manual on Ubuntu, and the clerk t
 **From [Apply Safely And Merge Files](./course-03-apply-and-merge.md):**
 
 - `netplan try` applies the change and reverts after 120 seconds unless you press Enter. `netplan apply` has no undo.
-- Files merge in filename order, key by key. A later file wins only for the keys it sets.
+- Files merge in filename order. Later scalars replace earlier values; sequences such as addresses are combined.
 - `dhcp4: true` with no DHCP (Dynamic Host Configuration Protocol) server leaves the interface in `configuring`.
 
 ## Your missions
 
 | Mission | After the part | What you proved |
 | --- | --- | --- |
-| [Private And Public Address Audit Lab](./labs/lab-01/README.md) | Apply Safely And Merge Files | find the private address on the host's interface and the public address seen after NAT |
+| [Repair merged Netplan configuration](./labs/lab-01/README.md) | Focused practice | Trace an unexpected address to a second Netplan file; Correct the merged configuration and apply it; Verify the sole intended address after reboot |
 
-If you skipped it, go back to it now. It is short, and the exam expects you to read addresses quickly.
+Complete the Netplan repair lab before moving on; compare the merged configuration with the live interface and repeat the checks after reboot.
 
 ## Check yourself
 
@@ -59,7 +59,7 @@ The address has no prefix. Netplan needs it written as `192.168.1.10/24`.
 <details>
 <summary>4. <code>90-lab.yaml</code> sets an address and DNS servers for <code>enp2s0</code>. <code>99-override.yaml</code> sets only a different address. What does the merged result hold?</summary>
 
-The address from `99-override.yaml` and the DNS (Domain Name System) servers from `90-lab.yaml`. Files merge key by key, and the later file wins only for the keys it sets.
+Both addresses, plus the DNS servers from `90-lab.yaml`. Address sequences are combined. Remove the unwanted declaration to keep only one address.
 </details>
 
 <details>

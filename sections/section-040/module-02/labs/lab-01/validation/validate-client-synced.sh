@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Checks the client is actually synced through the internal server:
 # chronyd active, the server is the currently selected (^*) source,
 # Leap status Normal, and stratum one hop above the server (2-15).
@@ -10,11 +14,11 @@ if ! systemctl is-active --quiet chrony 2>/dev/null && ! systemctl is-active --q
   exit 1
 fi
 
-sources="$(chronyc sources 2>/dev/null)"
-selected="$(echo "$sources" | grep -E '^\^\*.*astrona-ats-003-lab-042-server' || true)"
+sources="$(chronyc -n sources 2>/dev/null)"
+selected="$(echo "$sources" | grep -E '^\^\*[[:space:]]+192\.168\.10\.123[[:space:]]' || true)"
 
 if [[ -z "$selected" ]]; then
-  echo "FAIL: client-synced - astrona-ats-003-lab-042-server is not the currently selected (^*) source; got: $sources"
+  echo "FAIL: client-synced - 192.168.10.123 is not the currently selected (^*) source; got: $sources"
   exit 1
 fi
 
@@ -23,9 +27,11 @@ leap="$(echo "$tracking" | awk -F: '/Leap status/ {gsub(/^[ \t]+|[ \t]+$/, "", $
 stratum="$(echo "$tracking" | awk -F: '/^Stratum/ {gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2}')"
 
 if [[ "$leap" == "Normal" ]] && [[ "$stratum" =~ ^[0-9]+$ ]] && (( stratum >= 2 && stratum <= 15 )); then
-  echo "PASS: client-synced - synced via astrona-ats-003-lab-042-server, Leap status Normal, Stratum $stratum"
+  echo "PASS: client-synced - synced via 192.168.10.123, Leap status Normal, Stratum $stratum"
   exit 0
 else
   echo "FAIL: client-synced - Leap status '$leap', Stratum '$stratum' (expected Normal / 2-15, one hop above the server)"
   exit 1
 fi
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

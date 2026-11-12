@@ -118,31 +118,26 @@ An `/etc/hosts` entry only affects the machine that holds the file. Adding `192.
 > - **Testing resolution with `ping`.** `ping` also checks reachability, so a failure does not tell you which part failed. Use `getent hosts <name>` to test resolution on its own.
 > - **Pinning a public name in `/etc/hosts` as a quick fix.** It overrides DNS for that name on this machine, and then goes out of date without warning when the real address changes. Use it only as a deliberate, temporary override.
 
-## Your mission: Local Hostname Name Resolution Lab
+## Practice: Repair local hostname resolution
 
-You can now write an `/etc/hosts` entry and prove it resolves in both directions with `getent`. The mission asks you to add a second IPv4 address and an IPv6 address to the main interface, make them survive a reboot, and give the new address the name `app-srv1` in `/etc/hosts`, so that the name and the address resolve both ways.
+Find the incorrect app-srv1 mapping in /etc/hosts. Repair forward and reverse NSS lookup results. Keep unrelated host mappings intact. This lab starts independently; changes in the playground do not carry over.
 
-The mission runs on its own training ship, so first pause your playground. Nothing in it is lost:
+Pause the playground first:
 
-```sh
+```bash
 astrona stop hostname-resolution-playground
 ```
 
-Then start the mission:
+Read the [task](labs/lab-01/question.md), then start the lab:
 
-```sh
+```bash
 astrona run --git ssh://git@github.com/astrona-io/ATS003.git -c sections/section-010/module-04/labs/lab-01
 ```
 
-Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your own first. When you think you are done, send it for grading:
+Use the inspection commands while working. Submit once all tasks are complete; submission ends the environment.
 
-```sh
-astrona submit -c sections/section-010/module-04/labs/lab-01
-```
+Resume the playground afterwards:
 
-When the mission is done, remove it and wake your playground up again:
-
-```sh
-astrona destroy ats-003-lab-014
+```bash
 astrona start hostname-resolution-playground
 ```

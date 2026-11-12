@@ -1,4 +1,4 @@
-# Question
+# Reverse proxy and load balancing integration
 
 Solve this question on: `terminal`
 
@@ -22,3 +22,17 @@ Their configuration files are `/etc/nginx/conf.d/app-1111.conf` and `/etc/nginx/
 3. **A valid configuration.** `sudo nginx -t` must pass for the whole configuration. The existing apps on `1111` and `2222`, including `/special`, must still serve their original content.
 
 The grader sends real requests with `curl` to ports `1111`, `2222`, `8000` and `8001`, and runs `sudo nginx -t`.
+
+<!-- curriculum-links -->
+## Related lessons and assessment
+
+Read [section-050/module-01](../../../module-01/course.md), [section-050/module-02](../../../module-02/course.md).
+
+The grader checks:
+
+- Confirms `nginx -t` reports the full merged configuration as syntactically valid.
+- Confirms the pre-existing apps on ports 1111 and 2222 (including /special on 2222) still serve their original, unmodified content.
+- Confirms port 8001 reverse-proxies every request through to the 2222 app's /special path.
+- Confirms port 8000 load-balances traffic across both the 1111 and 2222 backends.
+
+Inspect your work before submitting. Submission ends this environment.

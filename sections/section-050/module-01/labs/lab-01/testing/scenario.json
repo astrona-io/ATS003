@@ -1,0 +1,31 @@
+{
+  "initial_failures": {
+    "default/verify-proxy-8001": "FAIL:"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh"
+    }
+  ],
+  "negative": [
+    {
+      "name": "wrong-routing",
+      "apply": [
+        {
+          "script": "testing/wrong-routing.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-proxy-8001": "FAIL:"
+      },
+      "restore": [
+        {
+          "script": "testing/restore-wrong-routing.sh"
+        }
+      ]
+    }
+  ],
+  "reboot": [
+    "default"
+  ]
+}

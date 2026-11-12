@@ -1,4 +1,4 @@
-# Application Proxy and SSH Capstone Lab
+# Reverse proxy and load balancing integration
 
 The capstone mission for this section, with no step-by-step guidance. NGINX must proxy every path on one port to a fixed page of an existing app, and balance requests over two existing apps on another port, while the apps stay untouched.
 

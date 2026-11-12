@@ -49,3 +49,9 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Why this matters
 
 When `ss` says a service listens and the firewall looks fine, but clients still time out, only a capture shows whether the packets arrive and whether anything answers. It is the tool that settles arguments between the other tools, and it is already installed on most servers.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Capture and decode an HTTP conversation](labs/lab-01/question.md): Capture only TCP port 8080 on loopback into a pcap; Identify the handshake, request and successful response; Extract the request path and response token from captured payload.
+- [Network troubleshooting capstone](../module-05/labs/lab-01/question.md): Climb the ladder from link to firewall and find three faults; Repair the link, the name and the firewall rule in order; Prove the service answers end to end with curl.

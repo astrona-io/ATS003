@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Confirms PasswordAuthentication is disabled for everyone except elena,
 # using `sshd -T -C` to read the effective per-connection config sshd would
 # actually apply -- the authoritative way to check Match block resolution.
@@ -29,3 +31,4 @@ if $pass; then
 else
   exit 1
 fi
+ASTRONA_STUDENT_SCRIPT

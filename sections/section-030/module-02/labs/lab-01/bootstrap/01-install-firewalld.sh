@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: firewalld ships in the base LFCS image; this disables the
 # conflicting ufw firewall before it is ever started.
 #
@@ -16,3 +18,4 @@ if command -v ufw >/dev/null 2>&1; then
   fi
   sudo systemctl disable --now ufw.service 2>/dev/null || true
 fi
+ASTRONA_STUDENT_SCRIPT

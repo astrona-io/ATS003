@@ -35,7 +35,7 @@ You proved the skills of this module in a graded mission:
 
 | Mission | After the part | What you proved |
 | --- | --- | --- |
-| [IPv4 & IPv6 Interface Configuration Lab](./labs/lab-01/README.md) | Runtime Changes And Persistent Configuration | add a second IPv4 and an IPv6 address, make them persistent, and name the address in `/etc/hosts` |
+| [IPv4 and IPv6 addressing](./labs/lab-01/README.md) | Focused practice | Add secondary IPv4 and IPv6 addresses without changing management DHCP; Persist the addresses in network configuration; Verify both addresses after a reboot |
 
 If you skipped it, go back to it now. The exam asks for exactly these skills.
 

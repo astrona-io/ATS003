@@ -1,0 +1,31 @@
+{
+  "initial_failures": {
+    "default/verify-hosts-forward": "FAIL: hosts-forward"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh"
+    }
+  ],
+  "negative": [
+    {
+      "name": "wrong-address",
+      "apply": [
+        {
+          "script": "testing/wrong-address.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-hosts-forward": "FAIL: hosts-forward"
+      },
+      "restore": [
+        {
+          "script": "testing/restore-wrong-address.sh"
+        }
+      ]
+    }
+  ],
+  "reboot": [
+    "default"
+  ]
+}

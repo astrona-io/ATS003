@@ -22,3 +22,16 @@ Find the cause and make the service reachable again.
 
 3. **Prove it works.** `curl http://127.0.0.1:8080/` must return a real HTTP
    status (2xx or 3xx) end to end.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-03](../../course.md).
+
+The grader checks:
+
+- Confirms something is listening on TCP port 8080 on a remotely reachable address (via 'ss -tulpn').
+- Confirms the 'tcp dport 8080 drop' rule has been removed from the live nftables ruleset.
+- Confirms the port 8080 web application responds with a real HTTP status code end to end.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

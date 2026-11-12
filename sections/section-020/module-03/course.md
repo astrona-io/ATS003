@@ -52,3 +52,8 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Why this matters
 
 A machine with more than one network is only useful if its traffic leaves by the right door. The exam asks you to add a route, prove which way Linux sends a packet, and make the route survive a reboot. The troubleshooting order in this module also works for almost every "I cannot reach it" problem you will meet.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Multi-Interface Static Routing Lab](labs/lab-01/question.md): Add a static route to a partner subnet through a gateway; Prove the route with ip route get and a real ping; Make the route survive a reboot in on-disk configuration.

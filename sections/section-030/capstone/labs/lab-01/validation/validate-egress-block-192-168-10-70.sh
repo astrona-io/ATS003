@@ -1,21 +1,14 @@
 #!/usr/bin/env bash
-# Checks that outgoing traffic to 192.168.10.70 is dropped in the
-# inet filter output chain (not input, which would be the wrong
-# direction).
-
-set -u
-
-output_chain="$(sudo nft list chain inet filter output 2>/dev/null)"
-
-if [[ -z "$output_chain" ]]; then
-  echo "FAIL: egress-block-192.168.10.70 - table inet filter, chain output does not exist"
-  exit 1
-fi
-
-if echo "$output_chain" | grep -Eq 'ip daddr 192\.168\.10\.70[[:space:]]+drop'; then
-  echo "PASS: egress-block-192.168.10.70 (egress to 192.168.10.70 is dropped in output chain)"
-  exit 0
-else
-  echo "FAIL: egress-block-192.168.10.70 - no 'ip daddr 192.168.10.70 drop' rule found in output chain"
-  exit 1
-fi
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
+set -eu
+fail() { echo "FAIL: $*"; exit 1; }
+[ "$(curl --noproxy '*' -fsS --max-time 3 http://192.168.10.80:9000/)" = egress-listener ] || fail 'egress control listener unavailable'
+status=0
+curl --noproxy '*' -fsS --max-time 2 http://192.168.10.70:9000/ >/dev/null 2>&1 || status=$?
+[ "$status" -eq 28 ] || fail "egress to 192.168.10.70 must be dropped (curl exit $status)"
+echo 'PASS: expected packet behavior observed'
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

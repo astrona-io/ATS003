@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Checks that cadet owns an ed25519 key pair and the private key is private.
 set -u
 
@@ -22,3 +24,4 @@ fi
 
 echo "PASS: key-pair (ed25519 key pair, private key mode ${mode})"
 exit 0
+ASTRONA_STUDENT_SCRIPT

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: deploys the two pre-existing, off-limits apps that the lab's
 # scenario refers to as running on web-srv1 (192.168.10.60) ports 1111 and
 # 2222. These represent another team's already-live services — the lab
@@ -10,6 +12,15 @@
 # be verified by content, not just HTTP status code.
 
 set -eu
+
+missing=()
+for package in nginx; do
+  dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed' || missing+=("$package")
+done
+if [ "${#missing[@]}" -gt 0 ]; then
+  sudo apt-get update -y
+  sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+fi
 
 sudo tee /etc/nginx/conf.d/app-1111.conf > /dev/null <<'EOF'
 # Pre-existing production app on port 1111.
@@ -46,3 +57,4 @@ EOF
 
 sudo nginx -t
 sudo systemctl reload nginx
+ASTRONA_STUDENT_SCRIPT

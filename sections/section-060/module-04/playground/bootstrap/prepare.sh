@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — Raw Packet Capturing (tcpdump)
 # Runs once at startup, as a regular user with passwordless sudo (the LFCS
 # base image, like the graded labs). tcpdump, curl, python3, socat, and
@@ -66,3 +68,4 @@ echo "[playground]   UDP   datagram to 127.0.0.1:9999   -> ICMP port-unreachable
 echo "[playground] Sample capture: /usr/local/share/lab-sample.pcap  (tcpdump -r it)"
 echo "[playground] Start here:  sudo tcpdump -i lo -n -c 10"
 echo "[playground] See docs/overview.md."
+ASTRONA_STUDENT_SCRIPT

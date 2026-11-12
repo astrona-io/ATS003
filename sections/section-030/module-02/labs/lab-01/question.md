@@ -30,3 +30,20 @@ The checker also confirms the starting state is still in place:
 - `firewalld` stays running and enabled.
 - The default zone stays `public`.
 - The primary interface stays bound to the `public` zone.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-02](../../course.md).
+
+The grader checks:
+
+- Confirms firewalld is enabled and running.
+- Confirms the default zone is public.
+- Confirms the primary (default-route) interface is bound to the public zone.
+- Confirms https is allowed in the public zone's runtime configuration.
+- Confirms https is allowed in the public zone's permanent configuration.
+- Confirms 8443/tcp is allowed in the public zone's runtime configuration.
+- Confirms 8443/tcp is allowed in the public zone's permanent configuration.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

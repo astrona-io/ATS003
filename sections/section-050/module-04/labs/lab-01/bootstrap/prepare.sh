@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: creates the users cadet and pilot, a throwaway sshd on
 # 127.0.0.1:2222 and a loopback-only web service on 127.0.0.1:8081. The real
 # sshd on port 22 that carries the astrona session is not touched.
@@ -59,3 +61,4 @@ UNIT
 
 sudo systemctl daemon-reload
 sudo systemctl enable --now sshd-station.service station-data.service
+ASTRONA_STUDENT_SCRIPT

@@ -17,7 +17,7 @@ This module was about NetworkManager: the communications officer that keeps netw
 
 - `nmcli connection add` with `ipv4.method manual` and `ipv4.addresses` creates a static profile. `con-name` is the profile's name, `ifname` the interface.
 - Creating a profile does not apply it; `nmcli connection up` does.
-- Profiles are saved as keyfiles in `/etc/NetworkManager/system-connections/<con-name>.nmconnection`, root-only with mode `600`.
+- Profiles may be stored as root-only keyfiles in `/etc/NetworkManager/system-connections/`. On this Ubuntu image, NetworkManager can persist them through Netplan YAML instead.
 - After a hand edit of a keyfile, run `sudo nmcli connection reload`.
 
 **From [Change, Reactivate And Keep A Profile](./course-03-change-and-reactivate.md):**
@@ -25,16 +25,16 @@ This module was about NetworkManager: the communications officer that keeps netw
 - `nmcli connection modify` changes only the saved profile. The interface changes on the next `nmcli connection up` or `nmcli device reapply`.
 - `+` adds to a list, `-` removes from it, and a plain setting replaces the whole list.
 - `ipv4.method auto` needs a DHCP (Dynamic Host Configuration Protocol) server. With none, activation fails with `IP configuration could not be reserved`.
-- `connection.autoconnect yes` brings a profile back at boot and often right after a `down`; `nmcli device disconnect` is the stronger stop.
+- `connection.autoconnect yes` permits activation at boot. A manual `connection down` blocks automatic reactivation of that profile until it is explicitly activated or the relevant state resets.
 - An `unmanaged` device is owned by another tool or excluded by a rule such as `unmanaged-devices=` in `/etc/NetworkManager/conf.d/`.
 
 ## Your missions
 
 | Mission | After the part | What you proved |
 | --- | --- | --- |
-| [Private And Public Address Audit Lab](./labs/lab-01/README.md) | Change, Reactivate And Keep A Profile | find the private address on the host's interface and the public address seen after NAT |
+| [Repair a persistent NetworkManager profile](./labs/lab-01/README.md) | Focused practice | Diagnose the saved and active settings of lab-static; Correct its address and enable autoconnect; Reactivate the profile and verify it after reboot |
 
-If you skipped it, go back to it now. It is short, and the exam expects you to read addresses quickly.
+Complete the profile-repair lab before moving on; it checks both persistent configuration and live behavior.
 
 ## Check yourself
 
@@ -55,13 +55,13 @@ No. `ip` changes live only in the running kernel. To keep an address, put it in 
 <details>
 <summary>3. Where does NetworkManager save a profile called <code>lab-static</code>?</summary>
 
-In `/etc/NetworkManager/system-connections/lab-static.nmconnection`, an INI-style keyfile that only root can read.
+With the keyfile backend, look in `/etc/NetworkManager/system-connections/`. On this Ubuntu image, inspect `/etc/netplan/` as well: NetworkManager can persist the profile through Netplan. Use `nmcli connection show lab-static` to inspect its settings regardless of the storage backend.
 </details>
 
 <details>
-<summary>4. You ran <code>nmcli connection down lab-static</code>, and two seconds later it is active again. What happened?</summary>
+<summary>4. Does <code>nmcli connection down lab-static</code> followed by a short wait prove autoconnect works at boot?</summary>
 
-`connection.autoconnect` is `yes`, so NetworkManager brought it straight back. Set autoconnect to `no`, or use `nmcli device disconnect` on the device.
+No. A manual down blocks automatic reactivation of that profile. Inspect the saved autoconnect setting, activate the profile explicitly, reboot, and check the live address and active profile again.
 </details>
 
 <details>

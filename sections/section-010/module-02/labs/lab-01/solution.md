@@ -91,7 +91,7 @@ sudo hostnamectl set-hostname "Web Server 1 (Frankfurt)" --pretty
 Confirm it is exactly right:
 
 ```bash
-hostnamectl status --pretty
+hostnamectl --pretty
 ```
 
 The output must be exactly `Web Server 1 (Frankfurt)`: the same capital

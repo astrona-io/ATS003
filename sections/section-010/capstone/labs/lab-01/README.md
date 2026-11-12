@@ -1,4 +1,4 @@
----
+# Addressing and local resolution integration
 estimated_duration: 30m
 ---
 

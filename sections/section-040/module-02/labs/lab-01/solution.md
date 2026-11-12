@@ -5,10 +5,10 @@ Two machines, one job each: turn `server` into an NTP (Network Time Protocol) se
 | Machine | Change | File |
 | --- | --- | --- |
 | `server` | add `allow 192.168.10.0/24` | `/etc/chrony/chrony.conf` |
-| `client` | replace public sources with `server astrona-ats-003-lab-042-server iburst` | `/etc/chrony/chrony.conf` |
+| `client` | replace public sources with `server 192.168.10.123 iburst` | `/etc/chrony/chrony.conf` |
 | both | `sudo systemctl restart chrony` after editing | — |
 
-If `astrona list` on the host shows the server machine under a different name, use that name in place of `astrona-ats-003-lab-042-server` below.
+The private network assigns `192.168.10.123` to `server` and `192.168.10.10` to `client`. Keep the management interface unchanged.
 
 ## The feedback loop
 
@@ -29,7 +29,7 @@ FAIL  client-points-at-server
 FAIL  client-synced-via-server
 ```
 
-Run it after each step.
+Run the inspection commands after each step. Submit once at the end; submission destroys the environment.
 
 ---
 
@@ -80,7 +80,7 @@ sudo nano /etc/chrony/chrony.conf
 Comment out (`#`) every existing `pool ` and `server ` line, then add one line:
 
 ```text
-server astrona-ats-003-lab-042-server iburst
+server 192.168.10.123 iburst
 ```
 
 Save and exit, then apply it:
@@ -102,7 +102,7 @@ chronyc sources -v
 chronyc tracking
 ```
 
-In `chronyc sources`, the line for `astrona-ats-003-lab-042-server` should start with `^*` (the caret means a server source, the star means selected). `chronyc tracking` should show `Leap status : Normal` and a `Stratum` value one higher than the server's. If it is still `^?` or `^~`, wait and check again, or give it a nudge: `sudo chronyc burst 4/4`, then `chronyc sources` again.
+In `chronyc sources`, the line for `192.168.10.123` should start with `^*` (the caret means a server source, the star means selected). `chronyc tracking` should show `Leap status : Normal` and a `Stratum` value one higher than the server's. If it is still `^?` or `^~`, wait and check again, or give it a nudge: `sudo chronyc burst 4/4`, then `chronyc sources` again.
 
 **Run the check.** `client-synced-via-server` now passes. All six are green.
 
@@ -120,5 +120,9 @@ astrona submit --git git@github.com:astrona-io/ATS003.git -c sections/section-04
 
 - **`allow-directive` fails.** The line must be exactly `allow 192.168.10.0/24` and not commented out. Check the spacing and the `#`.
 - **`listening-udp123` fails.** chrony was not restarted after you added `allow`, or `allow` is missing. Run `sudo systemctl restart chrony`.
-- **`client-points-at-server` fails.** A public `pool` or `server` line is still active in the client's configuration file. Comment out *every* one; only the `server astrona-ats-003-lab-042-server` line stays.
+- **`client-points-at-server` fails.** A public `pool` or `server` line is still active in the client's configuration file. Comment out *every* one; only the `server 192.168.10.123` line stays.
 - **`client-synced-via-server` fails.** Give it more time, or run `sudo chronyc burst 4/4` on the client. Also confirm that `chronyc tracking` on `server` already shows `Normal`: a server that is not itself synced cannot sync the client.
+
+## The isolated training clock
+
+The server starts with `local stratum 10`. This lets the private network exercise run without depending on public NTP traffic. It demonstrates client/server synchronization, but does not establish accurate UTC time. In production, configure reliable upstream sources instead of treating a local clock as authoritative. The client should select `192.168.10.123` and report stratum 11.

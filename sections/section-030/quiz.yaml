@@ -240,3 +240,31 @@ questions:
         explanation: "It reads its own zone and service files."
     correct_option: a
     explanation: "Change firewalld settings with `firewall-cmd`. Hand-written nft rules are a separate layer and can conflict."
+
+  - id: ats003-030-nat-return
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: Explain how masquerade supplies the return path
+    source_readings:
+    - sections/section-030/module-03/course-01-forward-filter-and-translate.md
+    prompt: "The router permits forwarded TCP traffic to port 8080. The server has no route to the\
+      \ client subnet, and its response must identify the router\u2019s outside address as the peer.\
+      \ Which additional router rule satisfies both requirements?"
+    options:
+    - id: a
+      text: DNAT the destination to the server in prerouting.
+      explanation: The destination is already the server; this does not replace the client source address.
+    - id: b
+      text: Masquerade matching traffic as it leaves the outside interface.
+      explanation: Masquerade uses the outgoing interface address and connection tracking handles the
+        reply translation.
+    - id: c
+      text: Accept port 8080 in the input chain.
+      explanation: The router is forwarding the request rather than receiving it as a local service.
+    - id: d
+      text: Redirect port 8080 to a local router port.
+      explanation: Redirect sends the request to the router instead of the intended server.
+    correct_option: b
+    explanation: "Masquerade changes the source to the router\u2019s outside address, so the server\
+      \ can return traffic without a route to the client subnet. Forward filtering remains a separate\
+      \ requirement."

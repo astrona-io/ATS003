@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: sets the pre-hardening sshd_config baseline the scenario expects
 # the trainee to change (password auth and X11 forwarding both enabled, no
 # Match blocks yet). This never touches PubkeyAuthentication or any other
@@ -9,6 +11,15 @@
 # running this lab.
 
 set -eu
+
+missing=()
+for package in sshpass; do
+  dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed' || missing+=("$package")
+done
+if [ "${#missing[@]}" -gt 0 ]; then
+  sudo apt-get update -y
+  sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+fi
 
 CONFIG=/etc/ssh/sshd_config
 
@@ -36,3 +47,4 @@ if [[ -d "${HOME}/.ssh" ]]; then
   chmod 700 "${HOME}/.ssh"
   [[ -f "${HOME}/.ssh/authorized_keys" ]] && chmod 600 "${HOME}/.ssh/authorized_keys"
 fi
+ASTRONA_STUDENT_SCRIPT

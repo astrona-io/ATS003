@@ -58,31 +58,57 @@ Two members into the *same* switch survive a cable or port fault, but not a fail
 > - **Configuring one interface in two systems.** Netplan and a separate NetworkManager profile for the same interface fight each other. Pick one.
 > - **Both members into one switch and calling it redundant.** That covers a port or cable fault, not a switch failure or a broken path beyond it.
 
-## Your mission: Link Aggregation (Bonding) Lab
+## Declare the practice topology in Netplan
 
-You can now build an active-backup bond, read its state from the kernel, and explain why it needs persistent configuration. Now prove it in a graded mission: on three practice antennas (`dummy0`, `dummy1`, `dummy2`) you build an active-backup bond, plus a bridge called `br0` built the same way with `type bridge`, and declare both in on-disk configuration so they survive a reboot.
+In the independent lab, the dummy interfaces already exist and are recreated at boot. Save the following as `/etc/netplan/99-lab.yaml`; it adds only the practice topology and leaves the management interface configuration in place.
 
-The mission runs on its own training ship, so first pause your playground. Nothing in it is lost:
+```yaml
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    dummy1: {}
+    dummy2: {}
+  bonds:
+    bond0:
+      interfaces:
+      - dummy1
+      - dummy2
+      parameters:
+        mode: active-backup
+```
 
-```sh
+The `interfaces` list attaches the supplied members. `mode: active-backup` selects one active bond member. Validate the file, apply it, then check kernel state:
+
+```bash
+sudo chmod 600 /etc/netplan/99-lab.yaml
+sudo netplan generate
+sudo netplan apply
+cat /proc/net/bonding/bond0
+```
+
+A saved declaration alone does not prove persistence. Reboot the lab VM, reconnect and repeat the live checks.
+
+## Practice: Build a persistent active-backup bond
+
+Create bond0 using only the supplied practice interfaces. Check active-backup mode and the active member. Persist bond0 in Netplan and verify it after reboot. This lab starts independently; changes in the playground do not carry over.
+
+Pause the playground first:
+
+```bash
 astrona stop linux-bonding-playground
 ```
 
-Then start the mission:
+Read the [task](labs/lab-01/question.md), then start the lab:
 
-```sh
+```bash
 astrona run --git ssh://git@github.com/astrona-io/ATS003.git -c sections/section-020/module-01/labs/lab-01
 ```
 
-Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your own first. When you think you are done, send it for grading:
+Use the inspection commands while working. Submit once all tasks are complete; submission ends the environment.
 
-```sh
-astrona submit -c sections/section-020/module-01/labs/lab-01
-```
+Resume the playground afterwards:
 
-When the mission is done, remove it and wake your playground up again:
-
-```sh
-astrona destroy ats-003-lab-021
+```bash
 astrona start linux-bonding-playground
 ```

@@ -1,0 +1,61 @@
+{
+  "initial_failures": {
+    "default/verify-capture": "http.pcap is missing",
+    "default/verify-evidence": "request-path"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh"
+    }
+  ],
+  "negative": [
+    {
+      "name": "text-instead-of-pcap",
+      "apply": [
+        {
+          "script": "testing/text-instead-of-pcap.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-capture": "not a readable packet capture"
+      },
+      "restore": [
+        {
+          "script": "testing/restore-text-instead-of-pcap.sh"
+        }
+      ]
+    },
+    {
+      "name": "empty-filter",
+      "apply": [
+        {
+          "script": "testing/empty-filter.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-capture": "missing a TCP handshake"
+      },
+      "restore": [
+        {
+          "script": "testing/restore-empty-filter.sh"
+        }
+      ]
+    },
+    {
+      "name": "wrong-response",
+      "apply": [
+        {
+          "script": "testing/wrong-response.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-evidence": "differs from the server response"
+      },
+      "restore": [
+        {
+          "script": "testing/restore-wrong-response.sh"
+        }
+      ]
+    }
+  ]
+}

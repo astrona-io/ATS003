@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Per-VM OS prep for the ntp-server VM — PLAYGROUND (NTP Client Time Sync)
 # Turns this VM into a self-contained NTP server for the 192.168.100.0/24
 # segment: it serves its own clock at stratum 8 (no upstream needed) and allows
@@ -27,3 +29,4 @@ sudo systemctl restart chrony 2>/dev/null || sudo systemctl restart chronyd 2>/d
 
 echo "[playground] ntp-server: chrony restarted. Serving on 192.168.100.10:123."
 sudo chronyc tracking 2>/dev/null || true
+ASTRONA_STUDENT_SCRIPT

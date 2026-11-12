@@ -1,5 +1,7 @@
 # Connection Recovery and Audit Capstone Lab
 
+**Legacy exercise.** Use the multi-fault troubleshooting capstone after the focused diagnostics labs. The main learning path uses [lab 065](../../../module-05/labs/lab-01/README.md). This ID remains runnable and covered by CI.
+
 The section 060 capstone: one graded task with no step-by-step guidance. It runs on one Ubuntu 24.04 virtual machine. The web application `myapp` listens on port 8080, but an nftables rule silently drops its traffic. You confirm the listener with `ss`, remove the rule, and prove the application answers with `curl`.
 
 ## Start the lab

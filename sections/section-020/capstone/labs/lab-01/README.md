@@ -1,5 +1,7 @@
 # Aggregation and Routing Capstone Lab
 
+**Legacy exercise.** Repeats the static routing exercise. The main learning path uses [lab 023](../../../module-03/labs/lab-01/README.md). This ID remains runnable and covered by CI.
+
 The section capstone: one static routing task on two training ships, `target` and `gateway`, with no step-by-step help. Add the route, prove it, and make it survive a reboot.
 
 ## Start the mission

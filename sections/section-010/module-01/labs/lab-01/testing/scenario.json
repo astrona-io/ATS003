@@ -1,0 +1,31 @@
+{
+  "initial_failures": {
+    "default/verify-secondary-ipv4": "FAIL: secondary"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh"
+    }
+  ],
+  "negative": [
+    {
+      "name": "missing-address",
+      "apply": [
+        {
+          "script": "testing/missing-address.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-secondary-ipv4": "FAIL: secondary"
+      },
+      "restore": [
+        {
+          "script": "testing/restore-missing-address.sh"
+        }
+      ]
+    }
+  ],
+  "reboot": [
+    "default"
+  ]
+}

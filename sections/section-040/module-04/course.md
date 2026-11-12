@@ -51,3 +51,8 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Why this matters
 
 "The network is down" is very often "the name does not resolve". The exam expects you to know which file or service decides, and to fix a resolver so that the change survives a restart.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [DNS Client Resolution Lab](labs/lab-01/question.md): Teach systemd-resolved a DNS server and a search domain with a drop-in; Resolve a short name through a search domain; Override one name in /etc/hosts while DNS keeps its own answer.

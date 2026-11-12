@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # Bootstrap: turns this VM into the partner-subnet gateway for the
 # static-routing lab. Enables IP forwarding persistently and creates a
 # dummy0 interface addressed 10.10.30.1/24, standing in for the
@@ -49,3 +51,4 @@ EOF
 
 sudo systemctl daemon-reload
 sudo systemctl enable --now gateway-dummy.service > /dev/null
+ASTRONA_STUDENT_SCRIPT

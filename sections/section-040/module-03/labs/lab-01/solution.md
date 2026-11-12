@@ -45,7 +45,7 @@ If it already has a `nameserver` line with a real address (not `127.0.0.53`), no
 If not, ask the client's own name lookup for the `dns` machine's lab name. This is the same lookup the grader uses:
 
 ```bash
-getent hosts astrona-ats-003-lab-043-dns
+getent hosts 192.168.10.53
 ```
 
 The first column of the line it prints is the address. You can also read the address of the `dns` machine from the **host terminal**:
@@ -120,5 +120,5 @@ astrona submit --git git@github.com:astrona-io/ATS003.git -c sections/section-04
 ## If a check stays red
 
 - **`system-resolver-a-record` fails, answer empty.** `/etc/resolv.conf` is not pointing at the `dns` machine, or `systemd-resolved` wrote over it again. Remove the file again and save it as a plain file. If it keeps changing back, run `sudo systemctl stop systemd-resolved` first.
-- **`direct-server-a-record` fails but the system one passes.** The grader looks up `astrona-ats-003-lab-043-dns` to find the server. Check that `getent hosts astrona-ats-003-lab-043-dns` prints an address, and that `ping <dns-ip>` gets replies.
+- **`direct-server-a-record` fails but the system one passes.** The grader looks up `192.168.10.53` to find the server. Check that `getent hosts 192.168.10.53` prints an address, and that `ping <dns-ip>` gets replies.
 - **`ns-record`, `mx-record` or `ptr-record` does not match.** Compare character for character, including the trailing `.`. Query the server directly with `@<dns-ip>` to rule out an old cached answer.

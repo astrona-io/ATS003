@@ -68,31 +68,26 @@ A grader that checks persistence does not reboot the machine. It looks for your 
 > - **Changing the management interface.** Adding, removing or switching off addresses on the interface that carries your SSH session can cut you off. Add next to its address; never replace it.
 > - **Letting two systems manage one interface.** NetworkManager and Netplan (or `systemd-networkd`) both configuring the same interface give results that are hard to predict.
 
-## Your mission: IPv4 & IPv6 Interface Configuration Lab
+## Practice: IPv4 and IPv6 addressing
 
-You can now read interfaces and addresses, add an address at runtime, and say what makes it permanent. The mission asks you to add a second IPv4 address and an IPv6 address next to the management address, make both survive a reboot, and give the new address a name in `/etc/hosts`.
+Add secondary IPv4 and IPv6 addresses without changing management DHCP. Persist the addresses in network configuration. Verify both addresses after a reboot. This lab starts independently; changes in the playground do not carry over.
 
-The mission runs on its own training ship, so first pause your playground. Nothing in it is lost:
+Pause the playground first:
 
-```sh
+```bash
 astrona stop network-interfaces-playground
 ```
 
-Then start the mission:
+Read the [task](labs/lab-01/question.md), then start the lab:
 
-```sh
+```bash
 astrona run --git ssh://git@github.com/astrona-io/ATS003.git -c sections/section-010/module-01/labs/lab-01
 ```
 
-Read the task in [`question.md`](./labs/lab-01/question.md) and solve it on your own first. When you think you are done, send it for grading:
+Use the inspection commands while working. Submit once all tasks are complete; submission ends the environment.
 
-```sh
-astrona submit -c sections/section-010/module-01/labs/lab-01
-```
+Resume the playground afterwards:
 
-When the mission is done, remove it and wake your playground up again:
-
-```sh
-astrona destroy ats-003-lab-011
+```bash
 astrona start network-interfaces-playground
 ```

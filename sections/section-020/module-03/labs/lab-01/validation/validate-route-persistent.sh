@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
+# Inspect protected state; user access checks select their target account explicitly.
+sudo -n bash <<'GRADER_ROOT'
 # Checks that the route to 10.10.30.0/24 via 10.10.20.1 is declared in a
 # persistent network config -- Netplan, systemd-networkd, NetworkManager,
 # or a legacy route-* script -- not just added live with `ip route add`.
@@ -58,3 +62,5 @@ else
   echo "FAIL: persistent-route - no Netplan/systemd-networkd/NetworkManager/legacy config declares a route to $dest via $gw"
   exit 1
 fi
+GRADER_ROOT
+ASTRONA_STUDENT_SCRIPT

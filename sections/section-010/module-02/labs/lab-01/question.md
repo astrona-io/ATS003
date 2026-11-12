@@ -17,3 +17,17 @@ Astronaut, this machine was built from a base image and still carries the generi
    ```
 
 3. **Local resolution.** Update `/etc/hosts` so the `127.0.1.1` line points at `web-srv1` instead of the old `ubuntu-2404-base` name.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-02](../../course.md).
+
+The grader checks:
+
+- Confirms /etc/hostname (the persisted static hostname) equals web-srv1.
+- Confirms the live `hostname` command reports web-srv1, proving the rename is active now, not just pending a reboot.
+- Confirms hostnamectl's pretty hostname equals 'Web Server 1 (Frankfurt)'.
+- Confirms /etc/hosts's 127.0.1.1 line was updated to reference web-srv1.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

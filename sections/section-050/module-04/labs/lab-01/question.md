@@ -19,3 +19,17 @@ Open the visitor's shell with `sudo -iu cadet`. Do tasks 1 to 4 as `cadet`.
 4. **Open a tunnel.** Keep a background `ssh` process running that forwards local port `9090` to `127.0.0.1:8081` on the station. `curl http://127.0.0.1:9090/` must return the web page.
 
 The grader checks the key files, the `authorized_keys` file of `pilot`, `ssh -G station`, a real batch-mode login as `cadet`, and the tunnel with `ss` and `curl`.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-04](../../course.md).
+
+The grader checks:
+
+- Confirms cadet owns an ed25519 key pair with a private key readable only by cadet.
+- Confirms the public key of cadet is in the authorized_keys file of pilot.
+- Confirms 'ssh -G station' resolves to pilot@localhost port 2222 and a batch-mode login as cadet works.
+- Confirms an ssh process listens on 127.0.0.1:9090 and the web service answers through it.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

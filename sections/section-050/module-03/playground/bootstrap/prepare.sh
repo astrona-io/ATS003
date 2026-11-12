@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Match the account used by astrona ssh, including its home and permissions.
+sudo -H -u student bash <<'ASTRONA_STUDENT_SCRIPT'
 # OS prep for PLAYGROUND — OpenSSH Server Hardening
 # Runs once at startup, as a regular user with passwordless sudo (the LFCS
 # base image, like the graded labs). openssh-server, openssh-client, and
@@ -8,6 +10,15 @@
 # test users. All experiments target :2222; the astrona SSH session on :22 is
 # never touched. Nothing here is a graded outcome.
 set -euo pipefail
+
+missing=()
+for package in sshpass; do
+  dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed' || missing+=("$package")
+done
+if [ "${#missing[@]}" -gt 0 ]; then
+  sudo apt-get update -y
+  sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing[@]}"
+fi
 
 echo "[playground] ssh-hardening-playground: preparing second sshd on :2222..."
 
@@ -95,3 +106,4 @@ echo "[playground] 'sudo systemctl reload sshd-test', then test:"
 echo "[playground]   ssh -p 2222 alice@localhost"
 echo "[playground] Do NOT edit /etc/ssh/sshd_config or touch ssh.service on :22 —"
 echo "[playground] that carries your astrona session. See docs/overview.md."
+ASTRONA_STUDENT_SCRIPT

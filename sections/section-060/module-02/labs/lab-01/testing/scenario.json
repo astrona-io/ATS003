@@ -1,0 +1,48 @@
+{
+  "initial_failures": {
+    "default/verify-merged": "FAIL: merged config",
+    "default/verify-live": "FAIL: live"
+  },
+  "solution": [
+    {
+      "script": "testing/solution.sh"
+    }
+  ],
+  "negative": [
+    {
+      "name": "runtime-only",
+      "apply": [
+        {
+          "script": "testing/runtime-only.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-merged": "FAIL: merged config"
+      },
+      "restore": [
+        {
+          "script": "testing/restore-runtime-only.sh"
+        }
+      ]
+    },
+    {
+      "name": "saved-only",
+      "apply": [
+        {
+          "script": "testing/saved-only.sh"
+        }
+      ],
+      "failures": {
+        "default/verify-live": "FAIL: live"
+      },
+      "restore": [
+        {
+          "script": "testing/restore-saved-only.sh"
+        }
+      ]
+    }
+  ],
+  "reboot": [
+    "default"
+  ]
+}

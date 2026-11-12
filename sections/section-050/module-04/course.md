@@ -50,3 +50,8 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Why this matters
 
 Almost every administrator task on a remote ship starts with `ssh`. The exam expects key-based login, a working `~/.ssh/config` and at least one tunnel, and it expects you to leave the account in a state that still works after a reboot.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [OpenSSH Client Lab](labs/lab-01/question.md): Create a key pair and install the public key for key login; Write a host alias in the client configuration file; Open a local port forward through an SSH server.

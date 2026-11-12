@@ -22,4 +22,20 @@ On `client`:
    | `dig +short internal.example.com MX` | `10 mail.internal.example.com.` |
    | `dig -x 192.168.10.80 +short` | `data-001.internal.example.com.` |
 
-   `<dns-ip>` is the address of the `dns` machine on the lab network. The check finds it by looking up the name `astrona-ats-003-lab-043-dns`.
+   `<dns-ip>` is the address of the `dns` machine on the lab network. The private network assigns it `192.168.10.53`; the client uses `192.168.10.10`. Bootstrap leaves the client resolver unchanged so configuring it is your task.
+<!-- curriculum-links -->
+
+## Related lessons and assessment
+
+Read [module-03](../../course.md).
+
+The grader checks:
+
+- Confirms the client's default resolver (dig, no @server) returns 192.168.10.80 for data-001.internal.example.com.
+- Confirms a direct query to the dns VM's real address returns the same A record as the system resolver.
+- Confirms internal.example.com's NS record is ns1.internal.example.com.
+- Confirms internal.example.com's MX record is priority 10, mail.internal.example.com.
+- Confirms the reverse (PTR) lookup for 192.168.10.80 resolves to data-001.internal.example.com.
+- Confirms bind9 is actually running and the zones loaded cleanly on the dns VM.
+
+Use the inspection commands in the solution to check your work. Submit when you have finished; submission ends this environment.

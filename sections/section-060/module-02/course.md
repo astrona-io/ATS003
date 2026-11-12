@@ -44,3 +44,9 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Why this matters
 
 On Ubuntu, Netplan is the layer that decides what the network looks like after every boot. A wrong indent or a careless `netplan apply` on a remote server can cut you off with no way back. Learning to check with `netplan get` and apply with `netplan try` keeps you in control.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Repair merged Netplan configuration](labs/lab-01/question.md): Trace an unexpected address to a second Netplan file; Correct the merged configuration and apply it; Verify the sole intended address after reboot.
+- [Network troubleshooting capstone](../module-05/labs/lab-01/question.md): Climb the ladder from link to firewall and find three faults; Repair the link, the name and the firewall rule in order; Prove the service answers end to end with curl.

@@ -67,3 +67,9 @@ Launch your playground now, and keep it running next to you while you read the p
 Interfaces and addresses are the base that all other Linux networking stands on. Routing picks which interface a signal leaves by, using the addresses and prefixes set here. Name resolution (DNS) hands back the same kind of address you put on an interface. Every service that listens on a port binds to one of these addresses, or to all of them at once.
 
 So when a problem later shows up as "the service is unreachable", your first questions come from this module. Is the interface up? Does it have an address? Is there a route?
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [IPv4 and IPv6 addressing](labs/lab-01/question.md): Add secondary IPv4 and IPv6 addresses without changing management DHCP; Persist the addresses in network configuration; Verify both addresses after a reboot.
+- [Addressing and local resolution integration](../capstone/labs/lab-01/question.md): Add a secondary IPv4 and a static IPv6 address beside the management address; Make both addresses survive a reboot in Netplan or NetworkManager configuration; Map the host name app-srv1 to its new address in /etc/hosts, forward and reverse.

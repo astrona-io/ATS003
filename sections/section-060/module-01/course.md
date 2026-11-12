@@ -48,3 +48,9 @@ Launch your playground now, and keep it running next to you while you read the p
 ## Why this matters
 
 The exam often asks for a network setting that is still there after a reboot. A setting made only with `ip` passes a quick look and then fails the moment the machine restarts. Knowing how to write a profile, activate it and prove it is on disk is what turns a working change into a lasting one.
+
+<!-- curriculum-practice -->
+## Practice and assessment
+
+- [Repair a persistent NetworkManager profile](labs/lab-01/question.md): Diagnose the saved and active settings of lab-static; Correct its address and enable autoconnect; Reactivate the profile and verify it after reboot.
+- [Network troubleshooting capstone](../module-05/labs/lab-01/question.md): Climb the ladder from link to firewall and find three faults; Repair the link, the name and the firewall rule in order; Prove the service answers end to end with curl.
