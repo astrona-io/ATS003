@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="https://astrona.io/courses/linux-foundation-certified-sysadmin-lfcs">
+    <img src="https://astrona.io/courses/linux-foundation-certified-sysadmin-lfcs/domains/ATS003.svg" alt="ATS003: Networking, part of the Linux Foundation Certified System Administrator course on Astrona" width="100%">
+  </a>
+</p>
+
 # Linux Foundation Certified System Administrator (LFCS)
 
 [![Liberapay](https://img.shields.io/badge/Liberapay-Support_Astrona.io-F6C915?logo=liberapay&logoColor=black&style=for-the-badge)](https://liberapay.com/Astrona.io)
